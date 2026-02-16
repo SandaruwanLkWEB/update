@@ -1,0 +1,553 @@
+<!doctype html>
+<html lang="si">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="theme-color" content="#E11D48" />
+  <title>Transport Authority Dashboard - Transport Management</title>
+  <link rel="stylesheet" href="assets/styles.css" />
+  <script src="assets/config.js"></script>
+  <script src="assets/app.js"></script>
+</head>
+<body>
+
+<!-- Glassmorphic Header -->
+<header>
+  <h1>🚗 Transport Authority Panel</h1>
+  <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+    <a href="index.html" class="btn ghost small">🏠 මුල් පිටුව</a>
+    <a href="profile.html" class="btn ghost small">👤 Profile</a>
+    <button class="btn ghost small" onclick="toggleTheme()">🌓 Theme</button>
+    <button class="btn secondary small" onclick="logout()">ඉවත් වන්න</button>
+  </div>
+</header>
+
+<main class="container">
+  <!-- User Info Card -->
+  <div class="card elevated" id="meBox" style="margin-bottom:16px; padding:12px 18px;">
+    <span style="color: var(--muted);">Loading...</span>
+  </div>
+
+  <!-- Tab Navigation -->
+  <div class="card" style="margin-bottom:14px;">
+    <div class="tabs">
+      <button class="btn active" id="tabVehicles" onclick="setTab('vehicles')">🚌 වාහන</button>
+      <button class="btn" id="tabAssign" onclick="setTab('assign')">📋 අනයුක්තිය</button>
+      <button class="btn" id="tabReports" onclick="setTab('reports')">📊 වාර්තා</button>
+    </div>
+  </div>
+
+  <!-- වාහන -->
+  <div class="card soft" id="pane_vehicles">
+    <h2 class="h2">🚌 Vehicle Management</h2>
+    <hr/>
+
+    <div class="grid two" style="margin-top:14px;">
+      <div>
+        <label>Vehicle No (UNIQUE)</label>
+        <input id="vNo" placeholder="NC-1234" />
+      </div>
+      <div>
+        <label>Type</label>
+        <select id="vType">
+          <option value="VAN">VAN</option>
+          <option value="BUS">BUS</option>
+          <option value="TUKTUK">TUKTUK</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="grid two" style="margin-top:12px;">
+      <div>
+        <label>Capacity</label>
+        <input id="vCap" type="number" min="1" placeholder="12" />
+      </div>
+      <div>
+        <label>Owner Name</label>
+        <input id="vOwner" placeholder="Owner name" />
+      </div>
+    </div>
+
+    <div class="card" style="background:#fff; border:1px solid var(--border); margin-top:14px;">
+      <div class="mini" style="margin-bottom:8px; font-weight:600;">🛣️ රූට් this vehicle can serve</div>
+      <div id="routeChecks" class="small"></div>
+    </div>
+
+    <div class="btnrow" style="margin-top:14px;">
+      <button class="btn btn-primary" onclick="saveVehicle()">💾 Save Vehicle</button>
+      <button class="btn ghost" onclick="clearVehicleForm()">🔄 Clear</button>
+      <button class="btn ghost" onclick="loadVehicles()">🔃 Refresh</button>
+    </div>
+
+    <hr style="margin:20px 0;"/>
+
+    <div class="grid two" style="margin-bottom:14px;">
+      <div>
+        <label>🔍 සෙවීම</label>
+        <input id="vehSearch" placeholder="vehicle no..." oninput="renderVehicles()" />
+      </div>
+      <div></div>
+    </div>
+
+    <div class="table-wrap">
+      <div id="vehList"></div>
+    </div>
+  </div>
+
+  <!-- Assignments -->
+  <div class="card soft" id="pane_assign" style="display:none;">
+    <h2 class="h2">📋 Assign වාහන to රූට්</h2>
+    <hr/>
+
+    <div class="grid two" style="margin-top:14px;">
+      <div>
+        <label>Select Request (Admin අනුමත කරන්න)</label>
+        <select id="reqSelect" onchange="selectRequest()"></select>
+        <div class="mini" style="margin-top:6px;">
+          Request එක select කරලා routes load වෙනවා. එක් route එකකට වාහන කීයක් හෝ එකතු කරන්න පුළුවන්.
+          <br/>
+          💡 <strong>ඕනෑම වාහනයක් ඕනෑම රූට් එකකට දාන්න පුළුවන්.</strong> ⭐ සලකුණ කර ඇති වාහන සාමාන්‍යයෙන් එම රූට් එකේ යන වාහන (යොමු සඳහා පමණි).
+        </div>
+      </div>
+      <div>
+        <label>Quick Actions</label>
+        <div class="btnrow" style="margin-top:6px;">
+          <button class="btn ghost" onclick="reloadCurrent()">🔄 Reload</button>
+          <button class="btn btn-primary" onclick="submitTA()">✅ Submit TA (Capacity Check)</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="reqMeta" class="alert" style="margin-top:14px;"></div>
+    <hr/>
+    <div id="groupsBox" class="small">Select a request...</div>
+  </div>
+
+  <!-- Reports -->
+  <div class="card soft" id="pane_reports" style="display:none;">
+    <h2 class="h2">📊 වාර්තා බාගත කිරීම</h2>
+    <hr/>
+    <div class="alert info" style="margin-bottom:14px;">
+      Reports download කරන්නේ HR Final Approval පස්සේම. Request එක select කරලා download කරන්න.
+    </div>
+    
+    <div class="grid two">
+      <div>
+        <label>📆 දිනය</label>
+        <input id="repDate" type="date" />
+      </div>
+      <div>
+        <label>Actions</label>
+        <div class="btnrow" style="margin-top:6px;">
+          <button class="btn btn-primary" onclick="downloadRouteReport()">📄 Route-wise PDF</button>
+          <button class="btn secondary" onclick="downloadVehicleReport()">📄 Vehicle PDF</button>
+        </div>
+      </div>
+    </div>
+    <p class="mini" style="margin-top:10px;">💡 If your browser blocks downloads, open the URL in new tab.</p>
+  </div>
+
+</main>
+
+<script>
+let ME=null;
+let VEH=[];
+let REQS=[];
+let CURRENT_REQ=null;
+let GROUPS=[];
+let ASSIGN=[]; // flat list of assignments per route
+
+let EDIT_VEH_ID = null;
+
+function setTab(tab){
+  const tabs = ["vehicles","assign","reports"];
+  for(const t of tabs){
+    qs("pane_"+t).style.display = (t===tab) ? "" : "none";
+    qs("tab"+t.charAt(0).toUpperCase()+t.slice(1)).classList.toggle("active", t===tab);
+  }
+}
+
+function routeName(id){
+  const r = ROUTE_TREE?.routes?.find(x => String(x.id)===String(id));
+  return r ? `${r.route_no} - ${r.route_name}` : "";
+}
+
+async function guard(){
+  ME = await guardRole("TA");
+  if(!ME) return;
+  qs("meBox").innerHTML = `<strong style="color: var(--brand);">${ME.role}</strong> <span style="color: var(--muted);">|</span> <span style="color: var(--text-secondary);">${ME.email}</span>`;
+}
+
+function renderRouteChecks(selectedIds=[]){
+  const selSet = new Set(selectedIds.map(x=>String(x)));
+  let html = "";
+  for(const r of ROUTE_TREE.routes){
+    const id = r.id;
+    const checked = selSet.has(String(id)) ? "checked" : "";
+        html += `<label class="route-check-item"><input type="checkbox" class="routeChk" value="${id}" ${checked} /><span>${r.route_no} - ${r.route_name}</span></label>`;
+  }
+  qs("routeChecks").innerHTML = html || "<span class='mini'>⚠️ No routes found (Admin must create routes first)</span>";
+}
+
+function selectedRouteIds(){
+  return qsa(".routeChk:checked").map(x => parseInt(x.value,10));
+}
+
+async function loadVehicles(){
+  const d = await api("/ta/vehicles");
+  VEH = d.vehicles || [];
+  renderVehicles();
+}
+
+function renderVehicles(){
+  const q = (qs("vehSearch").value||"").toLowerCase();
+  const list = VEH.filter(v => (v.vehicle_no||"").toLowerCase().includes(q));
+  let html = "<table><thead><tr><th>Vehicle No</th><th>Type</th><th>Capacity</th><th>Owner</th><th>Routes</th><th>Action</th></tr></thead><tbody>";
+  for(const v of list){
+    const rnames = (v.route_ids||[]).map(id => routeName(id)).filter(Boolean).join(", ");
+    html += `<tr>
+      <td><strong>${v.vehicle_no}</strong><br/><span class="mini">ID: ${v.id}</span></td>
+      <td><span class="badge">${v.vehicle_type}</span></td>
+      <td>${v.capacity}</td>
+      <td>${v.owner_name}</td>
+      <td class="mini">${rnames || "-"}</td>
+      <td><button class="btn small" onclick="editVehicle(${v.id})">✏️ Edit</button></td>
+    </tr>`;
+  }
+  html += "</tbody></table>";
+  qs("vehList").innerHTML = html;
+}
+
+function clearVehicleForm(){
+  EDIT_VEH_ID = null;
+  qs("vNo").value="";
+  qs("vType").value="VAN";
+  qs("vCap").value="";
+  qs("vOwner").value="";
+  renderRouteChecks([]);
+}
+
+function editVehicle(id){
+  const v = VEH.find(x=>x.id===id);
+  if(!v) return;
+  EDIT_VEH_ID = id;
+  qs("vNo").value = v.vehicle_no;
+  qs("vType").value = v.vehicle_type;
+  qs("vCap").value = v.capacity;
+  qs("vOwner").value = v.owner_name;
+  renderRouteChecks(v.route_ids||[]);
+  toast("✏️ Editing vehicle ID: " + id);
+  setTab("vehicles");
+}
+
+async function saveVehicle(){
+  try{
+    const vno = qs("vNo").value.trim();
+    const vtype = qs("vType").value;
+    const cap = parseInt(qs("vCap").value,10);
+    const owner = qs("vOwner").value.trim();
+    const routes = selectedRouteIds();
+    if(!vno || !vtype || !cap || !owner){
+      throw new Error("සියලු ක්ෂේත්‍ර පුරවන්න");
+    }
+    const payload = { vehicle_no: vno, vehicle_type: vtype, capacity: cap, owner_name: owner, route_ids: routes };
+    if(EDIT_VEH_ID){
+      await api(`/ta/vehicles/${EDIT_VEH_ID}`, { method:"PATCH", body: JSON.stringify(payload) });
+      toast("✅ Vehicle updated");
+    }else{
+      await api("/ta/vehicles", { method:"POST", body: JSON.stringify(payload) });
+      toast("✅ Vehicle created");
+    }
+    clearVehicleForm();
+    await loadVehicles();
+  }catch(e){ toast("❌ " + e.message); }
+}
+
+async function loadRequests(){
+  const d = await api("/ta/requests/approved");
+  REQS = d.requests || [];
+  let html = '<option value="">-- Select --</option>';
+  for(const r of REQS){
+    html += `<option value="${r.id}">#${r.id} | ${fmtDate(r.request_date)} ${fmtTime(r.request_time)} | ${r.department_name} | ${r.status}</option>`;
+  }
+  qs("reqSelect").innerHTML = html;
+}
+
+async function selectRequest(){
+  const id = qs("reqSelect").value;
+  if(!id){ CURRENT_REQ=null; qs("groupsBox").innerHTML="Select a request..."; return; }
+  CURRENT_REQ = parseInt(id,10);
+  await reloadCurrent();
+}
+
+async function reloadCurrent(){
+  try{
+    if(!CURRENT_REQ) return;
+    const req = REQS.find(x=>x.id===CURRENT_REQ);
+    qs("reqMeta").innerHTML = req ? `Selected: <strong>#${req.id}</strong> | ${fmtDate(req.request_date)} ${fmtTime(req.request_time)} | Dept: ${req.department_name} | Status: ${statusBadge(req.status)}` : "";
+    
+    // Get ROUTE-ONLY groups (no sub-routes)
+    const g = await api(`/ta/requests/${CURRENT_REQ}/groups`);
+    GROUPS = g.groups || [];
+    
+    // Get existing assignments
+    const a = await api(`/ta/requests/${CURRENT_REQ}/assignments`);
+    ASSIGN = a.assignments || [];
+    
+    renderGroups();
+  }catch(e){ toast("❌ " + e.message); }
+}
+
+// Show ALL vehicles - TA decides which goes where
+function vehicleOptionsForRoute(route_id, selectedVehicleId){
+  let html = '<option value="">-- වාහනය තෝරන්න --</option>';
+  for(const v of VEH){
+    const sel = String(v.id)===String(selectedVehicleId) ? "selected" : "";
+    const routeIds = (v.route_ids || []).map(x=>String(x));
+    const usualRoute = (route_id && routeIds.includes(String(route_id))) ? "⭐ " : "";
+    html += `<option value="${v.id}" ${sel}>${usualRoute}${v.vehicle_no} (Cap: ${v.capacity})</option>`;
+  }
+  return html;
+}
+
+function assignmentsForRoute(route_id){
+  return ASSIGN.filter(x => String(x.route_id) === String(route_id));
+}
+
+function capacityForAssignments(as){
+  let sum = 0;
+  for(const a of as){
+    const v = VEH.find(x=>String(x.id)===String(a.vehicle_id));
+    sum += v ? Number(v.capacity) : Number(a.capacity || 0);
+    sum += Number(a.overbook_amount || 0);
+  }
+  return sum;
+}
+
+function renderGroups(){
+  if(GROUPS.length===0){ 
+    qs("groupsBox").innerHTML = "<span class='badge warn'>⚠️ No routes found</span>"; 
+    return; 
+  }
+
+  let html = "";
+  for(const g of GROUPS){
+    const routeText = g.route_id ? routeName(g.route_id) : "(No Route)";
+    const current = assignmentsForRoute(g.route_id).map(x => ({...x}));
+    const cap = capacityForAssignments(current);
+    const remain = g.headcount - cap;
+
+    const badge = remain <= 0 ? "<span class='badge good'>✅ ධාරිතාව හරි</span>" : "<span class='badge bad'>⚠️ ධාරිතාව අඩුයි</span>";
+
+    html += `<div class="card" style="background:#fff; border:1px solid var(--border); margin-bottom:14px;">
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:10px; margin-bottom:12px;">
+        <div>
+          <div style="font-weight:700; font-size:15px;">${routeText}</div>
+          <div class="mini" style="margin-top:4px;">
+            සේවක ගණන: <strong>${g.headcount}</strong> | දැනට ධාරිතාව: <strong>${cap}</strong> | අඩුයි: <strong>${Math.max(remain,0)}</strong>
+          </div>
+        </div>
+        <div>${badge}</div>
+      </div>
+
+      <hr style="margin:12px 0;"/>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>වාහනය</th>
+              <th>රියදුරු නම</th>
+              <th>දුරකථනය</th>
+              <th>උපදෙස්</th>
+              <th>ඔවරයිඩ් (+)</th>
+              <th>හේතුව</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="assign_rows_${g.route_id}">
+            ${renderAssignRows(g.route_id, current)}
+          </tbody>
+        </table>
+      </div>
+
+      <div class="btnrow" style="margin-top:12px;">
+        <button class="btn small ghost" onclick="addAssignRow(${g.route_id})">➕ වාහනයක් එක් කරන්න</button>
+        <button class="btn small btn-primary" onclick="saveRoute(${g.route_id})">💾 රූට් සුරකින්න</button>
+      </div>
+    </div>`;
+  }
+  qs("groupsBox").innerHTML = html;
+}
+
+function renderAssignRows(route_id, current){
+  if(current.length===0) {
+    current = [{ vehicle_id:"", driver_name:"", driver_phone:"", instructions:"", overbook_amount:0, overbook_reason:"" }];
+  }
+  
+  let rows = "";
+  current.forEach((a, idx)=>{
+    const vid = a.vehicle_id || "";
+    const vOpt = vehicleOptionsForRoute(route_id, vid);
+    rows += `<tr id="row_${route_id}_${idx}">
+      <td style="min-width:220px;">
+        <select class="v_sel" data-route="${route_id}" data-idx="${idx}">${vOpt}</select>
+      </td>
+      <td><input class="v_name" data-route="${route_id}" data-idx="${idx}" value="${(a.driver_name||"").replace(/"/g,'&quot;')}" placeholder="රියදුරු නම" /></td>
+      <td><input class="v_phone" data-route="${route_id}" data-idx="${idx}" value="${(a.driver_phone||"").replace(/"/g,'&quot;')}" placeholder="07X..." /></td>
+      <td><input class="v_inst" data-route="${route_id}" data-idx="${idx}" value="${(a.instructions||"").replace(/"/g,'&quot;')}" placeholder="උපදෙස්" /></td>
+      <td style="width:110px;"><input class="v_over" data-route="${route_id}" data-idx="${idx}" type="number" min="0" max="2" value="${a.overbook_amount || 0}" /></td>
+      <td><input class="v_reason" data-route="${route_id}" data-idx="${idx}" value="${(a.overbook_reason||"").replace(/"/g,'&quot;')}" placeholder="(+1/+2 හේතුව)" /></td>
+      <td><button class="btn small ghost" onclick="removeAssignRow(${route_id}, ${idx})">🗑️</button></td>
+    </tr>`;
+  });
+  return rows;
+}
+
+function addAssignRow(route_id){
+  ASSIGN.push({ route_id, vehicle_id:"", driver_name:"", driver_phone:"", instructions:"", overbook_amount:0, overbook_reason:"" });
+  renderGroups();
+}
+
+function removeAssignRow(route_id, idx){
+  const list = assignmentsForRoute(route_id);
+  let seen = 0;
+  for(let i=0;i<ASSIGN.length;i++){
+    if(String(ASSIGN[i].route_id)===String(route_id)){
+      if(seen===idx){
+        ASSIGN.splice(i,1);
+        break;
+      }
+      seen++;
+    }
+  }
+  renderGroups();
+}
+
+async function saveRoute(route_id){
+  try{
+    const g = GROUPS.find(x => String(x.route_id)===String(route_id));
+    if(!g) throw new Error("රූට් හමු නොවීය");
+
+    // Collect all assignments for this route from the form
+    const selects = qsa(`select.v_sel[data-route="${route_id}"]`);
+    const assignments = [];
+    
+    for(const sel of selects){
+      const idx = sel.dataset.idx;
+      const vehicle_id = qsa(`select.v_sel[data-route="${route_id}"][data-idx="${idx}"]`)[0]?.value;
+      if(!vehicle_id) continue; // skip empty rows
+      
+      const driver_name = qsa(`input.v_name[data-route="${route_id}"][data-idx="${idx}"]`)[0]?.value.trim() || "";
+      const driver_phone = qsa(`input.v_phone[data-route="${route_id}"][data-idx="${idx}"]`)[0]?.value.trim() || "";
+      const instructions = qsa(`input.v_inst[data-route="${route_id}"][data-idx="${idx}"]`)[0]?.value.trim() || "";
+      const overbook_amount = parseInt(qsa(`input.v_over[data-route="${route_id}"][data-idx="${idx}"]`)[0]?.value || "0",10) || 0;
+      const overbook_reason = qsa(`input.v_reason[data-route="${route_id}"][data-idx="${idx}"]`)[0]?.value.trim() || "";
+      
+      assignments.push({
+        vehicle_id: parseInt(vehicle_id,10),
+        driver_name,
+        driver_phone,
+        instructions,
+        overbook_amount,
+        overbook_reason
+      });
+    }
+
+    if(assignments.length===0) throw new Error("අවම වශයෙන් වාහනයක් එක් කරන්න");
+
+    await api(`/ta/requests/${CURRENT_REQ}/assignments`, {
+      method:"POST",
+      body: JSON.stringify({ route_id, assignments })
+    });
+
+    toast("✅ රූට් සුරකින ලදී");
+    await reloadCurrent();
+  }catch(e){ toast("❌ " + e.message); }
+}
+
+async function submitTA(){
+  try{
+    if(!CURRENT_REQ) throw new Error("පළමුව ඉල්ලීමක් තෝරන්න");
+    await api(`/ta/requests/${CURRENT_REQ}/submit`, {method:"POST"});
+    toast("✅ TA වෙතින් යොමු කළා");
+    await loadRequests();
+    await reloadCurrent();
+  }catch(e){ toast("❌ " + e.message); }
+}
+
+// Reports
+
+async function downloadPdfWithAuth(url, filename){
+  try{
+    const token = (typeof getToken === "function") ? getToken() : localStorage.getItem("token");
+    const headers = token ? { "Authorization": `Bearer ${token}` } : {};
+    const res = await fetch(url, { method:"GET", headers });
+    if(res.status === 401){
+      if (typeof clearToken === "function") clearToken(); else localStorage.removeItem("token");
+      location.href = "login.html";
+      return;
+    }
+    if(!res.ok){
+      const text = await res.text();
+      let msg = text;
+      try{ const j = text ? JSON.parse(text) : {}; msg = j.error || j.message || text; }catch(e){}
+      msg = (msg && String(msg).trim()) || `Server error (HTTP ${res.status}).`;
+      if (typeof toast === "function") toast(msg); else alert(msg);
+      return;
+    }
+    const blob = await res.blob();
+    const a = document.createElement("a");
+    const objUrl = URL.createObjectURL(blob);
+    a.href = objUrl;
+    a.download = filename || "report.pdf";
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => {
+      URL.revokeObjectURL(objUrl);
+      a.remove();
+    }, 1200);
+  }catch(e){
+    const msg = "ජාල/සම්බන්ධතා ගැටලුවක්. කරුණාකර නැවත උත්සාහ කරන්න.";
+    if (typeof toast === "function") toast(msg); else alert(msg);
+  }
+}
+
+function downloadRouteReport(){
+  const d = qs("repDate").value;
+  if(!d){ toast("⚠️ දිනය තෝරන්න"); return; }
+  const base = (API_BASE_URL || "").replace(/\/$/, "");
+  const url = `${base}/reports/daily/route-wise?date=${encodeURIComponent(d)}`;
+  downloadPdfWithAuth(url, `route-wise-${d}.pdf`);
+}
+function downloadVehicleReport(){
+  const d = qs("repDate").value;
+  if(!d){ toast("⚠️ දිනය තෝරන්න"); return; }
+  const base = (API_BASE_URL || "").replace(/\/$/, "");
+  const url = `${base}/reports/daily/vehicle?date=${encodeURIComponent(d)}`;
+  downloadPdfWithAuth(url, `vehicle-${d}.pdf`);
+}
+
+(async function init(){
+  try{
+    await guard();
+    await loadRouteTree(true);
+    renderRouteChecks([]);
+    await loadVehicles();
+    await loadRequests();
+  }catch(e){ toast("❌ " + e.message); }
+})();
+
+function todayISO(){
+  const d = new Date();
+  const m = String(d.getMonth()+1).padStart(2,'0');
+  const da = String(d.getDate()).padStart(2,'0');
+  return `${d.getFullYear()}-${m}-${da}`;
+}
+(function(){
+  const rep = qs('repDate');
+  if(rep && !rep.value) rep.value = todayISO();
+})(); 
+</script>
+</body>
+</html>

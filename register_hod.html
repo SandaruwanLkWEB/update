@@ -1,0 +1,65 @@
+<!doctype html><html><head>
+<meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>HOD ලියාපදිංචි වීම</title>
+<link rel="stylesheet" href="assets/styles.css"/>
+<script src="assets/config.js"></script>
+<script src="assets/app.js"></script>
+</head><body>
+<div class="topbar"><div class="inner">
+<div class="brand"><span class="dot"></span> ප්‍රවාහන පද්ධතිය</div>
+<div class="nav"><a class="btn btn-ghost" href="login.html">ඇතුල්වීම</a><a class="btn" href="register.html">ආපසු</a></div>
+</div></div>
+<div class="container">
+<h1 class="h1">HOD ලියාපදිංචි වීම</h1>
+<div class="card soft">
+  <div class="grid two">
+    <div>
+      <label>නම</label>
+      <input id="hod_name" placeholder="නම"/>
+      <label>සේවක අංකය (Emp No)</label>
+      <input id="emp_no" placeholder="උදා: 01502"/>
+      <label>විද්‍යුත් තැපෑල</label>
+      <input id="email" type="email" placeholder="name@example.com"/>
+    </div>
+    <div>
+      <label>දෙපාර්තමේන්තුව</label>
+      <select id="department_id"></select>
+      <label>මුරපදය</label>
+      <input id="password" type="password" placeholder="අවම අකුරු 6"/>
+      <div class="toolbar">
+        <div class="btnrow"><button class="btn btn-primary" id="btnReg">යොමු කරන්න</button></div>
+      </div>
+      <div id="msg" class="alert hidden"></div>
+    </div>
+  </div>
+</div>
+</div>
+<script>
+(async ()=>{
+  try{
+    const d = await api("/public/departments");
+    const sel = document.getElementById("department_id");
+    sel.innerHTML = '<option value="">තෝරන්න</option>' + (d.departments||[]).map(x=>`<option value="${x.id}">${x.name}</option>`).join("");
+  }catch(e){}
+})();
+document.getElementById("btnReg").onclick = async ()=>{
+  const payload = {
+    hod_name: document.getElementById("hod_name").value.trim(),
+    emp_no: document.getElementById("emp_no").value.trim(),
+    email: document.getElementById("email").value.trim(),
+    department_id: document.getElementById("department_id").value,
+    password: document.getElementById("password").value
+  };
+  const msg = document.getElementById("msg");
+  msg.className = "alert hidden";
+  try{
+    await api("/auth/register-hod", { method:"POST", body: JSON.stringify(payload) });
+    msg.textContent = "සාර්ථකයි. ඔබගේ HOD ගිණුම පරිපාලක අනුමැතිය සඳහා යොමු කර ඇත.";
+    msg.classList.remove("hidden"); msg.classList.add("ok");
+  }catch(e){
+    msg.textContent = e.message || "අසමත් විය";
+    msg.classList.remove("hidden"); msg.classList.add("error");
+  }
+};
+</script>
+</body></html>

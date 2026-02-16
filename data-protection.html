@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="si">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>දත්ත ආරක්ෂාව | DSI Transport</title>
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; connect-src 'self' https://transport-production-e5c7.up.railway.app;" />
+  <link rel="stylesheet" href="/assets/styles.css" />
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <div class="logo">DSI</div>
+      <div>
+        <div class="title">DSI Transport</div>
+        <div class="subtitle">දත්ත ආරක්ෂාව</div>
+      </div>
+    </div>
+    <div class="right">
+      <a class="btn" href="/login.html">Login</a>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="card">
+      <h2>Data Protection (අභ්‍යන්තර පද්ධතිය)</h2>
+      <p class="muted">මෙම පද්ධතිය සමාගමේ අභ්‍යන්තර ප්‍රවාහන ක්‍රියාවලි සඳහා පමණක් භාවිතා වේ. අපි හැකි උපරිමයෙන් දත්ත ආරක්ෂාව සහ ප්‍රවේශ පාලනය ක්‍රියාත්මක කරමු.</p>
+
+      <h3>1) සන්නිවේදන ආරක්ෂාව (Transport Security)</h3>
+      <ul>
+        <li>HTTPS (SSL/TLS) භාවිතා කර දත්ත සන්නිවේදනය encryption කරයි.</li>
+        <li>CSP (Content Security Policy) මඟින් අමතර script/connection අවහිර කරයි.</li>
+      </ul>
+
+      <h3>2) ප්‍රවේශ පාලනය (Access Control)</h3>
+      <ul>
+        <li>Role-based access: Admin / HOD / Transport Authority / HR / EMP ලෙස වගකීම් අනුව පමණක් දත්ත දැක්වීම/සංස්කරණය.</li>
+        <li>Login token (JWT/Token) මඟින් session control.</li>
+      </ul>
+
+      <h3>3) දත්ත අවම කිරීම (Data Minimization)</h3>
+      <ul>
+        <li>ප්‍රවාහන අවශ්‍යතාවයට අදාළ දත්ත පමණක් සටහන් කරයි (emp no, නම, dept, route/sub-route, requests, assignments).</li>
+        <li>බාහිර අත්‍යවශ්‍ය නොවන tracking/advertising scripts භාවිතා නොකරයි.</li>
+      </ul>
+
+      <h3>4) දත්ත අඛණ්ඩතාව (Integrity)</h3>
+      <ul>
+        <li>Database constraints (unique/foreign keys) මඟින් duplicate වැළැක්වීම සහ සම්බන්ධතා පවත්වාගැනීම.</li>
+        <li>ලොජික් validation (capacity, approvals flow) මඟින් වැරදි assignment අවම කිරීම.</li>
+      </ul>
+
+      <h3>5) තබාගැනීම සහ Backup</h3>
+      <p class="muted">Hosting/DB provider මත backups සහ recovery options භාවිතා කළ හැක. සමාගමට අවශ්‍ය policy අනුව retention සකස් කළ හැක.</p>
+
+      <h3>6) Incident / Issue Reporting</h3>
+      <p>ගැටළුවක් හෝ සැකසහගත ක්‍රියාකාරිත්වයක් තිබේ නම්: <b>contract@dsitransport.top</b> වෙත දැනුම් දෙන්න.</p>
+
+      <hr />
+      <p class="muted">ඉහත වගුව සාමාන්‍ය දත්ත ආරක්ෂණ මාර්ගෝපදේශයක් ලෙස සලකන්න. සමාගමේ අභ්‍යන්තර නීති/ප්‍රතිපත්ති අනුව යාවත්කාලීන කළ හැක.</p>
+    </div>
+  </main>
+
+  <script src="/assets/app.js"></script>
+</body>
+</html>

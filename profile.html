@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="si">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="theme-color" content="#E11D48" />
+  <title>Profile & Security - Transport Management</title>
+  <link rel="stylesheet" href="assets/styles.css" />
+  <script src="assets/config.js"></script>
+  <script src="assets/app.js"></script>
+</head>
+<body>
+
+<header>
+  <h1>👤 Profile & Security</h1>
+  <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+    <a href="index.html" class="btn ghost small">🏠 Home</a>
+    <button class="btn ghost small" onclick="toggleTheme()">🌓 Theme</button>
+    <button class="btn secondary small" onclick="logout()">Logout</button>
+  </div>
+</header>
+
+<main class="container">
+  <section class="card elevated" style="padding:16px; margin-bottom:14px;">
+    <div class="h2">🧾 ගිණුම් තොරතුරු</div>
+    <div id="me" class="p-muted" style="margin-top:10px;">Loading...</div>
+  </section>
+
+  <section class="card soft" style="padding:16px;">
+    <div style="display:flex; justify-content:space-between; gap:10px; align-items:center; flex-wrap:wrap;">
+      <div>
+        <div class="h2">🔐 Two-Factor Authentication (Authenticator App)</div>
+        <div class="p-muted">Google/Microsoft/Authy/1Password/Bitwarden වගේ ඕනෑම authenticator app එකකින් භාවිතා කළ හැක.</div>
+      </div>
+      <span id="twofaStatus" class="badge">...</span>
+    </div>
+
+    <div id="twofaActions" class="btnrow" style="margin-top:14px; gap:10px; flex-wrap:wrap;"></div>
+
+    <div id="setupBox" class="card" style="display:none; padding:14px; margin-top:14px;">
+      <div class="h2">1) App එකෙන් QR Scan කරන්න</div>
+      <div class="grid two" style="margin-top:10px; align-items:start;">
+        <div>
+          <img id="qrImg" alt="QR" style="max-width:220px; border-radius:16px; border:1px solid var(--border);" />
+          <div class="p-muted" style="margin-top:8px;">Manual key: <code id="manualKey"></code></div>
+        </div>
+        <div>
+          <label>2) App code එක ඇතුල් කරලා Enable කරන්න</label>
+          <input id="codeEnable" placeholder="6-digit code" />
+          <div class="btnrow" style="margin-top:10px;">
+            <button class="btn btn-primary" id="btnEnable">✅ Enable 2FA</button>
+            <button class="btn" id="btnCancel">✖ Cancel</button>
+          </div>
+          <div id="setupMsg" class="p-muted" style="margin-top:10px;"></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="backupBox" class="card" style="display:none; padding:14px; margin-top:14px;">
+      <div class="h2">🗝️ Backup Codes</div>
+      <div class="p-muted">මෙවාව එක පාරක් පමණක් පෙන්වයි. හොඳින් සුරකින්න.</div>
+      <pre id="backupCodes" style="white-space:pre-wrap; margin-top:10px;"></pre>
+    </div>
+
+    <div id="disableBox" class="card" style="display:none; padding:14px; margin-top:14px;">
+      <div class="h2">2FA Disable</div>
+      <div class="grid two" style="margin-top:10px;">
+        <div>
+          <label>මුරපදය</label>
+          <input id="disablePass" type="password" placeholder="Password" />
+        </div>
+        <div>
+          <label>Authenticator code / Backup code</label>
+          <input id="disableCode" placeholder="Code" />
+        </div>
+      </div>
+      <div class="btnrow" style="margin-top:12px;">
+        <button class="btn btn-primary" id="btnDisable">🛑 Disable 2FA</button>
+      </div>
+      <div id="disableMsg" class="p-muted" style="margin-top:10px;"></div>
+    </div>
+  </section>
+</main>
+
+<script>
+let ME = null;
+
+function setStatus(enabled){
+  const s = document.getElementById('twofaStatus');
+  s.className = 'badge ' + (enabled ? 'ok' : 'warn');
+  s.textContent = enabled ? 'Enabled' : 'Disabled';
+}
+
+function renderActions(){
+  const box = document.getElementById('twofaActions');
+  box.innerHTML = '';
+  if(!ME) return;
+  if(ME.twofa_enabled){
+    box.innerHTML = `
+      <button class="btn" onclick="openDisable()">⚙️ Disable Options</button>
+    `;
+  }else{
+    box.innerHTML = `
+      <button class="btn btn-primary" onclick="startSetup()">➕ Enable 2FA</button>
+    `;
+  }
+}
+
+async function load(){
+  const d = await loadMe();
+  ME = d.me;
+  if(!ME){ location.href='login.html'; return; }
+  document.getElementById('me').innerHTML = `
+    <div><b>Email:</b> ${ME.email||''}</div>
+    <div><b>Role:</b> ${ME.role||''}</div>
+  `;
+  setStatus(!!ME.twofa_enabled);
+  renderActions();
+}
+
+function closeAll(){
+  document.getElementById('setupBox').style.display='none';
+  document.getElementById('backupBox').style.display='none';
+  document.getElementById('disableBox').style.display='none';
+  document.getElementById('setupMsg').textContent='';
+  document.getElementById('disableMsg').textContent='';
+}
+
+async function startSetup(){
+  closeAll();
+  document.getElementById('setupBox').style.display='block';
+  document.getElementById('setupMsg').textContent='⏳ QR සකසමින්...';
+  try{
+    const d = await api('/auth/2fa/setup', { method:'POST' });
+    document.getElementById('qrImg').src = d.qr;
+    document.getElementById('manualKey').textContent = d.manual_key;
+    document.getElementById('setupMsg').textContent='QR Scan කරලා code එක ඇතුල් කරන්න.';
+  }catch(e){
+    document.getElementById('setupMsg').textContent='❌ ' + e.message;
+  }
+}
+
+function openDisable(){
+  closeAll();
+  document.getElementById('disableBox').style.display='block';
+}
+
+document.getElementById('btnEnable').onclick = async ()=>{
+  const code = document.getElementById('codeEnable').value.trim();
+  document.getElementById('setupMsg').textContent='⏳ Enable කරමින්...';
+  try{
+    const d = await api('/auth/2fa/enable', { method:'POST', body: JSON.stringify({ code }) });
+    document.getElementById('backupBox').style.display='block';
+    document.getElementById('backupCodes').textContent = (d.backup_codes||[]).join('\n');
+    toast('✅ 2FA Enabled');
+    // refresh me
+    const me2 = await loadMe();
+    ME = me2.me;
+    setStatus(true);
+    renderActions();
+    document.getElementById('setupMsg').textContent='✅ 2FA Enabled.';
+  }catch(e){
+    document.getElementById('setupMsg').textContent='❌ ' + e.message;
+  }
+};
+
+document.getElementById('btnDisable').onclick = async ()=>{
+  const password = document.getElementById('disablePass').value;
+  const code = document.getElementById('disableCode').value.trim();
+  document.getElementById('disableMsg').textContent='⏳ Disable කරමින්...';
+  try{
+    await api('/auth/2fa/disable', { method:'POST', body: JSON.stringify({ password, code }) });
+    toast('✅ 2FA Disabled');
+    const me2 = await loadMe();
+    ME = me2.me;
+    setStatus(false);
+    renderActions();
+    closeAll();
+  }catch(e){
+    document.getElementById('disableMsg').textContent='❌ ' + e.message;
+  }
+};
+
+document.getElementById('btnCancel').onclick = ()=> closeAll();
+
+window.addEventListener('DOMContentLoaded', load);
+</script>
+
+</body>
+</html>

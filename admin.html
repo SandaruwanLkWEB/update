@@ -1,0 +1,709 @@
+<!doctype html>
+<html lang="si">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="theme-color" content="#E11D48" />
+  <title>Admin Dashboard - Transport Management</title>
+  <link rel="stylesheet" href="assets/styles.css" />
+  <script src="assets/config.js"></script>
+  <script src="assets/app.js"></script>
+</head>
+<body>
+
+<!-- Glassmorphic Header -->
+<header>
+  <h1>🔐 Admin Panel</h1>
+  <div style="display:flex; gap:8px; align-items:center;">
+    <a href="index.html" class="btn ghost small">🏠 Home</a>
+    <a href="profile.html" class="btn ghost small">👤 Profile</a>
+    <button class="btn ghost small" onclick="toggleTheme()">🌓 Theme</button>
+    <button class="btn secondary small" onclick="logout()">Logout</button>
+  </div>
+</header>
+
+<main class="container">
+  <!-- User Info Card -->
+  <div class="card elevated" id="meBox" style="margin-bottom:16px; padding:12px 18px;">
+    <span style="color: var(--muted);">Loading...</span>
+  </div>
+
+  <!-- Daily Run Lock Section -->
+  <section class="card soft" style="margin-bottom:18px;">
+    <h2 class="h2">📅 අද දවස අගුළු දමන්න (TA ට කලින්)</h2>
+    <p class="p-muted">සියලු දෙපාර්තමේන්තු ඉල්ලීම් එකතු කරලා එකම වාර්තාවක් සෑදේ, සැ.යු කිසි විටෙක සියලු ඉල්ලිම් ලැබිමට පෙර Lock භාවිතා කරන්න එපා. Lock කළ පසු HOD submissions/edit නවතී.</p>
+    
+    <div class="toolbar">
+      <div style="min-width:220px;">
+        <label>📆 දිනය</label>
+        <input id="runDate" type="date" />
+      </div>
+      <div class="btnrow">
+        <button class="btn" onclick="loadRunSummaryLive()">🔄 යාවත්කාලීන කරන්න</button>
+        <button class="btn btn-primary" onclick="lockRun()">🔒 Lock Today → TA</button>
+      </div>
+    </div>
+    
+    <div id="runMeta" style="margin-top:12px;"></div>
+    
+    <div class="grid two" style="margin-top:14px;">
+      <div class="card">
+        <div class="h2">🏢 දෙපාර්තමේන්තු සාරාංශය</div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>දෙපාර්තමේන්තුව</th>
+                <th>Submitted</th>
+                <th>Requests</th>
+                <th>Employees</th>
+              </tr>
+            </thead>
+            <tbody id="runDeptRows">
+              <tr><td colspan="4" class="mini">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      
+      <div class="card">
+        <div class="h2">⚠️ නොලැබුණු දෙපාර්තමේන්තු</div>
+        <div id="runMissing" class="alert">Loading...</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Tab Navigation -->
+  <div class="card" style="margin-bottom:14px;">
+    <div class="tabs">
+      <button class="btn active" id="tabApprovals" onclick="setTab('approvals')">✅ Approvals</button>
+      <button class="btn" id="tabMaster" onclick="setTab('master')">📊 Master Data</button>
+      <button class="btn" id="tabReports" onclick="setTab('reports')">📈 Reports</button>
+    </div>
+  </div>
+
+  <!-- Approvals Pane -->
+  <div class="card" id="pane_approvals">
+    <h2 class="h2">📋 Requests (All Departments)</h2>
+    <hr/>
+    
+    <!-- HOD Registration Approvals -->
+    <h2 class="h2" style="margin-top:18px;">👤 HOD ලියාපදිංචි අනුමැතිය</h2>
+    <div class="table-wrap" style="margin-bottom:18px;">
+      <table>
+        <thead>
+          <tr>
+            <th>Email</th>
+            <th>Department</th>
+            <th>Date</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="hodRegRows">
+          <tr><td colspan="4" class="mini">Loading...</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Request Filters -->
+    <div class="row" style="margin-top:18px;">
+      <div>
+        <label>🔍 Filter by status</label>
+        <select id="reqStatus" onchange="renderRequests()">
+          <option value="">All Statuses</option>
+          <option value="SUBMITTED">SUBMITTED</option>
+          <option value="DRAFT">DRAFT</option>
+          <option value="ADMIN_APPROVED">ADMIN_APPROVED</option>
+          <option value="TA_ASSIGNED">TA_ASSIGNED</option>
+          <option value="HR_FINAL_APPROVED">HR_FINAL_APPROVED</option>
+          <option value="REJECTED">REJECTED</option>
+        </select>
+      </div>
+      <div>
+        <label>🔎 Search</label>
+        <input id="reqSearch" placeholder="dept / date / id..." oninput="renderRequests()" />
+      </div>
+    </div>
+
+    <div class="btnrow" style="margin-top:12px;">
+      <button class="btn ghost" onclick="loadRequests()">🔄 Refresh</button>
+    </div>
+
+    <hr style="margin:18px 0;"/>
+    <div id="reqList" class="table-wrap">
+      <div class="mini" style="padding:16px;">Loading requests...</div>
+    </div>
+
+    <hr style="margin:18px 0;"/>
+    
+    <!-- Request Detail Modal -->
+    <div id="reqDetail" class="card elevated" style="display:none; margin-top:18px;">
+      <h3 class="h2">📄 Request Detail: <span id="dReqId"></span></h3>
+      <div id="dMeta" style="margin:10px 0;"></div>
+      <div id="dEmployees" class="table-wrap"></div>
+      <div class="btnrow" style="margin-top:14px;">
+        <button id="btnApprove" class="btn btn-primary" onclick="approveReq()">✅ Approve (ADMIN)</button>
+        <button class="btn ghost" onclick="closeDetail()">❌ Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Master Data Pane -->
+  <div class="card" id="pane_master" style="display:none;">
+    <h2 class="h2">📊 Master Data Management</h2>
+    
+    <!-- Departments -->
+    <section style="margin-top:18px;">
+      <h3 class="h2">🏢 දෙපාර්තමේන්තු</h3>
+      <div class="btnrow">
+        <button class="btn" onclick="loadDepartments()">🔄 Refresh</button>
+        <button class="btn btn-primary" onclick="showAddDept()">➕ Add Department</button>
+      </div>
+      <div id="deptList" class="table-wrap" style="margin-top:12px;">
+        <div class="mini" style="padding:16px;">Loading...</div>
+      </div>
+    </section>
+
+    <hr style="margin:24px 0;"/>
+
+    <!-- Routes -->
+    <section>
+      <h3 class="h2">🚌 මාර්ග (Routes)</h3>
+      <div class="btnrow">
+        <button class="btn" onclick="loadRoutes()">🔄 Refresh</button>
+        <button class="btn btn-primary" onclick="showAddRoute()">➕ Add Route</button>
+      </div>
+      <div id="routeList" class="table-wrap" style="margin-top:12px;">
+        <div class="mini" style="padding:16px;">Loading...</div>
+      </div>
+    </section>
+
+    <hr style="margin:24px 0;"/>
+
+    <!-- Subroutes Bulk Upload -->
+    <section>
+      <h3 class="h2">📍 උප-මාර්ග දැමිම</h3>
+      <p class="p-muted">එක් මාර්ගයකට උප ග්‍රාම නාම එකවර ඇතුළත් කරන්න (එක් line එකට එක් ග්‍රාම නාමයක් ලෙස)</p>
+      
+      <div style="margin-top:12px;">
+        <label>🚌 Route තෝරන්න</label>
+        <select id="selRoute">
+          <option value="">-- තෝරන්න --</option>
+        </select>
+      </div>
+      
+      <div style="margin-top:12px;">
+        <label>📝 ග්‍රාම නාම (Line by line)</label>
+        <textarea id="bulkLines" rows="8" placeholder="කොළඹ&#10;මොරටුව&#10;පානදුර&#10;..."></textarea>
+      </div>
+      
+      <div class="btnrow" style="margin-top:12px;">
+        <button class="btn btn-primary" onclick="doBulkSubs()">⬆️ Upload Sub-routes</button>
+      </div>
+    </section>
+  </div>
+
+  <!-- Reports Pane -->
+  <div class="card" id="pane_reports" style="display:none;">
+    <h2 class="h2">📈 Reports</h2>
+    
+    <div style="margin-top:18px;">
+      <label>📅 දිනය</label>
+      <input id="repDate" type="date" />
+    </div>
+    
+    <div class="btnrow" style="margin-top:12px;">
+      <button class="btn btn-primary" onclick="downloadRouteReport()">📄 Route-wise PDF</button>
+    </div>
+    <p class="mini" style="margin-top:10px;">💡 PDF එක මේ ටැබ් එක ඇතුලේම preview වෙනවා.</p>
+    
+    <div id="reportPreview" style="margin-top:18px;"></div>
+  </div>
+
+</main>
+
+<script>
+let ME=null;
+let REQS=[];
+let CURRENT=null;
+let DEPS=[];
+let ROUTES=[];
+let SUBS=[];
+
+function setTab(tab){
+  const tabs = ["approvals","master","reports"];
+  for(const t of tabs){
+    const pane = qs("pane_"+t);
+    const btn = qs("tab"+t.charAt(0).toUpperCase()+t.slice(1));
+    if(pane) pane.style.display = (t===tab) ? "" : "none";
+    if(btn) btn.classList.toggle("active", t===tab);
+  }
+
+  // ✅ Master Data tab open වුනම Departments + Routes live refresh
+  if(tab === "master"){
+    try { loadDepartments(); } catch(e){}
+    try { loadRoutes(); } catch(e){}
+  }
+}
+
+async function guard(){
+  try {
+    ME = await guardRole("ADMIN");
+    if(!ME) return;
+    qs("meBox").innerHTML = `<span class="badge brand">${ME.role}</span> <span style="margin-left:8px;">${ME.email}</span>`;
+  } catch(e) {
+    console.error('Guard error:', e);
+    location.href = "login.html";
+  }
+}
+
+async function loadRequests(){
+  try {
+    const d = await api("/admin/requests");
+    REQS = d.requests || [];
+    renderRequests();
+  } catch(e) {
+    qs("reqList").innerHTML = `<div class="alert error">දෝෂයක්: ${e.message}</div>`;
+  }
+}
+
+function renderRequests(){
+  const status = qs("reqStatus").value;
+  const q = (qs("reqSearch").value||"").toLowerCase();
+  const list = REQS
+    .filter(r => !status || r.status===status)
+    .filter(r => (String(r.id).includes(q) || (r.department_name||"").toLowerCase().includes(q) || (r.request_date||"").toLowerCase().includes(q)));
+
+  if(list.length===0){ 
+    qs("reqList").innerHTML = "<div style='padding:16px;' class='mini'>No matching requests</div>"; 
+    return; 
+  }
+
+  let html = "<table><thead><tr><th>ID</th><th>Date</th><th>Time</th><th>Department</th><th>Status</th><th>Action</th></tr></thead><tbody>";
+  for(const r of list){
+    html += `<tr>
+      <td><strong>${r.id}</strong></td>
+      <td>${fmtDate(r.request_date)}</td>
+      <td>${fmtTime(r.request_time)}</td>
+      <td>${r.department_name}</td>
+      <td>${statusBadge(r.status)}</td>
+      <td><button class="btn small" onclick="openDetail(${r.id})">View</button></td>
+    </tr>`;
+  }
+  html += "</tbody></table>";
+  qs("reqList").innerHTML = html;
+}
+
+async function openDetail(id){
+  try{
+    const d = await api(`/admin/requests/${id}`);
+    CURRENT = d.request;
+    qs("reqDetail").style.display = "";
+    qs("dReqId").textContent = id;
+    qs("dMeta").innerHTML = `<strong>Dept:</strong> ${d.request.department_name} | <strong>Date:</strong> ${fmtDate(d.request.request_date)} | <strong>Time:</strong> ${fmtTime(d.request.request_time)} | <strong>Status:</strong> ${statusBadge(d.request.status)}`;
+
+    let html = "<table><thead><tr><th>Employee</th><th>Emp No</th><th>Route</th><th>Sub</th></tr></thead><tbody>";
+    for(const e of d.employees){
+      html += `<tr>
+        <td>${e.full_name}</td>
+        <td>${e.emp_no}</td>
+        <td>${e.effective_route_id ?? ""}</td>
+        <td>${e.effective_sub_route_id ?? ""}</td>
+      </tr>`;
+    }
+    html += "</tbody></table>";
+    qs("dEmployees").innerHTML = html;
+
+    const canApprove = d.request.status === "SUBMITTED";
+    qs("btnApprove").disabled = !canApprove;
+    qs("btnApprove").textContent = canApprove ? "✅ Approve (ADMIN)" : "Already Processed";
+  }catch(e){ 
+    toast(e.message); 
+  }
+}
+
+function closeDetail(){
+  qs("reqDetail").style.display = "none";
+  CURRENT=null;
+}
+
+async function approveReq(){
+  try{
+    if(!CURRENT) return;
+    await api(`/admin/requests/${CURRENT.id}/approve`, {method:"POST"});
+    toast("✅ Request approved!");
+    await loadRequests();
+    await openDetail(CURRENT.id);
+  }catch(e){ 
+    toast("❌ Error: " + e.message); 
+  }
+}
+
+// HOD Registration with 404 Fix
+async function renderHodRegs(){
+  const tbody = document.getElementById('hodRegRows');
+  if(!tbody) return;
+  
+  try{
+    const deps = await api('/admin/departments');
+    const d = await loadPendingHodRegs();
+    const list = d.pending_hod || [];
+    const depName = (id)=> (deps.departments||[]).find(x=>x.id===id)?.name || id || '';
+    
+    if(list.length===0){ 
+      tbody.innerHTML = `<tr><td colspan='4' class='mini' style='text-align:center; padding:16px;'>මේ වන විට අනුමැතිය බලාපොරොත්තු HOD නැත</td></tr>`; 
+      return; 
+    }
+    
+    tbody.innerHTML = list.map(u=>`<tr>
+      <td>${u.email}</td>
+      <td>${depName(u.department_id)}</td>
+      <td>${fmtDate(u.created_at||'')}</td>
+      <td>
+        <button class='btn small btn-primary' onclick='approveH(${u.id})'>✅ Approve</button> 
+        <button class='btn small secondary' onclick='rejectH(${u.id})'>❌ Reject</button>
+      </td>
+    </tr>`).join('');
+    
+  }catch(e){ 
+    console.error('HOD Registration Error:', e);
+    
+    // Enhanced error handling for 404
+    if(e.message.includes('404') || e.message.includes('not found') || e.message.includes('Not Found')){
+      tbody.innerHTML = `<tr><td colspan='4' class='mini' style='text-align:center; padding:16px; color: var(--muted);'>
+        ℹ️ HOD registration approval feature is not yet configured
+      </td></tr>`; 
+    } else {
+      tbody.innerHTML = `<tr><td colspan='4' class='alert error' style='margin:8px;'>
+        ⚠️ දෝෂයක්: ${e.message}
+      </td></tr>`; 
+    }
+  }
+}
+
+async function approveH(id){ 
+  try {
+    await approveHodReg(id); 
+    await renderHodRegs(); 
+    toast('✅ අනුමත කළා'); 
+  } catch(e) {
+    toast('❌ දෝෂයක්: ' + e.message);
+  }
+}
+
+async function rejectH(id){ 
+  try {
+    await rejectHodReg(id); 
+    await renderHodRegs(); 
+    toast('❌ ප්‍රතික්ෂේප කළා'); 
+  } catch(e) {
+    toast('⚠️ දෝෂයක්: ' + e.message);
+  }
+}
+
+// Master data functions
+async function loadDepartments(){
+  try {
+    const d = await api("/admin/departments");
+    DEPS = d.departments || [];
+    let html = "<table><thead><tr><th>Name</th><th>Action</th></tr></thead><tbody>";
+    for(const dep of DEPS){
+      html += `<tr><td>${dep.name}</td><td><button class='btn small ghost' onclick="editDept(${dep.id})">Edit</button></td></tr>`;
+    }
+    html += "</tbody></table>";
+    qs("deptList").innerHTML = html;
+  } catch(e) {
+    qs("deptList").innerHTML = `<div class="alert error">${e.message}</div>`;
+  }
+}
+
+// ✅ Departments Edit
+async function editDept(id){
+  const dep = (DEPS || []).find(d => d.id === id);
+  if(!dep) return toast("❌ Department not found");
+
+  const name = prompt("📝 නව දෙපාර්තමේන්තු නම:", dep.name);
+  if(name === null) return; // cancel
+  if(!name.trim()) return toast("⚠️ නම හිස් වෙන්න බෑ");
+
+  try{
+    await api(`/admin/departments/${id}`, {
+      method: "PATCH",
+      body: JSON.stringify({ name: name.trim() })
+    });
+    toast("✅ Updated!");
+    await loadDepartments(); // live refresh
+    await loadRunSummaryLive();
+  }catch(e){
+    toast("❌ " + e.message);
+  }
+}
+
+async function loadRoutes(force=true){
+  try {
+        // Admin expects immediate updates after adding/editing routes/sub-routes
+    const tree = await loadRouteTree(!!force);
+    ROUTES = tree.routes || [];
+    SUBS = tree.sub_routes || [];
+    
+    // Update route selector
+    const sel = qs("selRoute");
+    if(sel) sel.innerHTML = optionHTML(ROUTES, "id", "route_name", "", true);
+    
+    let html = "<table><thead><tr><th>Route No</th><th>Name</th><th>Sub-routes</th></tr></thead><tbody>";
+    for(const r of ROUTES){
+      const subs = SUBS.filter(s => s.route_id === r.id);
+      html += `<tr><td>${r.route_no}</td><td>${r.route_name}</td><td>${subs.length}</td></tr>`;
+    }
+    html += "</tbody></table>";
+    qs("routeList").innerHTML = html;
+  } catch(e) {
+    qs("routeList").innerHTML = `<div class="alert error">${e.message}</div>`;
+  }
+}
+
+// Add Department
+function showAddDept() {
+  const name = prompt("📝 දෙපාර්තමේන්තු නම ඇතුළත් කරන්න:");
+  if (!name || !name.trim()) return;
+  
+  toast('⏳ එකතු කරමින්...');
+  api('/admin/departments', {
+    method: 'POST',
+    body: JSON.stringify({ name: name.trim() })
+  }).then(() => {
+    toast('✅ දෙපාර්තමේන්තුව එකතු කරන ලදී!');
+    loadDepartments().then(()=>loadRunSummaryLive());
+}).catch(e => {
+    toast('❌ දෝෂයක්: ' + e.message);
+  });
+}
+
+// Add Route
+function showAddRoute() {
+  const route_no = prompt("📝 මාර්ග අංකය ඇතුළත් කරන්න (උදා: 6):");
+  if (!route_no || !route_no.trim()) return;
+  
+  const route_name = prompt("📝 මාර්ග නම ඇතුළත් කරන්න (උදා: Negombo):");
+  if (!route_name || !route_name.trim()) return;
+  
+  toast('⏳ එකතු කරමින්...');
+  api('/admin/routes', {
+    method: 'POST',
+    body: JSON.stringify({ 
+      route_no: route_no.trim(),
+      route_name: route_name.trim()
+    })
+  }).then(() => {
+    toast('✅ මාර්ගය එකතු කරන ලදී!');
+    invalidateRoutesTree();
+    loadRoutes(true);
+  }).catch(e => {
+    toast('❌ දෝෂයක්: ' + e.message);
+  });
+}
+
+async function doBulkSubs(){
+  const routeId = qs('selRoute')?.value;
+  const lines = qs('bulkLines')?.value || '';
+  if(!routeId){ toast('⚠️ Route තෝරන්න'); return; }
+  if(!lines.trim()){ toast('⚠️ ග්‍රාම නාම දාන්න'); return; }
+  
+  try{
+    const r = await bulkUpsertSubs(routeId, lines);
+    toast(`✅ Bulk OK: ${r.inserted||0} sub-routes added`);
+    qs('bulkLines').value='';
+    invalidateRoutesTree();
+    await loadRoutes(true);
+  }catch(e){ 
+    toast('❌ ' + e.message); 
+  }
+}
+
+// Daily Run functions
+function todayISO(){
+  const d = new Date();
+  const m = String(d.getMonth()+1).padStart(2,'0');
+  const da = String(d.getDate()).padStart(2,'0');
+  return `${d.getFullYear()}-${m}-${da}`;
+}
+
+function setDefaultRunDate(){
+  const el = qs('runDate');
+  if(el && !el.value) el.value = todayISO();
+  const rep = qs('repDate');
+  if(rep && !rep.value) rep.value = todayISO();
+}
+
+async function loadRunSummary(){
+  const date = qs('runDate')?.value;
+  if(!date){ toast('⚠️ දිනය තෝරන්න'); return; }
+  
+  try {
+    const d = await api(`/admin/run/${date}/summary`);
+    qs('runMeta').innerHTML = `<div class="badge ${(d.master_request) ? 'ok' : 'warn'}">${(d.master_request) ? `🔒 Locked (${d.master_request.status})` : '🔓 Not Locked'}</div>`;
+    
+    // Department rows
+    const deptRows = (d.departments || []).map(dep => 
+      `<tr>
+        <td>${dep.department_name}</td>
+        <td>${dep.submitted ? '✅' : '❌'}</td>
+        <td>${dep.requests_count || 0}</td>
+        <td>${dep.employees_count || 0}</td>
+      </tr>`
+    ).join('');
+    qs('runDeptRows').innerHTML = deptRows || '<tr><td colspan="4" class="mini">No data</td></tr>';
+    
+    // Missing departments
+    const missing = (d.missing_departments || []).join(', ') || 'None';
+    qs('runMissing').innerHTML = missing;
+    qs('runMissing').className = missing === 'None' ? 'alert ok' : 'alert warn';
+    
+  } catch(e) {
+    toast('❌ ' + e.message);
+  }
+}
+
+// Live-safe wrapper (prevents overlapping calls + avoids toast spam)
+let __runSummaryBusy = false;
+async function loadRunSummaryLive(){
+  const date = qs('runDate')?.value;
+  if(!date) return;
+  if(__runSummaryBusy) return;
+  __runSummaryBusy = true;
+  try{
+    await loadRunSummary();
+  }finally{
+    __runSummaryBusy = false;
+  }
+}
+
+
+async function lockRun(){
+  const date = qs('runDate')?.value;
+  if(!date){ toast('⚠️ දිනය තෝරන්න'); return; }
+  if(!confirm(`Lock ${date} daily run? HODs won't be able to submit/edit after this.`)) return;
+  
+  try {
+    await api(`/admin/run/${date}/lock`, {method:'POST'});
+    toast('✅ Daily run locked!');
+        await loadRunSummaryLive();
+} catch(e) {
+    toast('❌ ' + e.message);
+  }
+}
+
+function downloadPdfWithAuth(url, filename){
+  const token = localStorage.getItem("token");
+  fetch(url, {
+    method: "GET",
+    headers: token ? { "Authorization": `Bearer ${token}` } : {}
+  }).then(async (res)=>{
+    if(!res.ok){
+      const t = await res.text().catch(()=> "");
+      throw new Error(t || `HTTP ${res.status}`);
+    }
+    const blob = await res.blob();
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = filename || "report.pdf";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(()=>URL.revokeObjectURL(a.href), 3000);
+  }).catch((e)=>{
+    console.error(e);
+    // fallback open new tab
+    window.open(url, "_blank");
+  });
+}
+
+let __REPORT_PREVIEW_URL = null;
+
+function previewPdfWithAuth(url, filename){
+  const box = qs("reportPreview");
+  if(!box){
+    // fallback: download
+    downloadPdfWithAuth(url, filename);
+    return;
+  }
+  box.innerHTML = `<div class="mini">⏳ Loading PDF preview...</div>`;
+
+  try{
+    if(__REPORT_PREVIEW_URL){
+      URL.revokeObjectURL(__REPORT_PREVIEW_URL);
+      __REPORT_PREVIEW_URL = null;
+    }
+  }catch(e){}
+
+  const token = localStorage.getItem("token");
+  fetch(url, {
+    method: "GET",
+    headers: token ? { "Authorization": `Bearer ${token}` } : {}
+  }).then(async (res)=>{
+    if(!res.ok){
+      const t = await res.text().catch(()=> "");
+      throw new Error(t || `HTTP ${res.status}`);
+    }
+    const blob = await res.blob();
+    const objUrl = URL.createObjectURL(blob);
+    __REPORT_PREVIEW_URL = objUrl;
+
+    const safeName = (filename || "report.pdf").replace(/"/g, "");
+    box.innerHTML = `
+      <div class="card elevated" style="padding:12px;">
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:space-between;">
+          <div class="mini">📄 Preview: <b>${safeName}</b></div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <a class="btn ghost small" href="${objUrl}" target="_blank" rel="noopener">Open</a>
+            <a class="btn secondary small" href="${objUrl}" download="${safeName}">Download</a>
+          </div>
+        </div>
+        <div style="height:80vh; margin-top:12px;">
+          <iframe src="${objUrl}" style="width:100%;height:100%;border:1px solid rgba(255,255,255,.18);border-radius:14px;background:#fff;"></iframe>
+        </div>
+      </div>
+    `;
+  }).catch((err)=>{
+    box.innerHTML = `<div class="alert error">❌ PDF preview fail: ${escapeHtml(err?.message || err)}</div>`;
+  });
+}
+
+
+function downloadRouteReport(){
+  const d = qs("repDate")?.value;
+  if(!d){ toast("⚠️ දිනය තෝරන්න"); return; }
+  const base = (API_BASE_URL || "").replace(/\/$/, "");
+  const url = `${base}/reports/daily/route-wise?date=${encodeURIComponent(d)}`;
+  previewPdfWithAuth(url, `route-wise-${d}.pdf`);
+}
+// Initialize
+(async()=>{
+  await guard();
+  setDefaultRunDate();
+  // Load run summary once + keep it live
+  await loadRunSummaryLive();
+  try{
+    const rd = qs('runDate');
+    if(rd) rd.addEventListener('change', ()=>loadRunSummaryLive());
+  }catch(e){}
+  setInterval(()=>{ if(document.hidden) return; loadRunSummaryLive(); }, 25000);
+
+  await loadRequests();
+  await loadDepartments();
+  await loadRoutes();
+  
+  // Load HOD registrations (with 404 handling)
+  setTimeout(()=>{ 
+    try{ 
+      renderHodRegs(); 
+    }catch(e){
+      console.error('HOD Regs init error:', e);
+    } 
+  }, 500);
+})();
+</script>
+
+</body>
+</html>
+``` [❶](code://python)

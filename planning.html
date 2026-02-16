@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="si">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <meta name="theme-color" content="#E11D48"/>
+  <title>📊 Planning Department - Reports</title>
+  <link rel="stylesheet" href="assets/styles.css"/>
+  <script src="assets/config.js"></script>
+  <script src="assets/app.js"></script>
+</head>
+<body>
+
+<header>
+  <h1>📊 Planning Department</h1>
+  <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+    <a href="index.html" class="btn ghost small">🏠 Home</a>
+    <a href="profile.html" class="btn ghost small">👤 Profile</a>
+    <button class="btn ghost small" onclick="toggleTheme()">🌓 Theme</button>
+    <button class="btn secondary small" onclick="logout()">Logout</button>
+  </div>
+</header>
+
+<main class="container">
+  <div class="card elevated" style="margin-bottom:16px; padding:14px 16px;">
+    <div style="display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; align-items:center;">
+      <div>
+        <div style="font-weight:900; font-size:18px;">Department-wise Daily Report</div>
+        <div class="muted" style="margin-top:4px;">HR අවසාන අනුමැතිය (Final Approved) ලැබුණු දවස් සඳහා පමණක් ලබාගත හැක.</div>
+      </div>
+      <div class="badge ok" id="meRole" style="height: fit-content;">PLANNING</div>
+    </div>
+  </div>
+
+  <div class="grid" style="grid-template-columns: 1fr; gap:16px;">
+    <div class="card">
+      <h3 style="margin-top:0;">Report Settings</h3>
+
+      <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:12px;">
+        <div>
+          <label>📅 Date (අනිවාර්යයි)</label>
+          <input id="date" type="date" />
+        </div>
+
+        <div>
+          <label>🏢 Department (Optional)</label>
+          <select id="department_id"></select>
+          <div class="muted" style="margin-top:6px; font-size:12px;">"All Departments" තෝරාගත්තොත් එක් Department එකට එක් Sheet එකක් ලෙස Excel එක ලැබේ.</div>
+        </div>
+
+        <div>
+          <label>⏰ Off Time (Optional)</label>
+          <input id="off_time" type="time" />
+        </div>
+      </div>
+
+      <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:14px;">
+        <button class="btn btn-primary" id="btnDownload">⬇️ Excel Download</button>
+        <button class="btn ghost" id="btnClear">🧹 Clear</button>
+      </div>
+
+      <div id="msg" class="alert error hidden" style="margin-top:12px;"></div>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-top:0;">Output</h3>
+      <ul style="margin:0; padding-left:18px;">
+        <li>Excel file එකේ **එක් Department එකට එක් Sheet**.</li>
+        <li>Columns: <b>Emp Name</b>, <b>Emp No</b> සහ <b>Total</b> row එක.</li>
+        <li>Data source: තෝරාගත් දිනයේ <b>Daily Master</b> request එක (Final Approved).</li>
+      </ul>
+    </div>
+  </div>
+</main>
+
+<script>
+(async function init(){
+  try{
+    await guardRole("PLANNING");
+
+    // Default date = today (local)
+    const d = new Date();
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth()+1).padStart(2,'0');
+    const dd = String(d.getDate()).padStart(2,'0');
+    qs("date").value = `${yyyy}-${mm}-${dd}`;
+
+    // Load departments
+    const dep = await api("/public/departments");
+    const list = dep.departments || [];
+
+    const sel = qs("department_id");
+    sel.innerHTML = `<option value="">All Departments</option>` +
+      list.map(d=>`<option value="${d.id}">${d.name}</option>`).join("");
+
+  }catch(e){
+    toast(e.message || "Error");
+  }
+})();
+
+function showErr(message){
+  const msg = qs("msg");
+  msg.textContent = "❌ " + (message || "Error");
+  msg.classList.remove("hidden");
+}
+function clearErr(){
+  qs("msg").classList.add("hidden");
+}
+
+qs("btnClear").onclick = ()=>{
+  qs("department_id").value = "";
+  qs("off_time").value = "";
+  clearErr();
+};
+
+qs("btnDownload").onclick = async ()=>{
+  clearErr();
+  const date = (qs("date").value || "").trim();
+  const department_id = (qs("department_id").value || "").trim();
+  const off_time = (qs("off_time").value || "").trim();
+
+  if(!date){
+    showErr("කරුණාකර Date තෝරන්න (YYYY-MM-DD)");
+    return;
+  }
+
+  const token = getToken();
+  if(!token){
+    location.href = "login.html";
+    return;
+  }
+
+  const base = (API_BASE_URL || "").replace(/\/$/, "");
+  let url = `${base}/reports/daily/department-excel?date=${encodeURIComponent(date)}`;
+  if(department_id) url += `&department_id=${encodeURIComponent(department_id)}`;
+  if(off_time) url += `&off_time=${encodeURIComponent(off_time)}`;
+
+  const btn = qs("btnDownload");
+  btn.disabled = true;
+  btn.textContent = "⏳ Downloading...";
+
+  try{
+    toast("⏳ බාගත කරමින්...");
+    const res = await fetch(url, {
+      method: "GET",
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "Accept": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+      }
+    });
+
+    if(!res.ok){
+      const t = await res.text();
+      let msg = `HTTP ${res.status}`;
+      try{
+        const j = JSON.parse(t);
+        msg = j.error || j.message || msg;
+      }catch(_){
+        msg = t || msg;
+      }
+      throw new Error(msg);
+    }
+
+    const blob = await res.blob();
+    const fname = department_id ? `department-${department_id}-${date}.xlsx` : `department-wise-${date}.xlsx`;
+
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = fname;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(()=>URL.revokeObjectURL(a.href), 800);
+
+    toast("✅ Download complete");
+  }catch(e){
+    showErr(e.message || "Download failed");
+  }finally{
+    btn.disabled = false;
+    btn.textContent = "⬇️ Excel Download";
+  }
+};
+</script>
+
+</body>
+</html>

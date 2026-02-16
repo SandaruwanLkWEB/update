@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="si">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>පෞද්ගලිකත්ව ප්‍රතිපත්තිය | DSI Transport</title>
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; connect-src 'self' https://transport-production-e5c7.up.railway.app;" />
+  <link rel="stylesheet" href="/assets/styles.css" />
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <div class="logo">DSI</div>
+      <div>
+        <div class="title">DSI Transport</div>
+        <div class="subtitle">පෞද්ගලිකත්ව ප්‍රතිපත්තිය</div>
+      </div>
+    </div>
+    <div class="right">
+      <a class="btn" href="/login.html">Login</a>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="card">
+      <h2>අභ්‍යන්තර දත්ත පමණක්</h2>
+      <p class="muted">මෙම වෙබ් පද්ධතිය <b>DSI ආයතනයේ අභ්‍යන්තර ප්‍රවාහන කළමනාකරණය</b> සඳහා පමණක් භාවිතා වේ. <b>Company internal data only</b> — බාහිර මහජන සේවාවක් නොවේ.</p>
+
+      <h3>අපි එකතු කරන දත්ත</h3>
+      <ul>
+        <li>Login සඳහා: email, password hash (සර්වරයේ), role, status.</li>
+        <li>සේවකයන් සඳහා: emp no, නම, department, default route/sub-route, active status.</li>
+        <li>දිනපතා ඉල්ලීම්/අනුමත කිරීම: request records, route/sub-route grouping, vehicle assignment.</li>
+        <li>තාක්ෂණික: browser localStorage (token/role/email) — login session පවත්වාගෙන යාමට.</li>
+      </ul>
+
+      <h3>දත්ත භාවිතා කරන්නේ මොකටද?</h3>
+      <ul>
+        <li>දිනපතා ප්‍රවාහන ඉල්ලීම් සකස් කිරීම සහ අනුමත කිරීම (HOD → Admin → TA → HR).</li>
+        <li>රූට්/සබ්-රූට් අනුව සේවකයින් වෙන් කරවා වාහන පවරීම සහ capacity validate කිරීම.</li>
+        <li>Report (Route-wise / Vehicle-wise) සාදමින් HR final approval පසු download කිරීම.</li>
+      </ul>
+
+      <h3>දත්ත ප්‍රවේශය සහ බෙදාගැනීම</h3>
+      <ul>
+        <li>Role-based access: Admin/HOD/TA/HR/EMP roles අනුවම screens & API access සීමා කර ඇත.</li>
+        <li>අභ්‍යන්තර අවශ්‍යතාවයට පමණක් — තෙවන පාර්ශ්වයන්ට (third parties) අලෙවි/බෙදා නොදේ.</li>
+      </ul>
+
+      <h3>දත්ත රඳවා තබාගැනීම</h3>
+      <p class="muted">ආයතනික අවශ්‍යතාව (audit/report) අනුව දත්ත රඳවා තබාගනී. අවශ්‍ය නොවන පරණ දත්ත පසුව සමාගම විසින් ඉවත් කළ හැක.</p>
+
+      <h3>ඔබගේ වගකීම</h3>
+      <ul>
+        <li>ඔබේ login විස්තර වෙන අයට නොදෙන්න.</li>
+        <li>Public/Shared device වලින් login වුවහොත් logout කරන්න.</li>
+      </ul>
+
+      <h3>සම්බන්ධ වීමට</h3>
+      <p>ඕනෑම පෞද්ගලිකත්ව ගැටළුවක්/පැමිණිල්ලක් සඳහා: <b>contract@dsitransport.top</b></p>
+    </div>
+  </main>
+
+  <script src="/assets/app.js"></script>
+</body>
+</html>

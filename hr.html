@@ -1,0 +1,394 @@
+<!doctype html>
+<html lang="si">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="theme-color" content="#E11D48" />
+  <title>HR Dashboard - Transport Management</title>
+  <link rel="stylesheet" href="assets/styles.css" />
+  <script src="assets/config.js"></script>
+  <script src="assets/app.js"></script>
+</head>
+<body>
+
+<!-- Glassmorphic Header -->
+<header>
+  <h1>👥 මානව සම්පත් අංශය (ප්‍රධාන කාර්‍යාලය ඩී සැම්සන් රාජපක්ෂ මාවත ගාල්ල) (HR)</h1>
+  <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+    <a href="index.html" class="btn ghost small">🏠 මුල් පිටුව</a>
+    <a href="profile.html" class="btn ghost small">👤 Profile</a>
+    <button class="btn ghost small" onclick="toggleTheme()">🌓 Theme</button>
+    <button class="btn secondary small" onclick="logout()">ඉවත් වන්න</button>
+  </div>
+</header>
+
+<main class="container">
+  <!-- User Info Card -->
+  <div class="card elevated" id="meBox" style="margin-bottom:16px; padding:12px 18px;">
+    <span style="color: var(--muted);">Loading...</span>
+  </div>
+
+  <!-- Tab Navigation -->
+  <div class="card" style="margin-bottom:14px;">
+    <div class="tabs">
+      <button class="btn active" id="tabApprove" onclick="setTab('approve')">✅ අවසන් අනුමැතිය</button>
+      <button class="btn" id="tabReports" onclick="setTab('reports')">📊 වාර්තා</button>
+    </div>
+  </div>
+
+  <!-- Approvals Pane -->
+  <div class="card soft" id="pane_approve">
+    <h2 class="h2">📋 TA Assigned ඉල්ලීම්</h2>
+    <hr/>
+    <div class="btnrow" style="margin-bottom:14px;">
+      <button class="btn ghost" onclick="loadTARequests()">🔄 Refresh</button>
+    </div>
+    <div id="listBox" class="small">Loading...</div>
+  </div>
+
+  <!-- Reports Pane -->
+  <div class="card soft" id="pane_reports" style="display:none;">
+    <h2 class="h2">📊 වාර්තා ලබා ගන්න</h2>
+    <hr/>
+    <div class="alert info" style="margin-bottom:14px;">
+      Reports download කරන්නේ HR අවසන් අනුමැතිය දුන්නාට පස්සෙ පමණයි. දිනය select කරලා download කරන්න.
+    </div>
+    
+    <div class="grid two">
+      <div>
+        <label>📆 දිනය</label>
+        <input id="repDate" type="date" />
+      </div>
+      <div>
+        <label>Actions</label>
+        <div class="btnrow" style="margin-top:6px;">
+          <button class="btn btn-primary" onclick="downloadRouteReport()">📄 Route-wise PDF</button>
+          <button class="btn secondary" onclick="downloadVehicleReport()">📄 Vehicle PDF</button>
+        </div>
+      </div>
+    </div>
+    <p class="mini" style="margin-top:10px;">💡 If your browser blocks downloads, open the URL in new tab.</p>
+  </div>
+
+</main>
+
+<!-- Request Details Modal -->
+<div id="detailsModal" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.5); z-index:1000; overflow-y:auto;" onclick="closeDetails(event)">
+  <div class="card" style="max-width:900px; margin:40px auto; max-height:90vh; overflow-y:auto;" onclick="event.stopPropagation()">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+      <h2 class="h2" style="margin:0;">📋 Request Details</h2>
+      <button class="btn ghost small" onclick="closeDetails()">✕ Close</button>
+    </div>
+    <hr/>
+    <div id="detailsContent"></div>
+  </div>
+</div>
+
+<script>
+let ME=null;
+let LIST=[];
+let CURRENT_DETAIL = null;
+
+function setTab(tab){
+  const tabs = ["approve","reports"];
+  for(const t of tabs){
+    qs("pane_"+t).style.display = (t===tab) ? "" : "none";
+    qs("tab"+t.charAt(0).toUpperCase()+t.slice(1)).classList.toggle("active", t===tab);
+  }
+}
+
+async function guard(){
+  ME = await guardRole("HR");
+  if(!ME) return;
+  qs("meBox").innerHTML = `<strong style="color: var(--brand);">${ME.role}</strong> <span style="color: var(--muted);">|</span> <span style="color: var(--text-secondary);">${ME.email}</span>`;
+}
+
+async function loadTARequests(){
+  try{
+    const d = await api("/hr/requests/ta-assigned");
+    LIST = d.requests || [];
+    render();
+  }catch(e){
+    toast("❌ " + e.message);
+  }
+}
+
+function render(){
+  if(LIST.length===0){ 
+    qs("listBox").innerHTML = "<span class='badge good'>✅ බලාපොරොත්තු වූ ඉල්ලීම් නැත</span>"; 
+    return; 
+  }
+  
+  let html = "<div class='table-wrap'><table><thead><tr><th>ID</th><th>දිනය</th><th>වේලාව</th><th>දෙපාර්තමේන්තුව</th><th>තත්ත්වය</th><th>ක්‍රියාව</th></tr></thead><tbody>";
+  for(const r of LIST){
+    html += `<tr>
+      <td><strong>#${r.id}</strong></td>
+      <td>${fmtDate(r.request_date)}</td>
+      <td>${fmtTime(r.request_time)}</td>
+      <td>${r.department_name}</td>
+      <td>${statusBadge(r.status)}</td>
+      <td>
+        <div style="display:flex; gap:6px; flex-wrap:wrap;">
+          <button class="btn small ghost" onclick="viewDetails(${r.id})">👁️ View</button>
+          ${r.status==="TA_ASSIGNED_PENDING_HR" ? `
+            <button class="btn small" onclick="overApprove(${r.id})">✅ Override අනුමත</button>
+            <button class="btn small secondary" onclick="overReject(${r.id})">❌ Override ප්‍රතික්ෂේප</button>
+          ` : `
+            <button class="btn small btn-primary" onclick="finalApprove(${r.id})">✅ අවසාන අනුමැතිය</button>
+          `}
+        </div>
+      </td>
+    </tr>`;
+  }
+  html += "</tbody></table></div>";
+  qs("listBox").innerHTML = html;
+}
+
+async function viewDetails(id){
+  try{
+    CURRENT_DETAIL = id;
+    qs("detailsModal").style.display = "block";
+    qs("detailsContent").innerHTML = "<div style='text-align:center; padding:40px;'>Loading...</div>";
+    
+    const req = LIST.find(r => r.id === id);
+    
+    // Get employees
+    const empData = await api(`/admin/requests/${id}/employees`);
+    const employees = empData.employees || [];
+    
+    // Get assignments
+    const assignData = await api(`/admin/requests/${id}/assignments-summary`);
+    const assignments = assignData.assignments || [];
+    
+    // Group employees by route
+    const byRoute = {};
+    for(const emp of employees){
+      const routeKey = emp.effective_route_id || 'NO_ROUTE';
+      if(!byRoute[routeKey]) {
+        byRoute[routeKey] = {
+          route_no: emp.route_no || 'No Route',
+          route_name: emp.route_name || '',
+          sub_routes: {},
+          total: 0
+        };
+      }
+      
+      const subKey = emp.effective_sub_route_id || 'MAIN';
+      if(!byRoute[routeKey].sub_routes[subKey]){
+        byRoute[routeKey].sub_routes[subKey] = {
+          sub_name: emp.sub_name || 'Main Route',
+          employees: []
+        };
+      }
+      
+      byRoute[routeKey].sub_routes[subKey].employees.push(emp);
+      byRoute[routeKey].total++;
+    }
+    
+    let html = `
+      <div class="card" style="background:#fff; border:1px solid var(--border); margin-bottom:14px;">
+        <div class="h2">📌 Request Info</div>
+        <div class="mini" style="margin-top:8px;">
+          <strong>Request ID:</strong> #${req.id}<br/>
+          <strong>දිනය:</strong> ${fmtDate(req.request_date)}<br/>
+          <strong>වේලාව:</strong> ${fmtTime(req.request_time)}<br/>
+          <strong>තත්ත්වය:</strong> ${statusBadge(req.status)}
+        </div>
+      </div>
+      
+      <div class="card" style="background:#fff; border:1px solid var(--border); margin-bottom:14px;">
+        <div class="h2">👥 Employee Details (${employees.length} total)</div>
+        <div style="margin-top:12px;">
+    `;
+    
+    for(const [routeKey, routeData] of Object.entries(byRoute)){
+      html += `
+        <div style="margin-bottom:16px;">
+          <div style="font-weight:700; font-size:15px; color: var(--brand);">
+            ${routeData.route_no}${routeData.route_name ? ' - ' + routeData.route_name : ''} (${routeData.total} employees)
+          </div>
+      `;
+      
+      for(const [subKey, subData] of Object.entries(routeData.sub_routes)){
+        html += `
+          <div style="margin-left:20px; margin-top:8px;">
+            <div style="font-weight:600; font-size:14px;">📍 ${subData.sub_name} (${subData.employees.length})</div>
+            <div class="mini" style="margin-top:4px;">
+        `;
+        
+        for(const emp of subData.employees){
+          html += `• ${emp.full_name} (${emp.emp_no})<br/>`;
+        }
+        
+        html += `</div></div>`;
+      }
+      
+      html += `</div>`;
+    }
+    
+    html += `</div></div>`;
+    
+    // Assignments
+    html += `
+      <div class="card" style="background:#fff; border:1px solid var(--border);">
+        <div class="h2">🚗 Vehicle Assignments</div>
+        <div style="margin-top:12px;">
+    `;
+    
+    if(assignments.length === 0){
+      html += `<div class="alert">⚠️ No vehicle assignments yet</div>`;
+    } else {
+      // Group assignments by route
+      const assignByRoute = {};
+      for(const a of assignments){
+        const rkey = a.route_id || 'NO_ROUTE';
+        if(!assignByRoute[rkey]) assignByRoute[rkey] = [];
+        assignByRoute[rkey].push(a);
+      }
+      
+      for(const [rkey, assigns] of Object.entries(assignByRoute)){
+        const firstAssign = assigns[0];
+        const routeLabel = firstAssign.route_no ? `${firstAssign.route_no} - ${firstAssign.route_name}` : 'No Route';
+        
+        html += `
+          <div style="margin-bottom:16px;">
+            <div style="font-weight:700; font-size:15px; color: var(--brand);">${routeLabel}</div>
+            <div class="table-wrap" style="margin-top:8px;">
+              <table>
+                <thead>
+                  <tr><th>Vehicle</th><th>Driver</th><th>Phone</th><th>Capacity</th><th>Override</th></tr>
+                </thead>
+                <tbody>
+        `;
+        
+        for(const a of assigns){
+          const overrideInfo = a.overbook_amount > 0 ? `+${a.overbook_amount} (${a.overbook_status})` : '-';
+          html += `
+            <tr>
+              <td><strong>${a.vehicle_no}</strong></td>
+              <td>${a.driver_name || 'N/A'}</td>
+              <td>${a.driver_phone || 'N/A'}</td>
+              <td>${a.capacity}</td>
+              <td>${overrideInfo}</td>
+            </tr>
+          `;
+        }
+        
+        html += `</tbody></table></div></div>`;
+      }
+    }
+    
+    html += `</div></div>`;
+    
+    qs("detailsContent").innerHTML = html;
+    
+  }catch(e){
+    qs("detailsContent").innerHTML = `<div class="alert bad">❌ Error loading details: ${e.message}</div>`;
+  }
+}
+
+function closeDetails(event){
+  if(!event || event.target.id === 'detailsModal'){
+    qs("detailsModal").style.display = "none";
+    CURRENT_DETAIL = null;
+  }
+}
+
+async function overApprove(id){
+  try{
+    await api(`/hr/requests/${id}/overbook/approve`, {method:"POST"});
+    toast("✅ ඔවරයිඩ් (+1/+2) අනුමත කරන ලදී");
+    await loadTARequests();
+  }catch(e){ toast("❌ " + e.message); }
+}
+
+async function overReject(id){
+  try{
+    await api(`/hr/requests/${id}/overbook/reject`, {method:"POST"});
+    toast("✅ ඔවරයිඩ් ප්‍රතික්ෂේප කරන ලදී");
+    await loadTARequests();
+  }catch(e){ toast("❌ " + e.message); }
+}
+
+async function finalApprove(id){
+  try{
+    await api(`/hr/requests/${id}/final-approve`, {method:"POST"});
+    toast("✅ අවසාන අනුමැතිය ලබා දුන්නා");
+    await loadTARequests();
+  }catch(e){ toast("❌ " + e.message); }
+}
+
+
+async function downloadPdfWithAuth(url, filename){
+  try{
+    const token = (typeof getToken === "function") ? getToken() : localStorage.getItem("token");
+    const headers = token ? { "Authorization": `Bearer ${token}` } : {};
+    const res = await fetch(url, { method:"GET", headers });
+    if(res.status === 401){
+      if (typeof clearToken === "function") clearToken(); else localStorage.removeItem("token");
+      location.href = "login.html";
+      return;
+    }
+    if(!res.ok){
+      const text = await res.text();
+      let msg = text;
+      try{ const j = text ? JSON.parse(text) : {}; msg = j.error || j.message || text; }catch(e){}
+      msg = (msg && String(msg).trim()) || `Server error (HTTP ${res.status}).`;
+      if (typeof toast === "function") toast(msg); else alert(msg);
+      return;
+    }
+    const blob = await res.blob();
+    const a = document.createElement("a");
+    const objUrl = URL.createObjectURL(blob);
+    a.href = objUrl;
+    a.download = filename || "report.pdf";
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => {
+      URL.revokeObjectURL(objUrl);
+      a.remove();
+    }, 1200);
+  }catch(e){
+    const msg = "ජාල/සම්බන්ධතා ගැටලුවක්. කරුණාකර නැවත උත්සාහ කරන්න.";
+    if (typeof toast === "function") toast(msg); else alert(msg);
+  }
+}
+
+function downloadRouteReport(){
+  const d = qs("repDate").value;
+  if(!d){ toast("⚠️ දිනය තෝරන්න"); return; }
+  const base = (API_BASE_URL || "").replace(/\/$/, "");
+  const url = `${base}/reports/daily/route-wise?date=${encodeURIComponent(d)}`;
+  downloadPdfWithAuth(url, `route-wise-${d}.pdf`);
+}
+
+function downloadVehicleReport(){
+  const d = qs("repDate").value;
+  if(!d){ toast("⚠️ දිනය තෝරන්න"); return; }
+  const base = (API_BASE_URL || "").replace(/\/$/, "");
+  const url = `${base}/reports/daily/vehicle?date=${encodeURIComponent(d)}`;
+  downloadPdfWithAuth(url, `vehicle-${d}.pdf`);
+}
+
+(async function init(){
+  try{
+    await guard();
+    await loadTARequests();
+  }catch(e){ 
+    toast("❌ " + e.message); 
+  }
+})();
+
+function todayISO(){
+  const d = new Date();
+  const m = String(d.getMonth()+1).padStart(2,'0');
+  const da = String(d.getDate()).padStart(2,'0');
+  return `${d.getFullYear()}-${m}-${da}`;
+}
+(function(){
+  const rep = qs('repDate');
+  if(rep && !rep.value) rep.value = todayISO();
+})(); 
+</script>
+</body>
+</html>

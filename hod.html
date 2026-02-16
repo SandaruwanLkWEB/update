@@ -1,0 +1,530 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>HOD Dashboard</title>
+  <link rel="stylesheet" href="assets/styles.css" />
+  <script src="assets/config.js"></script>
+  <script src="assets/app.js"></script>
+</head>
+<body>
+<header>
+  <h1>HOD Dashboard</h1>
+  <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+    <a href="index.html" class="btn ghost small">🏠 Home</a>
+    <a href="profile.html" class="btn ghost small">👤 Profile</a>
+    <button class="btn ghost small" onclick="toggleTheme()">🌓 Theme</button>
+    <button class="btn secondary small" onclick="logout()">Logout</button>
+  </div>
+</header>
+
+<div class="container">
+  <div class="card" id="meBox"></div>
+
+  <div class="card">
+    <div class="tabs">
+      <button class="btn active" id="tabApprovals" onclick="showTab('approvals')">Approvals</button>
+      <button class="btn" id="tabEmployees" onclick="showTab('employees')">Employees</button>
+      <button class="btn" id="tabRequests" onclick="showTab('requests')">Requests</button>
+    </div>
+  </div>
+
+  <!-- Approvals -->
+  <div class="card" id="pane_approvals">
+    <h2 style="margin:0 0 10px;">Pending Registrations</h2>
+    <div id="pendingBox" class="small">Loading...</div>
+  </div>
+
+  <!-- Employees -->
+  <div class="card" id="pane_employees" style="display:none;">
+    <h2 style="margin:0 0 10px;">Employee Management</h2>
+
+    <div class="row">
+      <div>
+        <label>Full Name</label>
+        <input id="eName" placeholder="Saman Perera" />
+      </div>
+      <div>
+        <label>Emp No</label>
+        <input id="eNo" placeholder="EMP001" />
+      </div>
+    </div>
+
+    <div class="row">
+      <div>
+        <label>පෙරනිමි රූට්</label>
+        <select id="eRoute"></select>
+      </div>
+      <div>
+        <label>Default ග්‍රාම</label>
+        <select id="eSub"></select>
+      </div>
+    </div>
+
+    <div class="row">
+      <div>
+        <label>Email (Optional)</label>
+        <input id="eEmail" type="email" placeholder="emp@company.lk" />
+        <div class="small">Email + Password දුන්නොත් account එක එවෙලේම ACTIVE (EMP role) වේ.</div>
+      </div>
+      <div>
+        <label>Password (Optional)</label>
+        <input id="ePass" type="password" placeholder="min 6 chars" />
+      </div>
+    </div>
+
+    <div style="display:flex; gap:8px; flex-wrap:wrap;">
+      <button class="btn" onclick="addEmployee()">Add Employee</button>
+      <button class="btn ghost" onclick="loadEmployees()">Refresh</button>
+    </div>
+
+    <div class="hr"></div>
+
+    <div class="row">
+      <div>
+        <label>Search</label>
+        <input id="empSearch" placeholder="type name or emp no..." oninput="renderEmployees()" />
+      </div>
+      <div></div>
+    </div>
+
+    <div id="empList"></div>
+  </div>
+
+  <!-- Requests -->
+  <div class="card" id="pane_requests" style="display:none;">
+    <h2 style="margin:0 0 10px;">Daily Requests</h2>
+
+    <div class="row">
+      <div>
+        <label>Date</label>
+        <input id="rDate" placeholder="YYYY-MM-DD" />
+      </div>
+      <div>
+        <label>Time</label>
+        <input id="rTime" placeholder="HH:MM" />
+      </div>
+    </div>
+    <label>Notes (Optional)</label>
+    <textarea id="rNotes" rows="2" placeholder="Special OT / notes..."></textarea>
+
+    <div class="row">
+      <div>
+        <label>Employee Search</label>
+        <input id="selSearch" placeholder="filter employees..." oninput="renderSelectEmployees()" />
+        <div class="small">Tick කරලා select කරලා route/sub route override කරන්න පුළුවන්.</div>
+      </div>
+      <div>
+        <label>Persist changes to Employee defaults?</label>
+        <select id="persistMode">
+          <option value="NO">No (only for this request)</option>
+          <option value="YES">Yes (update employee default route/sub too)</option>
+        </select>
+      </div>
+    </div>
+
+    <div id="selectEmployeesBox"></div>
+
+    <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:10px;">
+      <button class="btn" onclick="createDraft()">Create Draft</button>
+      <button class="btn ghost" onclick="loadRequests()">Refresh Requests</button>
+    </div>
+
+    <div class="hr"></div>
+
+    <h3 style="margin:0 0 10px;">My Requests (latest 50)</h3>
+    <div id="reqList" class="small">Loading...</div>
+
+    <div class="hr"></div>
+
+    <div id="reqEditor" style="display:none;">
+      <h3 style="margin:0 0 10px;">Request Editor: <span id="editReqId"></span></h3>
+      <div id="reqMeta" class="small"></div>
+      <div class="hr"></div>
+      <div id="reqEmployeesBox"></div>
+
+      <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:10px;">
+        <button class="btn" onclick="saveReqChanges()">Save Changes</button>
+        <button class="btn secondary" onclick="submitRequest()">Submit to Admin</button>
+        <button class="btn ghost" onclick="closeEditor()">Close</button>
+      </div>
+      <p class="small">⚠ Admin approve වුන පස්සේ request එක lock වෙනවා.</p>
+    </div>
+
+  </div>
+</div>
+
+<script>
+let ME = null;
+let EMP = [];
+let REQS = [];
+let CURRENT_REQ_ID = null;
+let PENDING_CHANGES = new Map(); // key employee_id -> {effective_route_id, effective_sub_route_id, remove, persist_to_employee}
+
+function setTab(active){
+  const tabs = ["approvals","employees","requests"];
+  for(const t of tabs){
+    qs("pane_"+t).style.display = (t===active) ? "" : "none";
+    qs("tab"+t.charAt(0).toUpperCase()+t.slice(1)).classList.toggle("active", t===active);
+  }
+}
+
+function showTab(t){ setTab(t); }
+
+async function initLookups(){
+  const tree = await loadRouteTree(true);
+  // Employee add route selects
+  qs("eRoute").innerHTML = optionHTML(tree.routes.map(r=>({id:r.id, label:`${r.route_no} - ${r.route_name}`})),"id","label","",true,"-- Select Route --");
+  qs("eRoute").addEventListener("change", ()=>{
+    const rid = qs("eRoute").value;
+    const subs = subRoutesFor(rid).map(s=>({id:s.id, label:s.sub_name}));
+    qs("eSub").innerHTML = optionHTML(subs,"id","label","",true,"-- Select ග්‍රාම --");
+  });
+  qs("eSub").innerHTML = optionHTML([],"id","label","",true,"-- Select ග්‍රාම --");
+}
+
+function routeLabel(route_id){
+  if(!ROUTE_TREE) return "";
+  const r = ROUTE_TREE.routes.find(x => String(x.id)===String(route_id));
+  return r ? `${r.route_no} - ${r.route_name}` : "";
+}
+function subLabel(sub_id){
+  if(!ROUTE_TREE) return "";
+  const s = ROUTE_TREE.sub_routes.find(x => String(x.id)===String(sub_id));
+  return s ? s.sub_name : "";
+}
+
+async function guard(){
+  ME = await guardRole("HOD");
+  if(!ME) return;
+  qs("meBox").innerHTML = `<b>${ME.role}</b> | ${ME.email} | Dept ID: ${ME.department_id}`;
+  // defaults
+  const today = new Date();
+  const yyyy = today.getFullYear();
+  const mm = String(today.getMonth()+1).padStart(2,"0");
+  const dd = String(today.getDate()).padStart(2,"0");
+  qs("rDate").value = `${yyyy}-${mm}-${dd}`;
+}
+
+async function loadPending(){
+  const d = await api("/hod/registrations/pending");
+  if(d.pending.length===0){ qs("pendingBox").innerHTML = "<span class='badge good'>No pending</span>"; return; }
+  let html = "<table><tr><th>ID</th><th>Email</th><th>Created</th><th>Action</th></tr>";
+  for(const p of d.pending){
+    html += `<tr>
+      <td>${p.id}</td>
+      <td>${p.email}</td>
+      <td>${(p.created_at||"").toString().slice(0,19).replace("T"," ")}</td>
+      <td><button class='btn small' onclick='approveReg(${p.id})'>Approve</button></td>
+    </tr>`;
+  }
+  html += "</table>";
+  qs("pendingBox").innerHTML = html;
+}
+
+async function approveReg(id){
+  try{
+    await api(`/hod/registrations/${id}/approve`, {method:"POST"});
+    toast("Approved");
+    await loadPending();
+  }catch(e){ toast(e.message); }
+}
+
+async function loadEmployees(){
+  const d = await api("/hod/employees");
+  EMP = d.employees || [];
+  renderEmployees();
+  renderSelectEmployees();
+}
+
+function renderEmployees(){
+  const q = (qs("empSearch").value||"").toLowerCase();
+  const list = EMP.filter(e => (e.full_name||"").toLowerCase().includes(q) || (e.emp_no||"").toLowerCase().includes(q));
+  let html = "<table><tr><th>Name</th><th>Emp No</th><th>පෙරනිමි රූට්</th><th>පෙරනිමි ග්‍රාම</th><th>Active</th><th>Action</th></tr>";
+  for(const e of list){
+    const routeOptions = optionHTML(
+      ROUTE_TREE.routes.map(r=>({id:r.id, label:`${r.route_no} - ${r.route_name}`})),
+      "id","label", e.default_route_id || "", true, "--"
+    );
+    const subs = subRoutesFor(e.default_route_id || "").map(s=>({id:s.id, label:s.sub_name}));
+    const subOptions = optionHTML(subs, "id","label", e.default_sub_route_id || "", true, "--");
+    html += `<tr>
+      <td>${e.full_name}</td>
+      <td>${e.emp_no}</td>
+      <td>
+        <select id="er_${e.id}" onchange="onEmpRouteChange(${e.id})">${routeOptions}</select>
+      </td>
+      <td>
+        <select id="es_${e.id}">${subOptions}</select>
+      </td>
+      <td>
+        <select id="ea_${e.id}">
+          <option value="true" ${e.is_active ? "selected":""}>Yes</option>
+          <option value="false" ${!e.is_active ? "selected":""}>No</option>
+        </select>
+      </td>
+      <td>
+        <button class="btn small" onclick="saveEmployee(${e.id})">Save</button>
+      </td>
+    </tr>`;
+  }
+  html += "</table>";
+  qs("empList").innerHTML = html;
+}
+
+function onEmpRouteChange(empId){
+  const rid = qs("er_"+empId).value;
+  const subs = subRoutesFor(rid).map(s=>({id:s.id, label:s.sub_name}));
+  qs("es_"+empId).innerHTML = optionHTML(subs, "id","label","", true, "--");
+}
+
+async function saveEmployee(empId){
+  try{
+    const body = {
+      default_route_id: qs("er_"+empId).value ? parseInt(qs("er_"+empId).value,10) : null,
+      default_sub_route_id: qs("es_"+empId).value ? parseInt(qs("es_"+empId).value,10) : null,
+      is_active: qs("ea_"+empId).value === "true"
+    };
+    await api(`/hod/employees/${empId}`, {method:"PATCH", body: JSON.stringify(body)});
+    toast("Saved");
+    await loadEmployees();
+  }catch(e){ toast(e.message); }
+}
+
+async function addEmployee(){
+  try{
+    const body = {
+      full_name: qs("eName").value.trim(),
+      emp_no: qs("eNo").value.trim(),
+      default_route_id: qs("eRoute").value ? parseInt(qs("eRoute").value,10) : null,
+      default_sub_route_id: qs("eSub").value ? parseInt(qs("eSub").value,10) : null
+    };
+    const email = qs("eEmail").value.trim();
+    const pass = qs("ePass").value;
+    if(email && pass){ body.email=email; body.password=pass; }
+
+    await api("/hod/employees", {method:"POST", body: JSON.stringify(body)});
+    qs("eName").value=""; qs("eNo").value=""; qs("eEmail").value=""; qs("ePass").value="";
+    qs("eRoute").value=""; qs("eSub").innerHTML = optionHTML([], "id","label","", true, "-- Select ග්‍රාම --");
+    toast("Employee added");
+    await loadEmployees();
+  }catch(e){ toast(e.message); }
+}
+
+function renderSelectEmployees(){
+  const q = (qs("selSearch").value||"").toLowerCase();
+  const list = EMP.filter(e => e.is_active).filter(e => (e.full_name||"").toLowerCase().includes(q) || (e.emp_no||"").toLowerCase().includes(q));
+  let html = "<table><tr><th></th><th>Name</th><th>Emp No</th><th>රූට්</th><th>ග්‍රාම</th></tr>";
+  for(const e of list){
+    const routeOptions = optionHTML(
+      ROUTE_TREE.routes.map(r=>({id:r.id, label:`${r.route_no} - ${r.route_name}`})),
+      "id","label", e.default_route_id || "", true, "--"
+    );
+    const subs = subRoutesFor(e.default_route_id || "").map(s=>({id:s.id, label:s.sub_name}));
+    const subOptions = optionHTML(subs, "id","label", e.default_sub_route_id || "", true, "--");
+    html += `<tr>
+      <td><input type="checkbox" id="chk_${e.id}"></td>
+      <td>${e.full_name}</td>
+      <td>${e.emp_no}</td>
+      <td><select id="sr_${e.id}" onchange="onSelRouteChange(${e.id})">${routeOptions}</select></td>
+      <td><select id="ss_${e.id}">${subOptions}</select></td>
+    </tr>`;
+  }
+  html += "</table>";
+  qs("selectEmployeesBox").innerHTML = html;
+}
+
+function onSelRouteChange(empId){
+  const rid = qs("sr_"+empId).value;
+  const subs = subRoutesFor(rid).map(s=>({id:s.id, label:s.sub_name}));
+  qs("ss_"+empId).innerHTML = optionHTML(subs, "id","label","", true, "--");
+}
+
+function selectedEmployeesWithOverrides(){
+  const picked = [];
+  for(const e of EMP){
+    const chk = document.getElementById("chk_"+e.id);
+    if(chk && chk.checked){
+      const route_id = qs("sr_"+e.id).value ? parseInt(qs("sr_"+e.id).value,10) : null;
+      const sub_id = qs("ss_"+e.id).value ? parseInt(qs("ss_"+e.id).value,10) : null;
+      picked.push({ employee_id: e.id, route_id, sub_id });
+    }
+  }
+  return picked;
+}
+
+async function createDraft(){
+  try{
+    const picked = selectedEmployeesWithOverrides();
+    if(picked.length===0) throw new Error("Select employees first");
+    const body = {
+      request_date: qs("rDate").value.trim(),
+      request_time: qs("rTime").value.trim(),
+      notes: qs("rNotes").value.trim(),
+      employee_ids: picked.map(x=>x.employee_id)
+    };
+    const r = await api("/hod/requests", {method:"POST", body: JSON.stringify(body)});
+    const reqId = r.request.id;
+
+    // Apply overrides (if any different) + optional persist
+    const persist = qs("persistMode").value === "YES";
+    const changes = [];
+    for(const p of picked){
+      changes.push({
+        employee_id: p.employee_id,
+        effective_route_id: p.route_id,
+        effective_sub_route_id: p.sub_id,
+        persist_to_employee: persist
+      });
+    }
+    await api(`/hod/requests/${reqId}/employees`, {method:"PATCH", body: JSON.stringify({changes})});
+
+    toast("Draft created: " + reqId);
+    await loadRequests();
+    await openEditor(reqId);
+    setTab("requests");
+  }catch(e){ toast(e.message); }
+}
+
+async function loadRequests(){
+  const d = await api("/hod/requests");
+  REQS = d.requests || [];
+  renderRequests();
+}
+
+function renderRequests(){
+  if(REQS.length===0){ qs("reqList").innerHTML = "<span class='badge warn'>No requests</span>"; return; }
+  let html = "<table><tr><th>ID</th><th>Date</th><th>Time</th><th>Status</th><th>Action</th></tr>";
+  for(const r of REQS){
+    html += `<tr>
+      <td>${r.id}</td>
+      <td>${fmtDate(r.request_date)}</td>
+      <td>${fmtTime(r.request_time)}</td>
+      <td>${statusBadge(r.status)}</td>
+      <td>
+        <button class="btn small" onclick="openEditor(${r.id})">View / Edit</button>
+      </td>
+    </tr>`;
+  }
+  html += "</table>";
+  qs("reqList").innerHTML = html;
+}
+
+async function openEditor(id){
+  try{
+    CURRENT_REQ_ID = id;
+    PENDING_CHANGES = new Map();
+    // Show editor immediately to avoid mobile UI feeling "stuck"
+    qs("reqEditor").style.display = "";
+    qs("editReqId").textContent = id;
+    qs("reqMeta").innerHTML = `<span class="small">Loading request details...</span>`;
+    qs("reqEmployeesBox").innerHTML = `<div class="small">Loading...</div>`;
+    try{ qs("reqEditor").scrollIntoView({behavior:"smooth", block:"start"}); }catch(_e){}
+
+    const d = await api(`/hod/requests/${id}`);
+    qs("reqMeta").innerHTML = `Date: <b>${fmtDate(d.request.request_date)}</b> | Time: <b>${fmtTime(d.request.request_time)}</b> | Status: ${statusBadge(d.request.status)}`;
+
+    if(!["DRAFT","SUBMITTED"].includes(d.request.status)){
+      qs("reqEmployeesBox").innerHTML = "<div class='small'>Request is locked (Admin approved or later). View only.</div>" + renderReqEmployeesTable(d.employees, true);
+      return;
+    }
+
+    qs("reqEmployeesBox").innerHTML = renderReqEmployeesTable(d.employees, false);
+  }catch(e){
+    toast(e.message);
+    qs("reqMeta").innerHTML = `<span class="small">Failed to load request.</span>`;
+    qs("reqEmployeesBox").innerHTML = "";
+  }
+}
+
+function renderReqEmployeesTable(items, readonly){
+  let html = "<table><tr><th>Name</th><th>Emp No</th><th>තෝරාගත් රූට්</th><th>තෝරාගත් ග්‍රාම</th><th>Remove</th><th>Persist</th></tr>";
+  for(const it of items){
+    const routeOptions = optionHTML(
+      ROUTE_TREE.routes.map(r=>({id:r.id, label:`${r.route_no} - ${r.route_name}`})),
+      "id","label", it.effective_route_id || "", true, "--"
+    );
+    const subs = subRoutesFor(it.effective_route_id || "").map(s=>({id:s.id, label:s.sub_name}));
+    const subOptions = optionHTML(subs, "id","label", it.effective_sub_route_id || "", true, "--");
+    html += `<tr>
+      <td>${it.full_name}</td>
+      <td>${it.emp_no}</td>
+      <td>${readonly ? (routeLabel(it.effective_route_id)||"") : `<select id="rr_${it.employee_id}" onchange="onReqRouteChange(${it.employee_id})">${routeOptions}</select>`}</td>
+      <td>${readonly ? (subLabel(it.effective_sub_route_id)||"") : `<select id="rs_${it.employee_id}">${subOptions}</select>`}</td>
+      <td>${readonly ? "" : `<input type="checkbox" id="rm_${it.employee_id}" onchange="markRemove(${it.employee_id})">`}</td>
+      <td>${readonly ? "" : `<input type="checkbox" id="rp_${it.employee_id}">`}</td>
+    </tr>`;
+  }
+  html += "</table>";
+  return html;
+}
+
+function onReqRouteChange(empId){
+  const rid = qs("rr_"+empId).value;
+  const subs = subRoutesFor(rid).map(s=>({id:s.id, label:s.sub_name}));
+  qs("rs_"+empId).innerHTML = optionHTML(subs, "id","label","", true, "--");
+}
+
+function markRemove(empId){
+  // just visual; saved in saveReqChanges()
+}
+
+async function saveReqChanges(){
+  try{
+    if(!CURRENT_REQ_ID) return;
+    const d = await api(`/hod/requests/${CURRENT_REQ_ID}`);
+    if(!["DRAFT","SUBMITTED"].includes(d.request.status)) throw new Error("Request locked");
+    const changes = [];
+    for(const it of d.employees){
+      const remove = qs("rm_"+it.employee_id)?.checked || false;
+      if(remove){
+        changes.push({ employee_id: it.employee_id, remove: true });
+        continue;
+      }
+      const route_id = qs("rr_"+it.employee_id).value ? parseInt(qs("rr_"+it.employee_id).value,10) : null;
+      const sub_id = qs("rs_"+it.employee_id).value ? parseInt(qs("rs_"+it.employee_id).value,10) : null;
+      const persist = qs("rp_"+it.employee_id).checked || false;
+      changes.push({
+        employee_id: it.employee_id,
+        effective_route_id: route_id,
+        effective_sub_route_id: sub_id,
+        persist_to_employee: persist
+      });
+    }
+    await api(`/hod/requests/${CURRENT_REQ_ID}/employees`, {method:"PATCH", body: JSON.stringify({changes})});
+    toast("Saved");
+    await openEditor(CURRENT_REQ_ID);
+    await loadEmployees(); // if persisted
+  }catch(e){ toast(e.message); }
+}
+
+async function submitRequest(){
+  try{
+    if(!CURRENT_REQ_ID) return;
+    await api(`/hod/requests/${CURRENT_REQ_ID}/submit`, {method:"POST"});
+    toast("Submitted to Admin");
+    await loadRequests();
+    await openEditor(CURRENT_REQ_ID);
+  }catch(e){ toast(e.message); }
+}
+
+function closeEditor(){
+  qs("reqEditor").style.display = "none";
+  CURRENT_REQ_ID = null;
+}
+
+(async function init(){
+  try{
+    await guard();
+    await initLookups();
+    await loadPending();
+    await loadEmployees();
+    await loadRequests();
+  }catch(e){
+    toast(e.message);
+  }
+})();
+</script>
+</body>
+</html>
