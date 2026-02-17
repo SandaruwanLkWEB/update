@@ -5,16 +5,56 @@ function clearToken() { localStorage.removeItem("token"); }
 // --- Theme (Light default + optional Dark) ---
 function applyThemeFromStorage(){
   const saved = localStorage.getItem("theme") || "light";
-  document.body.classList.toggle("dark", saved === "dark");
+  document.documentElement.dataset.theme = (saved === "dark") ? "dark" : "";
 }
 
 function toggleTheme(){
-  const isDark = document.body.classList.toggle("dark");
-  localStorage.setItem("theme", isDark ? "dark" : "light");
-  toast(isDark ? "🌙 Dark mode" : "☀️ Light mode");
+  const isDark = (document.documentElement.dataset.theme === "dark");
+  document.documentElement.dataset.theme = isDark ? "" : "dark";
+  localStorage.setItem("theme", isDark ? "light" : "dark");
 }
 
 document.addEventListener("DOMContentLoaded", applyThemeFromStorage);
+
+// --- Lucide Icons ---
+function initLucide(){
+  try{
+    if (window.lucide && typeof window.lucide.createIcons === "function"){
+      window.lucide.createIcons();
+    }
+  }catch(e){}
+}
+
+// --- Welcome Overlay (shown once after login) ---
+function maybeShowWelcome(){
+  try{
+    const flag = localStorage.getItem("justLoggedIn");
+    if(!flag) return;
+    localStorage.removeItem("justLoggedIn");
+    const role = localStorage.getItem("justLoggedInRole") || "";
+    const email = localStorage.getItem("rememberedEmail") || "";
+    const div = document.createElement("div");
+    div.className = "welcome";
+    div.innerHTML = `
+      <div class="welcome-card">
+        <div class="welcome-top">
+          <div class="welcome-mark"><i data-lucide="bus-front"></i></div>
+          <div>
+            <div class="welcome-title">Welcome • DSI Transport System</div>
+            <div class="welcome-sub">${role ? role.toUpperCase() : "USER"} ${email ? "• " + email : ""}</div>
+          </div>
+        </div>
+        <div class="welcome-bar"><div></div></div>
+      </div>`;
+    document.body.appendChild(div);
+    initLucide();
+    setTimeout(()=>{ div.style.opacity="0"; div.style.transition="opacity .22s ease"; }, 1150);
+    setTimeout(()=>{ div.remove(); }, 1450);
+  }catch(e){}
+}
+
+document.addEventListener("DOMContentLoaded", () => { initLucide(); maybeShowWelcome(); });
+
 
 function qs(id){ return document.getElementById(id); }
 function qsa(sel){ return Array.from(document.querySelectorAll(sel)); }

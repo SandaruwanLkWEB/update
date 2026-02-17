@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <meta name="theme-color" content="#E11D48" />
+  <meta name="theme-color" content="#4F46E5" />
   <title>Admin Dashboard - Transport Management</title>
   <link rel="stylesheet" href="assets/styles.css" />
   <script src="assets/config.js"></script>
@@ -12,21 +12,111 @@
 <body>
 
 <!-- Glassmorphic Header -->
-<header>
-  <h1>🔐 Admin Panel</h1>
-  <div style="display:flex; gap:8px; align-items:center;">
-    <a href="index.html" class="btn ghost small">🏠 Home</a>
-    <a href="profile.html" class="btn ghost small">👤 Profile</a>
-    <button class="btn ghost small" onclick="toggleTheme()">🌓 Theme</button>
-    <button class="btn secondary small" onclick="logout()">Logout</button>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <div class="brand">
+      <div class="brand-mark">DSI</div>
+      <div>
+        <div class="brand-title">Admin Dashboard</div>
+        <div class="brand-sub">Transport Management</div>
+      </div>
+    </div>
+    <div class="topbar-actions">
+      <button class="icon-btn" onclick="toggleTheme()" title="Theme"><i data-lucide="moon"></i></button>
+      <a class="btn secondary small" href="profile.html"><i data-lucide="user"></i><span>Profile</span></a>
+      <a class="btn ghost small" href="index.html"><i data-lucide="home"></i><span>Home</span></a>
+      <button class="btn ghost small" onclick="logout()"><i data-lucide="log-out"></i><span>Logout</span></button>
+    </div>
   </div>
 </header>
+
 
 <main class="container">
   <!-- User Info Card -->
   <div class="card elevated" id="meBox" style="margin-bottom:16px; padding:12px 18px;">
     <span style="color: var(--muted);">Loading...</span>
   </div>
+  <div class="kpi-grid">
+
+      <div class="card kpi-card">
+        <div class="kpi-icon"><i data-lucide="clipboard-list"></i></div>
+        <div>
+          <div class="kpi-value" id="kpi_admin_today">—</div>
+          <div class="kpi-label">Today Requests</div>
+          <div class="kpi-sub" id="kpi_admin_todaySub">Updated</div>
+        </div>
+      </div>
+      <div class="card kpi-card">
+        <div class="kpi-icon"><i data-lucide="shield-check"></i></div>
+        <div>
+          <div class="kpi-value" id="kpi_admin_pending_admin">—</div>
+          <div class="kpi-label">Pending Admin</div>
+          <div class="kpi-sub" id="kpi_admin_pending_adminSub">Updated</div>
+        </div>
+      </div>
+      <div class="card kpi-card">
+        <div class="kpi-icon"><i data-lucide="bus-front"></i></div>
+        <div>
+          <div class="kpi-value" id="kpi_admin_pending_ta">—</div>
+          <div class="kpi-label">Pending TA</div>
+          <div class="kpi-sub" id="kpi_admin_pending_taSub">Updated</div>
+        </div>
+      </div>
+      <div class="card kpi-card">
+        <div class="kpi-icon"><i data-lucide="badge-check"></i></div>
+        <div>
+          <div class="kpi-value" id="kpi_admin_pending_hr">—</div>
+          <div class="kpi-label">Pending HR Final</div>
+          <div class="kpi-sub" id="kpi_admin_pending_hrSub">Updated</div>
+        </div>
+      </div>
+      <div class="card kpi-card">
+        <div class="kpi-icon"><i data-lucide="truck"></i></div>
+        <div>
+          <div class="kpi-value" id="kpi_admin_vehicles">—</div>
+          <div class="kpi-label">Vehicles Assigned</div>
+          <div class="kpi-sub" id="kpi_admin_vehiclesSub">Updated</div>
+        </div>
+      </div>
+      <div class="card kpi-card">
+        <div class="kpi-icon"><i data-lucide="building-2"></i></div>
+        <div>
+          <div class="kpi-value" id="kpi_admin_departments">—</div>
+          <div class="kpi-label">Departments Active</div>
+          <div class="kpi-sub" id="kpi_admin_departmentsSub">Updated</div>
+        </div>
+      </div>
+  </div>
+
+  <div class="section-title"><strong>Quick Actions</strong><span></span></div>
+  <div class="action-grid">
+    <a class="action-card" href="#" onclick="setTab('approvals'); return false;">
+  <div class="ico"><i data-lucide="check-circle-2"></i></div>
+  <div class="meta"><div class="t">Approve Requests</div><div class="s">Review submitted requests</div></div>
+</a><a class="action-card" href="#" onclick="if(typeof openLockModal==='function'){openLockModal();}else if(typeof setTab==='function'){setTab('approvals');}; return false;">
+  <div class="ico"><i data-lucide="lock-keyhole"></i></div>
+  <div class="meta"><div class="t">Lock / Unlock Day</div><div class="s">Control today’s operations</div></div>
+</a><a class="action-card" href="#" onclick="setTab('master'); return false;">
+  <div class="ico"><i data-lucide="route"></i></div>
+  <div class="meta"><div class="t">Routes & Sub-routes</div><div class="s">Manage master data</div></div>
+</a><a class="action-card" href="#" onclick="setTab('reports'); return false;">
+  <div class="ico"><i data-lucide="file-down"></i></div>
+  <div class="meta"><div class="t">Reports Center</div><div class="s">Generate daily reports</div></div>
+</a>
+  </div>
+
+  <div class="two-col">
+    <div class="card pad">
+      <div class="section-title"><strong>Recent Requests</strong><span></span></div>
+      <div class="list" id="recentList"><div class="alert">Loading…</div></div>
+    </div>
+    <div class="card pad">
+      <div class="section-title"><strong>Recent Actions</strong><span></span></div>
+      <div class="list" id="recentActions"><div class="alert">Loading…</div></div>
+    </div>
+  </div>
+
 
   <!-- Daily Run Lock Section -->
   <section class="card soft" style="margin-bottom:18px;">
@@ -333,6 +423,7 @@ async function approveReq(){
     await api(`/admin/requests/${CURRENT.id}/approve`, {method:"POST"});
     toast("✅ Request approved!");
     await loadRequests();
+  renderAdminKpis();
     await openDetail(CURRENT.id);
   }catch(e){ 
     toast("❌ Error: " + e.message); 
@@ -677,6 +768,54 @@ function downloadRouteReport(){
   const url = `${base}/reports/daily/route-wise?date=${encodeURIComponent(d)}`;
   previewPdfWithAuth(url, `route-wise-${d}.pdf`);
 }
+
+function statusBadge(status){
+  const s = (status||"").toUpperCase();
+  if(s.includes("SUBMIT")) return '<span class="badge blue">SUBMITTED</span>';
+  if(s.includes("ADMIN")) return '<span class="badge green">ADMIN OK</span>';
+  if(s.includes("TA_") || s.includes("ASSIGN")) return '<span class="badge purple">ASSIGNED</span>';
+  if(s.includes("FINAL") || s.includes("HR")) return '<span class="badge green">FINAL</span>';
+  if(s.includes("REJECT")) return '<span class="badge red">REJECTED</span>';
+  if(s.includes("LOCK")) return '<span class="badge amber">LOCKED</span>';
+  return '<span class="badge">'+(status||"")+'</span>';
+}
+
+function renderAdminKpis(){
+  try{
+    const reqs = (typeof REQS !== "undefined" && Array.isArray(REQS)) ? REQS : [];
+    const today = reqs.length;
+    const pendingAdmin = reqs.filter(r=>String(r.status||"").toUpperCase()==="SUBMITTED").length;
+    const pendingTA = reqs.filter(r=>String(r.status||"").toUpperCase()==="ADMIN_APPROVED").length;
+    const pendingHR = reqs.filter(r=>String(r.status||"").toUpperCase()==="TA_ASSIGNED").length;
+    const deptActive = new Set(reqs.map(r=>r.department_id||r.department_name||r.department||"").filter(Boolean)).size;
+    const vehiclesAssigned = reqs.filter(r=>String(r.status||"").toUpperCase().includes("ASSIGNED")).length;
+
+    const set = (id,v,sub)=>{ const el=qs(id); if(el) el.textContent = (v===undefined||v===null) ? "0" : String(v); const s=qs(id+"Sub"); if(s) s.textContent=sub||""; };
+    const now = new Date();
+    set("kpi_admin_today", today, "Today");
+    set("kpi_admin_pending_admin", pendingAdmin, "Need Admin approval");
+    set("kpi_admin_pending_ta", pendingTA, "Need assignment");
+    set("kpi_admin_pending_hr", pendingHR, "Need HR final");
+    set("kpi_admin_vehicles", vehiclesAssigned, "Assigned so far");
+    set("kpi_admin_departments", deptActive, "Active depts");
+
+    // Recent list
+    const list = qs("recentList");
+    if(list){
+      const items = reqs.slice().reverse().slice(0,8).map(r=>{
+        const title = (r.department_name||r.department||("Dept "+(r.department_id||"")))+" • "+(r.date||r.request_date||"");
+        const sub = "Employees: "+(r.employee_count||r.count||r.total_employees||"-");
+        return `<div class="list-item"><div class="left"><div class="title">${title}</div><div class="sub">${sub}</div></div>${statusBadge(r.status)}</div>`;
+      }).join("");
+      list.innerHTML = items || '<div class="alert">No requests yet.</div>';
+    }
+    const acts = qs("recentActions");
+    if(acts){
+      acts.innerHTML = '<div class="alert">Actions are shown in Approvals/Audit.</div>';
+    }
+  }catch(e){}
+}
+
 // Initialize
 (async()=>{
   await guard();
@@ -690,6 +829,7 @@ function downloadRouteReport(){
   setInterval(()=>{ if(document.hidden) return; loadRunSummaryLive(); }, 25000);
 
   await loadRequests();
+  renderAdminKpis();
   await loadDepartments();
   await loadRoutes();
   
@@ -704,6 +844,6 @@ function downloadRouteReport(){
 })();
 </script>
 
+  <script src="https://unpkg.com/lucide@latest"></script>
 </body>
 </html>
-``` [❶](code://python)

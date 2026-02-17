@@ -3,185 +3,24 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <meta name="theme-color" content="#E11D48"/>
-  <title>🔐 ඇතුල්වීම - Transport Management</title>
+  <meta name="theme-color" content="#4F46E5"/>
+  <title>ඇතුල්වීම - DSI Transport System</title>
   <link rel="stylesheet" href="assets/styles.css"/>
   <script src="assets/config.js"></script>
   <script src="assets/app.js"></script>
-  <style>
-    /* Enhanced login page styles */
-    .login-wrapper {
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-    }
-    
-    .login-card {
-      width: 100%;
-      max-width: 480px;
-      animation: fadeInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    
-    @keyframes fadeInUp {
-      from {
-        opacity: 0;
-        transform: translateY(30px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-    
-    .logo-section {
-      text-align: center;
-      margin-bottom: 32px;
-    }
-    
-    .logo-icon {
-      width: 80px;
-      height: 80px;
-      margin: 0 auto 16px;
-      background: linear-gradient(135deg, var(--brand), var(--brand-2));
-      border-radius: var(--r-lg);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 40px;
-      box-shadow: var(--glow-brand), var(--shadow-lg);
-      animation: pulse-glow 3s ease-in-out infinite;
-    }
-    
-    .logo-title {
-      font-size: 28px;
-      font-weight: 900;
-      background: linear-gradient(135deg, var(--text), var(--muted));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      margin: 0;
-    }
-    
-    .logo-subtitle {
-      color: var(--muted);
-      margin-top: 8px;
-      font-size: 14px;
-    }
-    
-    .input-group {
-      margin-bottom: 18px;
-    }
-    
-    .input-with-icon {
-      position: relative;
-    }
-    
-    .input-icon {
-      position: absolute;
-      left: 16px;
-      top: 50%;
-      transform: translateY(-50%);
-      color: var(--muted-2);
-      font-size: 18px;
-      pointer-events: none;
-    }
-    
-    .input-with-icon input {
-      padding-left: 48px;
-    }
-    
-    .remember-forgot {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin: 16px 0;
-      font-size: 14px;
-    }
-    
-    .remember-me {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      color: var(--text-secondary);
-      cursor: pointer;
-    }
-    
-    .forgot-link {
-      color: var(--brand);
-      font-weight: 600;
-      transition: opacity 0.2s;
-    }
-    
-    .forgot-link:hover {
-      opacity: 0.8;
-    }
-    
-    .divider {
-      display: flex;
-      align-items: center;
-      text-align: center;
-      margin: 24px 0;
-      color: var(--muted-2);
-      font-size: 14px;
-    }
-    
-    .divider::before,
-    .divider::after {
-      content: '';
-      flex: 1;
-      border-bottom: 1px solid var(--border);
-    }
-    
-    .divider span {
-      padding: 0 16px;
-    }
-    
-    .register-prompt {
-      text-align: center;
-      margin-top: 24px;
-      padding-top: 24px;
-      border-top: 1px solid var(--border);
-      color: var(--text-secondary);
-    }
-    
-    .register-link {
-      color: var(--brand);
-      font-weight: 700;
-      text-decoration: none;
-    }
-    
-    .register-link:hover {
-      text-decoration: underline;
-    }
-    
-    @media(max-width: 640px) {
-      .logo-icon {
-        width: 64px;
-        height: 64px;
-        font-size: 32px;
-      }
-      
-      .logo-title {
-        font-size: 24px;
-      }
-    }
-  /* Password reset modal */
-.reset-modal{ position:fixed; inset:0; z-index:9999; display:flex; align-items:center; justify-content:center; padding:16px; }
-.reset-backdrop{ position:absolute; inset:0; background:rgba(0,0,0,.45); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
-.reset-dialog{ position:relative; width:100%; max-width:520px; padding:16px 18px; }
-.reset-head{ display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:10px; }
-.reset-head h3{ margin:0; font-size:18px; }
-.reset-grid{ display:grid; gap:12px; }
-.reset-actions{ display:flex; gap:10px; justify-content:flex-end; margin-top:10px; flex-wrap:wrap; }
-.hint{ color: var(--muted); font-size: 13px; }
-.orline{ display:flex; align-items:center; gap:10px; color:var(--muted-2); font-size:13px; }
-.orline::before, .orline::after{ content:""; height:1px; background:var(--border); flex:1; }
-
-</style>
+  
 </head>
 <body>
+<div class="login-shell">
+  <div class="card elev login-card pad">
+    <div class="login-hero">
+      <div class="mark"><i data-lucide="bus-front"></i></div>
+      <div>
+        <div class="title">DSI Transport System</div>
+        <div class="sub">Secure sign-in • Indigo Enterprise UI</div>
+      </div>
+    </div>
+
 
 <div class="topbar">
   <div class="inner">
@@ -348,6 +187,9 @@
       </div>
       <div id="twofaMsg" class="p-muted" style="margin-top:10px;"></div>
     </div>
+  </div>
+</div>
+
   </div>
 </div>
 
@@ -523,6 +365,8 @@ document.getElementById("btnLogin").onclick = async ()=>{
     
     // Redirect based on role
     setTimeout(() => {
+      localStorage.setItem("justLoggedIn","1");
+      localStorage.setItem("justLoggedInRole", role || "");
       if(role==="ADMIN") location.href="admin.html";
       else if(role==="HOD") location.href="hod.html";
       else if(role==="TA") location.href="ta.html";
@@ -607,5 +451,6 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 </script>
 
+  <script src="https://unpkg.com/lucide@latest"></script>
 </body>
 </html>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <meta name="theme-color" content="#E11D48" />
+  <meta name="theme-color" content="#4F46E5" />
   <title>🚌 අද ප්‍රවාහන තොරතුරු - Employee Dashboard</title>
   <link rel="stylesheet" href="assets/styles.css" />
   <script src="assets/config.js"></script>
@@ -101,15 +101,25 @@
 </head>
 <body>
 
-<header>
-  <h1>🚌 අද ප්‍රවාහන තොරතුරු</h1>
-  <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
-    <a href="index.html" class="btn ghost small">🏠 Home</a>
-    <a href="profile.html" class="btn ghost small">👤 Profile</a>
-    <button class="btn ghost small" onclick="toggleTheme()">🌓 Theme</button>
-    <button class="btn secondary small" onclick="logout()">Logout</button>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <div class="brand">
+      <div class="brand-mark">DSI</div>
+      <div>
+        <div class="brand-title">Employee View</div>
+        <div class="brand-sub">Transport Management</div>
+      </div>
+    </div>
+    <div class="topbar-actions">
+      <button class="icon-btn" onclick="toggleTheme()" title="Theme"><i data-lucide="moon"></i></button>
+      <a class="btn secondary small" href="profile.html"><i data-lucide="user"></i><span>Profile</span></a>
+      <a class="btn ghost small" href="index.html"><i data-lucide="home"></i><span>Home</span></a>
+      <button class="btn ghost small" onclick="logout()"><i data-lucide="log-out"></i><span>Logout</span></button>
+    </div>
   </div>
 </header>
+
 
 <div class="container">
   
@@ -323,5 +333,6 @@ async function refreshTransport() {
 setInterval(() => { loadToday(); }, 5 * 60 * 1000);
 </script>
 
+  <script src="https://unpkg.com/lucide@latest"></script>
 </body>
 </html>

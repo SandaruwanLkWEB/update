@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <meta name="theme-color" content="#E11D48" />
+  <meta name="theme-color" content="#4F46E5" />
   <title>HR Dashboard - Transport Management</title>
   <link rel="stylesheet" href="assets/styles.css" />
   <script src="assets/config.js"></script>
@@ -12,21 +12,111 @@
 <body>
 
 <!-- Glassmorphic Header -->
-<header>
-  <h1>👥 මානව සම්පත් අංශය (ප්‍රධාන කාර්‍යාලය ඩී සැම්සන් රාජපක්ෂ මාවත ගාල්ල) (HR)</h1>
-  <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
-    <a href="index.html" class="btn ghost small">🏠 මුල් පිටුව</a>
-    <a href="profile.html" class="btn ghost small">👤 Profile</a>
-    <button class="btn ghost small" onclick="toggleTheme()">🌓 Theme</button>
-    <button class="btn secondary small" onclick="logout()">ඉවත් වන්න</button>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <div class="brand">
+      <div class="brand-mark">DSI</div>
+      <div>
+        <div class="brand-title">HR Dashboard</div>
+        <div class="brand-sub">Transport Management</div>
+      </div>
+    </div>
+    <div class="topbar-actions">
+      <button class="icon-btn" onclick="toggleTheme()" title="Theme"><i data-lucide="moon"></i></button>
+      <a class="btn secondary small" href="profile.html"><i data-lucide="user"></i><span>Profile</span></a>
+      <a class="btn ghost small" href="index.html"><i data-lucide="home"></i><span>Home</span></a>
+      <button class="btn ghost small" onclick="logout()"><i data-lucide="log-out"></i><span>Logout</span></button>
+    </div>
   </div>
 </header>
+
 
 <main class="container">
   <!-- User Info Card -->
   <div class="card elevated" id="meBox" style="margin-bottom:16px; padding:12px 18px;">
     <span style="color: var(--muted);">Loading...</span>
   </div>
+  <div class="kpi-grid">
+
+      <div class="card kpi-card">
+        <div class="kpi-icon"><i data-lucide="badge-check"></i></div>
+        <div>
+          <div class="kpi-value" id="kpi_hr_pending">—</div>
+          <div class="kpi-label">Pending HR Final</div>
+          <div class="kpi-sub" id="kpi_hr_pendingSub">Updated</div>
+        </div>
+      </div>
+      <div class="card kpi-card">
+        <div class="kpi-icon"><i data-lucide="check-circle-2"></i></div>
+        <div>
+          <div class="kpi-value" id="kpi_hr_final">—</div>
+          <div class="kpi-label">Final Approved Today</div>
+          <div class="kpi-sub" id="kpi_hr_finalSub">Updated</div>
+        </div>
+      </div>
+      <div class="card kpi-card">
+        <div class="kpi-icon"><i data-lucide="file-down"></i></div>
+        <div>
+          <div class="kpi-value" id="kpi_hr_reports">—</div>
+          <div class="kpi-label">Reports Generated</div>
+          <div class="kpi-sub" id="kpi_hr_reportsSub">Updated</div>
+        </div>
+      </div>
+      <div class="card kpi-card">
+        <div class="kpi-icon"><i data-lucide="building-2"></i></div>
+        <div>
+          <div class="kpi-value" id="kpi_hr_depts">—</div>
+          <div class="kpi-label">Departments Completed</div>
+          <div class="kpi-sub" id="kpi_hr_deptsSub">Updated</div>
+        </div>
+      </div>
+      <div class="card kpi-card">
+        <div class="kpi-icon"><i data-lucide="users"></i></div>
+        <div>
+          <div class="kpi-value" id="kpi_hr_emp">—</div>
+          <div class="kpi-label">Employees Covered</div>
+          <div class="kpi-sub" id="kpi_hr_empSub">Updated</div>
+        </div>
+      </div>
+      <div class="card kpi-card">
+        <div class="kpi-icon"><i data-lucide="alert-circle"></i></div>
+        <div>
+          <div class="kpi-value" id="kpi_hr_issues">—</div>
+          <div class="kpi-label">Issues / Exceptions</div>
+          <div class="kpi-sub" id="kpi_hr_issuesSub">Updated</div>
+        </div>
+      </div>
+  </div>
+
+  <div class="section-title"><strong>Quick Actions</strong><span></span></div>
+  <div class="action-grid">
+    <a class="action-card" href="#" onclick="if(typeof setTab==='function'){setTab('final');}; return false;">
+  <div class="ico"><i data-lucide="badge-check"></i></div>
+  <div class="meta"><div class="t">Finalize Approvals</div><div class="s">Approve TA assigned requests</div></div>
+</a><a class="action-card" href="#" onclick="if(typeof setTab==='function'){setTab('reports');}; return false;">
+  <div class="ico"><i data-lucide="file-down"></i></div>
+  <div class="meta"><div class="t">Download Reports</div><div class="s">Route-wise & vehicle reports</div></div>
+</a><a class="action-card" href="#" onclick="if(typeof setTab==='function'){setTab('summary');}; return false;">
+  <div class="ico"><i data-lucide="bar-chart-3"></i></div>
+  <div class="meta"><div class="t">Department Summary</div><div class="s">View per-department info</div></div>
+</a><a class="action-card" href="#" onclick="if(typeof setTab==='function'){setTab('audit');}; return false;">
+  <div class="ico"><i data-lucide="scroll-text"></i></div>
+  <div class="meta"><div class="t">Audit Log</div><div class="s">Review actions</div></div>
+</a>
+  </div>
+
+  <div class="two-col">
+    <div class="card pad">
+      <div class="section-title"><strong>Recent Requests</strong><span></span></div>
+      <div class="list" id="recentList"><div class="alert">Loading…</div></div>
+    </div>
+    <div class="card pad">
+      <div class="section-title"><strong>Recent Actions</strong><span></span></div>
+      <div class="list" id="recentActions"><div class="alert">Loading…</div></div>
+    </div>
+  </div>
+
 
   <!-- Tab Navigation -->
   <div class="card" style="margin-bottom:14px;">
@@ -390,5 +480,6 @@ function todayISO(){
   if(rep && !rep.value) rep.value = todayISO();
 })(); 
 </script>
+  <script src="https://unpkg.com/lucide@latest"></script>
 </body>
 </html>
