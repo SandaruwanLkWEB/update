@@ -174,7 +174,97 @@
   <!-- ─── MAIN CONTENT ───────────────────────────── -->
   <main class="flex-1 p-5 lg:p-7 space-y-6 animate-fade-in">
 
+    
     <!-- ════════════════════════════════════════════
+         DASHBOARD CARDS (KPI)
+    ═══════════════════════════════════════════════ -->
+    <section class="dash-kpi">
+      <div class="dash-kpi-grid">
+        <!-- 1) Daily Lock -->
+        <button type="button" class="dash-kpi-card" data-drawer="lock" aria-label="Daily Lock details">
+          <div class="dash-kpi-ico"><i data-lucide="lock" class="w-5 h-5"></i></div>
+          <div class="dash-kpi-main">
+            <div class="dash-kpi-title">Lock Button Dashboard</div>
+            <div class="dash-kpi-sub" id="kpiDayInfo">Day Information: —</div>
+          </div>
+          <div class="dash-kpi-right">
+            <span class="dash-kpi-badge" id="kpiLockBadge">—</span>
+          </div>
+        </button>
+
+        <!-- 2) Total Departments -->
+        <button type="button" class="dash-kpi-card" data-drawer="departments_total" aria-label="Total departments details">
+          <div class="dash-kpi-ico"><i data-lucide="building-2" class="w-5 h-5"></i></div>
+          <div class="dash-kpi-main">
+            <div class="dash-kpi-value" id="kpiDeptTotal">—</div>
+            <div class="dash-kpi-title">දෙපාර්තමෙන්තු සාරාංශය</div>
+            <div class="dash-kpi-sub">(Total Department)</div>
+          </div>
+        </button>
+
+        <!-- 3) Submitted -->
+        <button type="button" class="dash-kpi-card" data-drawer="submitted" aria-label="Submitted departments details">
+          <div class="dash-kpi-ico"><i data-lucide="check-circle-2" class="w-5 h-5"></i></div>
+          <div class="dash-kpi-main">
+            <div class="dash-kpi-value" id="kpiSubmitted">—</div>
+            <div class="dash-kpi-title">Submitted values</div>
+            <div class="dash-kpi-sub">අද submit කළ දෙපාර්තමේන්තු</div>
+          </div>
+        </button>
+
+        <!-- 4) Not Submitted -->
+        <button type="button" class="dash-kpi-card" data-drawer="not_submitted" aria-label="Not submitted departments details">
+          <div class="dash-kpi-ico"><i data-lucide="alert-circle" class="w-5 h-5"></i></div>
+          <div class="dash-kpi-main">
+            <div class="dash-kpi-value" id="kpiNotSubmitted">—</div>
+            <div class="dash-kpi-title">Not submitted values</div>
+            <div class="dash-kpi-sub">අද submit නොකළ දෙපාර්තමේන්තු</div>
+          </div>
+        </button>
+
+        <!-- 5) HOD Registration Pending -->
+        <button type="button" class="dash-kpi-card" data-drawer="hod_pending" aria-label="HOD registration approvals details">
+          <div class="dash-kpi-ico"><i data-lucide="user-check" class="w-5 h-5"></i></div>
+          <div class="dash-kpi-main">
+            <div class="dash-kpi-value" id="kpiHodPending">—</div>
+            <div class="dash-kpi-title">HOD Registration Approvals</div>
+            <div class="dash-kpi-sub">(Pending request values)</div>
+          </div>
+        </button>
+
+        <!-- 6) Transport Requests -->
+        <button type="button" class="dash-kpi-card" data-drawer="transport_requests" aria-label="Transport requests details">
+          <div class="dash-kpi-ico"><i data-lucide="clipboard-list" class="w-5 h-5"></i></div>
+          <div class="dash-kpi-main">
+            <div class="dash-kpi-value" id="kpiReqTotal">—</div>
+            <div class="dash-kpi-title">Transport Requests</div>
+            <div class="dash-kpi-sub">Total transport request values</div>
+          </div>
+        </button>
+
+        <!-- 7) Employees -->
+        <button type="button" class="dash-kpi-card" data-drawer="employees" aria-label="Employees details">
+          <div class="dash-kpi-ico"><i data-lucide="users" class="w-5 h-5"></i></div>
+          <div class="dash-kpi-main">
+            <div class="dash-kpi-value" id="kpiEmployees">—</div>
+            <div class="dash-kpi-title">Employees</div>
+            <div class="dash-kpi-sub">Total Employees (Master Data)</div>
+          </div>
+        </button>
+
+        <!-- 8) Vehicles -->
+        <button type="button" class="dash-kpi-card" data-drawer="vehicles" aria-label="Vehicles details">
+          <div class="dash-kpi-ico"><i data-lucide="bus-front" class="w-5 h-5"></i></div>
+          <div class="dash-kpi-main">
+            <div class="dash-kpi-value" id="kpiVehicles">—</div>
+            <div class="dash-kpi-title">Vehicles</div>
+            <div class="dash-kpi-sub">Vehicles Available</div>
+          </div>
+        </button>
+      </div>
+    </section>
+
+<!-- ════════════════════════════════════════════
          DAILY RUN LOCK SECTION
     ═══════════════════════════════════════════════ -->
     <section class="section-card overflow-hidden">
@@ -186,7 +276,7 @@
           </div>
           <div>
             <h2 class="text-white font-700 text-base leading-none">Daily Run Lock</h2>
-            <p class="text-white/75 text-xs mt-1">Lock submissions before dispatching to TA</p>
+            <p class="text-slate-400 text-xs mt-1">Lock submissions before dispatching to TA</p>
           </div>
         </div>
         <!-- Run date picker -->
@@ -262,19 +352,17 @@
     <!-- ════════════════════════════════════════════
          TAB NAV BAR
     ═══════════════════════════════════════════════ -->
-    <div class="section-card tabbar" role="tablist" aria-label="Admin Sections">
-      <button class="tab-btn active" id="tabApprovalsContent" onclick="setTab('approvals')" role="tab" aria-controls="pane_approvals" aria-selected="true">
-        <i data-lucide="check-circle" class="w-4 h-4"></i><span>Approvals</span>
+    <div class="section-card px-5 py-3 flex items-center gap-2 flex-wrap">
+      <button class="tab-btn active" id="tabApprovalsContent" onclick="setTab('approvals')">
+        <i data-lucide="check-circle" class="w-4 h-4"></i> Approvals
       </button>
-      <button class="tab-btn" id="tabMasterContent" onclick="setTab('master')" role="tab" aria-controls="pane_master" aria-selected="false">
-        <i data-lucide="database" class="w-4 h-4"></i><span>Master Data</span>
+      <button class="tab-btn" id="tabMasterContent" onclick="setTab('master')">
+        <i data-lucide="database" class="w-4 h-4"></i> Master Data
       </button>
-      <button class="tab-btn" id="tabReportsContent" onclick="setTab('reports')" role="tab" aria-controls="pane_reports" aria-selected="false">
-        <i data-lucide="bar-chart-2" class="w-4 h-4"></i><span>Reports</span>
+      <button class="tab-btn" id="tabReportsContent" onclick="setTab('reports')">
+        <i data-lucide="bar-chart-2" class="w-4 h-4"></i> Reports
       </button>
     </div>
-
-
 
     <!-- ════════════════════════════════════════════
          PANE: APPROVALS
@@ -524,6 +612,29 @@
 </div><!-- /main wrapper -->
 
 
+
+<!-- ══════════════════════════════════════════════════════════
+     KPI DRAWER (Bottom Sheet / Modal)
+═══════════════════════════════════════════════════════════ -->
+<div id="kpiDrawerOverlay" class="kpi-drawer-overlay hidden" onclick="closeKpiDrawer()"></div>
+
+<section id="kpiDrawer" class="kpi-drawer hidden" role="dialog" aria-modal="true" aria-labelledby="kpiDrawerTitle">
+  <header class="kpi-drawer-hd">
+    <div class="kpi-drawer-hd-left">
+      <div id="kpiDrawerTitle" class="kpi-drawer-title">Details</div>
+      <div id="kpiDrawerSub" class="kpi-drawer-sub">—</div>
+    </div>
+    <button type="button" class="kpi-drawer-close" onclick="closeKpiDrawer()" aria-label="Close">
+      <i data-lucide="x" class="w-5 h-5"></i>
+    </button>
+  </header>
+
+  <div id="kpiDrawerBody" class="kpi-drawer-body"></div>
+
+  <footer id="kpiDrawerFooter" class="kpi-drawer-ft"></footer>
+</section>
+
+
 <!-- ══════════════════════════════════════════════════════════
      ALL ORIGINAL SCRIPTS — PRESERVED EXACTLY
 ═══════════════════════════════════════════════════════════ -->
@@ -534,6 +645,22 @@ let CURRENT=null;
 let DEPS=[];
 let ROUTES=[];
 let SUBS=[];
+
+let RUN_SUMMARY=null;
+let RUN_DEPARTMENTS=[];
+let RUN_MISSING=[];
+let RUN_LOCKED=false;
+let RUN_LOCK_STATUS_TEXT="—";
+
+let HOD_PENDING=[];
+let EMPLOYEES=[];
+let VEHICLES=[];
+
+const __REQ_DETAIL_CACHE = new Map();
+let __DRAWER_OPEN=false;
+let __DRAWER_TYPE=null;
+let __DRAWER_EXPANDED_KEY=null;
+
 
 /* ── Sidebar helpers (new, mobile) ────────────── */
 function openSidebar(){
@@ -569,10 +696,8 @@ function setTab(tab){
     const cBtn = document.getElementById(contentBtnMap[t]);
 
     if(pane)  pane.classList.toggle("hidden", t !== tab);
-    if(pane)  pane.setAttribute("aria-hidden", (t!==tab) ? "true":"false");
     if(sBtn)  sBtn.classList.toggle("active",  t === tab);
     if(cBtn)  cBtn.classList.toggle("active",  t === tab);
-    if(cBtn)  cBtn.setAttribute("aria-selected", (t===tab) ? "true":"false");
   }
 
   if(tab === "master"){
@@ -580,6 +705,467 @@ function setTab(tab){
     try { loadRoutes(); } catch(e){}
   }
 }
+
+
+/* ── KPI Helpers ─────────────────────────────── */
+function setText(id, txt){
+  const el=document.getElementById(id);
+  if(el) el.textContent = (txt==null? "—" : String(txt));
+}
+function setHtml(id, html){
+  const el=document.getElementById(id);
+  if(el) el.innerHTML = html;
+}
+
+function kpiBadge(text, tone){
+  const t = tone || "slate";
+  return `<span class="dash-kpi-pill ${t}">${escapeHtml(text||"—")}</span>`;
+}
+
+function updateKpis(){
+  // Day info (runDate)
+  const date = document.getElementById('runDate')?.value || '—';
+  const dayEl = document.getElementById('kpiDayInfo');
+  if(dayEl) dayEl.textContent = `Day Information: ${date}`;
+
+  // Lock badge
+  const b = document.getElementById('kpiLockBadge');
+  if(b){
+    b.textContent = RUN_LOCK_STATUS_TEXT || (RUN_LOCKED ? "Locked" : "Not Locked");
+    b.className = "dash-kpi-badge " + (RUN_LOCKED ? "ok" : "warn");
+  }
+
+  // Dept totals
+  setText('kpiDeptTotal', (DEPS && DEPS.length!=null) ? DEPS.length : '—');
+
+  // Submitted / not submitted (from run summary)
+  const submittedCount = (RUN_DEPARTMENTS||[]).filter(d=>!!d.submitted).length;
+  const notSubmittedCount = (RUN_MISSING||[]).length || (RUN_DEPARTMENTS||[]).filter(d=>!d.submitted).length;
+  setText('kpiSubmitted', RUN_DEPARTMENTS.length ? submittedCount : '—');
+  setText('kpiNotSubmitted', RUN_DEPARTMENTS.length ? notSubmittedCount : '—');
+
+  // HOD pending
+  setText('kpiHodPending', (HOD_PENDING && HOD_PENDING.length!=null) ? HOD_PENDING.length : '—');
+
+  // Requests total (selected day)
+  const rd = document.getElementById('runDate')?.value;
+  const reqToday = (REQS||[]).filter(r=>{
+    if(!rd) return true;
+    const v = (r.request_date||"");
+    return v===rd || v.startsWith(rd);
+  });
+  setText('kpiReqTotal', (rd ? reqToday.length : (REQS||[]).length));
+
+  // Employees / vehicles (if endpoints exist)
+  setText('kpiEmployees', (EMPLOYEES && EMPLOYEES.length!=null && EMPLOYEES.length>0) ? EMPLOYEES.length : (EMPLOYEES===null ? 'N/A' : '—'));
+  setText('kpiVehicles',  (VEHICLES && VEHICLES.length!=null && VEHICLES.length>0) ? VEHICLES.length : (VEHICLES===null ? 'N/A' : '—'));
+}
+
+/* ── Drawer (Bottom Sheet) ───────────────────── */
+function openKpiDrawer(type){
+  __DRAWER_OPEN=true;
+  __DRAWER_TYPE=type;
+  __DRAWER_EXPANDED_KEY=null;
+
+  const overlay=document.getElementById('kpiDrawerOverlay');
+  const drawer=document.getElementById('kpiDrawer');
+  if(overlay) overlay.classList.remove('hidden');
+  if(drawer){
+    drawer.classList.remove('hidden');
+    requestAnimationFrame(()=>drawer.classList.add('open'));
+  }
+  document.body.classList.add('kpi-drawer-open');
+
+  renderKpiDrawer(type);
+  try{ lucide.createIcons(); }catch(e){}
+}
+
+function closeKpiDrawer(){
+  __DRAWER_OPEN=false;
+  __DRAWER_TYPE=null;
+  __DRAWER_EXPANDED_KEY=null;
+
+  const overlay=document.getElementById('kpiDrawerOverlay');
+  const drawer=document.getElementById('kpiDrawer');
+  if(overlay) overlay.classList.add('hidden');
+  if(drawer){
+    drawer.classList.remove('open');
+    setTimeout(()=>drawer.classList.add('hidden'), 180);
+  }
+  document.body.classList.remove('kpi-drawer-open');
+}
+
+function drawerSetTitle(title, sub){
+  setText('kpiDrawerTitle', title||'Details');
+  setText('kpiDrawerSub', sub||'');
+}
+
+function routeLabel(routeId, subId){
+  const r = (ROUTES||[]).find(x=>String(x.id)===String(routeId));
+  const s = (SUBS||[]).find(x=>String(x.id)===String(subId));
+  const rName = r ? `${r.route_no} — ${r.route_name}` : (routeId ?? '—');
+  const sName = s ? (s.name||s.sub_route_name||s.village_name||s.sub_route||s.id) : (subId ?? '—');
+  return `${escapeHtml(rName)} <span class="dash-dot">•</span> ${escapeHtml(sName)}`;
+}
+
+function compactEmployeeRow(e){
+  const name = escapeHtml(e.full_name || e.name || '—');
+  const empNo = escapeHtml(e.emp_no || '—');
+  const routeId = e.effective_route_id ?? e.route_id ?? e.current_route_id ?? e.route;
+  const subId   = e.effective_sub_route_id ?? e.sub_route_id ?? e.current_sub_route_id ?? e.sub_route;
+  const routeTxt = routeLabel(routeId, subId);
+  return `
+    <div class="emp-row">
+      <div class="emp-top">
+        <div class="emp-name">${name}</div>
+        <div class="emp-pill">${empNo}</div>
+      </div>
+      <div class="emp-meta">${routeTxt}</div>
+    </div>`;
+}
+
+function renderAccordion(items, summaryHtmlFn, detailHtmlFn){
+  if(!items || items.length===0){
+    return `<div class="drawer-empty">
+      <i data-lucide="inbox" class="w-6 h-6 opacity-40"></i>
+      <div class="mt-2 text-sm text-slate-500">No records found</div>
+    </div>`;
+  }
+  return `<div class="acc">
+    ${items.map(it=>{
+      const key = escapeHtml(it._key);
+      const isOpen = (__DRAWER_EXPANDED_KEY===it._key);
+      return `
+        <div class="acc-item ${isOpen?'open':''}" data-acc-key="${key}">
+          <button type="button" class="acc-sum" data-acc-btn="1">
+            ${summaryHtmlFn(it)}
+            <span class="acc-chev"><i data-lucide="chevron-down" class="w-4 h-4"></i></span>
+          </button>
+          <div class="acc-det">
+            <div class="acc-det-inner">
+              ${detailHtmlFn(it)}
+            </div>
+          </div>
+        </div>`;
+    }).join('')}
+  </div>`;
+}
+
+async function showReqEmployees(reqId, mountId){
+  const box = document.getElementById(mountId);
+  if(!box) return;
+  box.innerHTML = `<div class="text-sm text-slate-400 flex items-center gap-2 py-2">
+    <i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Loading employees…
+  </div>`;
+  lucide.createIcons();
+
+  try{
+    let d = __REQ_DETAIL_CACHE.get(reqId);
+    if(!d){
+      d = await api(`/admin/requests/${reqId}`);
+      __REQ_DETAIL_CACHE.set(reqId, d);
+    }
+    const emps = d.employees || [];
+    box.innerHTML = `
+      <div class="emp-list">
+        ${emps.map(compactEmployeeRow).join('') || '<div class="text-sm text-slate-500 py-2">No employees</div>'}
+      </div>`;
+  }catch(e){
+    box.innerHTML = `<div class="alert alert-error">❌ ${escapeHtml(e.message||e)}</div>`;
+  }finally{
+    lucide.createIcons();
+  }
+}
+
+function renderKpiDrawer(type){
+  const body=document.getElementById('kpiDrawerBody');
+  const footer=document.getElementById('kpiDrawerFooter');
+  if(!body || !footer) return;
+
+  const date = document.getElementById('runDate')?.value || '—';
+
+  // Default footer
+  footer.innerHTML = `
+    <button type="button" class="btn btn-ghost btn-sm" onclick="closeKpiDrawer()">
+      <i data-lucide="x" class="w-3.5 h-3.5"></i> Close
+    </button>`;
+
+  if(type==='lock'){
+    drawerSetTitle('Daily Lock — Day Information', `Selected day: ${date}`);
+    body.innerHTML = `
+      <div class="drawer-block">
+        <div class="drawer-kv">
+          <div class="k">Date</div><div class="v"><strong>${escapeHtml(date)}</strong></div>
+        </div>
+        <div class="drawer-kv">
+          <div class="k">Status</div><div class="v">${RUN_LOCKED ? '<span class="badge badge-green">🔒 Locked</span>' : '<span class="badge badge-amber">🔓 Not Locked</span>'}</div>
+        </div>
+        <div class="note mt-3">
+          <strong>සැ.යු:</strong> Lock කළ පසු HOD submissions/edit නවතී.
+        </div>
+      </div>`;
+    footer.innerHTML = `
+      <button type="button" class="btn btn-ghost btn-sm" onclick="loadRunSummaryLive(); updateKpis();">
+        <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Refresh
+      </button>
+      <button type="button" class="btn btn-lock btn-sm" onclick="lockRun()">
+        <i data-lucide="lock" class="w-3.5 h-3.5"></i> Lock → TA
+      </button>
+      <button type="button" class="btn btn-ghost btn-sm" onclick="closeKpiDrawer()">
+        <i data-lucide="x" class="w-3.5 h-3.5"></i> Close
+      </button>`;
+    return;
+  }
+
+  if(type==='departments_total'){
+    drawerSetTitle('දෙපාර්තමේන්තු — සියල්ල', `Total: ${(DEPS||[]).length}`);
+    const items = (DEPS||[]).map(d=>({...d, _key:`dep-${d.id}`}));
+    body.innerHTML = renderAccordion(
+      items,
+      (it)=> `<div class="acc-sum-main">
+        <div class="acc-title">${escapeHtml(it.name||'—')}</div>
+        <div class="acc-sub">Department ID: ${escapeHtml(it.id)}</div>
+      </div>`,
+      (it)=> `
+        <div class="drawer-actions">
+          <button class="btn btn-ghost btn-sm" onclick="editDept(${it.id})">
+            <i data-lucide="pencil" class="w-3.5 h-3.5"></i> Edit Name
+          </button>
+          <button class="btn btn-ghost btn-sm" onclick="setTab('master'); closeKpiDrawer();">
+            <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i> Go to Master Data
+          </button>
+        </div>`
+    );
+    return;
+  }
+
+  if(type==='submitted'){
+    const subs = (RUN_DEPARTMENTS||[]).filter(d=>!!d.submitted);
+    drawerSetTitle('Submitted Departments', `Date: ${date} • Count: ${subs.length}`);
+    const items = subs.map((d,i)=>({...d, _key:`sub-${i}-${d.department_name}`}));
+    body.innerHTML = renderAccordion(
+      items,
+      (it)=> `<div class="acc-sum-main">
+        <div class="acc-title">${escapeHtml(it.department_name||'—')}</div>
+        <div class="acc-sub">Requests: ${escapeHtml(it.requests_count||0)} • Employees: ${escapeHtml(it.employees_count||0)}</div>
+      </div><div class="acc-pill ok">Submitted</div>`,
+      (it)=> `
+        <div class="drawer-kpi-pills">
+          <span class="pill">Requests: <strong>${escapeHtml(it.requests_count||0)}</strong></span>
+          <span class="pill">Employees: <strong>${escapeHtml(it.employees_count||0)}</strong></span>
+        </div>
+        <div class="drawer-actions mt-3">
+          <button class="btn btn-ghost btn-sm" onclick="closeKpiDrawer(); document.getElementById('runDeptRows')?.scrollIntoView({behavior:'smooth'});">
+            <i data-lucide="table" class="w-3.5 h-3.5"></i> View Summary Table
+          </button>
+        </div>`
+    );
+    return;
+  }
+
+  if(type==='not_submitted'){
+    const miss = (RUN_MISSING||[]);
+    drawerSetTitle('Not Submitted — Missing Departments', `Date: ${date} • Count: ${miss.length}`);
+    const items = miss.map((name,i)=>({_key:`miss-${i}-${name}`, name}));
+    body.innerHTML = renderAccordion(
+      items,
+      (it)=> `<div class="acc-sum-main">
+        <div class="acc-title">${escapeHtml(it.name||'—')}</div>
+        <div class="acc-sub">අද submit කරලා නැහැ</div>
+      </div><div class="acc-pill warn">Missing</div>`,
+      (it)=> `
+        <div class="note">මෙම දෙපාර්තමේන්තුව අද submit කරලා නැහැ.</div>
+        <div class="drawer-actions mt-3">
+          <button class="btn btn-ghost btn-sm" onclick="navigator.clipboard?.writeText('${(it.name||'').replace(/'/g,"\\'")}')">
+            <i data-lucide="copy" class="w-3.5 h-3.5"></i> Copy Name
+          </button>
+          <button class="btn btn-ghost btn-sm" onclick="closeKpiDrawer(); document.getElementById('runMissing')?.scrollIntoView({behavior:'smooth'});">
+            <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i> View Missing Box
+          </button>
+        </div>`
+    );
+    return;
+  }
+
+  if(type==='hod_pending'){
+    drawerSetTitle('Pending HOD Registration Approvals', `Pending: ${(HOD_PENDING||[]).length}`);
+    const items = (HOD_PENDING||[]).map(u=>({...u, _key:`hod-${u.id}`}));
+    body.innerHTML = renderAccordion(
+      items,
+      (it)=> `<div class="acc-sum-main">
+        <div class="acc-title">${escapeHtml(it.email||'—')}</div>
+        <div class="acc-sub">Department ID: ${escapeHtml(it.department_id||'—')} • Applied: ${escapeHtml(fmtDate(it.created_at||''))}</div>
+      </div><div class="acc-pill warn">Pending</div>`,
+      (it)=> `
+        <div class="drawer-actions">
+          <button class="btn btn-success btn-sm" onclick="approveH(${it.id}).then(()=>{ refreshDrawerIfOpen(); })">
+            <i data-lucide="check" class="w-3.5 h-3.5"></i> Approve
+          </button>
+          <button class="btn btn-danger btn-sm" onclick="rejectH(${it.id}).then(()=>{ refreshDrawerIfOpen(); })">
+            <i data-lucide="x" class="w-3.5 h-3.5"></i> Reject
+          </button>
+        </div>`
+    );
+    footer.innerHTML = `
+      <button type="button" class="btn btn-ghost btn-sm" onclick="renderHodRegs(); refreshDrawerIfOpen();">
+        <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Refresh
+      </button>
+      <button type="button" class="btn btn-ghost btn-sm" onclick="setTab('approvals'); closeKpiDrawer();">
+        <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i> Go to Approvals
+      </button>
+      <button type="button" class="btn btn-ghost btn-sm" onclick="closeKpiDrawer()">
+        <i data-lucide="x" class="w-3.5 h-3.5"></i> Close
+      </button>`;
+    return;
+  }
+
+  if(type==='transport_requests'){
+    const rd = document.getElementById('runDate')?.value;
+    const list = (REQS||[]).filter(r=>{
+      if(!rd) return true;
+      const v = (r.request_date||"");
+      return v===rd || v.startsWith(rd);
+    });
+
+    // group by department
+    const map = new Map();
+    for(const r of list){
+      const key = r.department_name || ('Dept ' + (r.department_id||''));
+      if(!map.has(key)) map.set(key, { _key:`dept-${key}`, dept:key, rows:[], counts:{} });
+      const g = map.get(key);
+      g.rows.push(r);
+      g.counts[r.status] = (g.counts[r.status]||0) + 1;
+    }
+    const items = Array.from(map.values()).sort((a,b)=> (b.rows.length - a.rows.length));
+
+    drawerSetTitle('Transport Requests — Today', `Date: ${date} • Total: ${list.length}`);
+
+    body.innerHTML = renderAccordion(
+      items,
+      (it)=> `<div class="acc-sum-main">
+        <div class="acc-title">${escapeHtml(it.dept)}</div>
+        <div class="acc-sub">${escapeHtml(it.rows.length)} requests</div>
+      </div><div class="acc-pill indigo">${escapeHtml(it.rows.length)}</div>`,
+      (it)=> {
+        const pills = Object.entries(it.counts||{}).map(([k,v])=>`<span class="pill">${escapeHtml(k)}: <strong>${escapeHtml(v)}</strong></span>`).join('');
+        const reqList = it.rows
+          .sort((a,b)=> (String(a.request_time||'').localeCompare(String(b.request_time||''))))
+          .map(r=>{
+            const mountId = `empBox_${r.id}`;
+            return `
+              <div class="req-mini">
+                <div class="req-mini-top">
+                  <div class="req-mini-left">
+                    <div class="req-mini-id">#${escapeHtml(r.id)}</div>
+                    <div class="req-mini-meta">${escapeHtml(fmtDate(r.request_date))} • ${escapeHtml(fmtTime(r.request_time))} • ${statusBadge(r.status)}</div>
+                  </div>
+                  <button class="btn btn-ghost btn-sm" onclick="showReqEmployees(${r.id}, '${mountId}')">
+                    <i data-lucide="users" class="w-3.5 h-3.5"></i> Employees
+                  </button>
+                </div>
+                <div id="${mountId}" class="req-mini-emp"></div>
+              </div>`;
+          }).join('');
+        return `
+          <div class="drawer-kpi-pills">${pills || '<span class="pill">No status</span>'}</div>
+          <div class="req-mini-list mt-3">${reqList || '<div class="text-sm text-slate-500">No requests</div>'}</div>
+        `;
+      }
+    );
+
+    footer.innerHTML = `
+      <button type="button" class="btn btn-ghost btn-sm" onclick="loadRequests().then(()=>{ updateKpis(); refreshDrawerIfOpen(); })">
+        <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Refresh
+      </button>
+      <button type="button" class="btn btn-ghost btn-sm" onclick="setTab('approvals'); closeKpiDrawer();">
+        <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i> Go to Approvals
+      </button>
+      <button type="button" class="btn btn-ghost btn-sm" onclick="closeKpiDrawer()">
+        <i data-lucide="x" class="w-3.5 h-3.5"></i> Close
+      </button>`;
+    return;
+  }
+
+  if(type==='employees'){
+    drawerSetTitle('Employees (Master Data)', `Total: ${(EMPLOYEES||[]).length || 0}`);
+    if(EMPLOYEES===null){
+      body.innerHTML = `<div class="alert alert-warn">ℹ️ Employees endpoint not available in this backend.</div>`;
+      return;
+    }
+    const items = (EMPLOYEES||[]).slice(0,500).map((e,i)=>({...e, _key:`emp-${e.emp_no||e.id||i}`}));
+    body.innerHTML = renderAccordion(
+      items,
+      (it)=> `<div class="acc-sum-main">
+        <div class="acc-title">${escapeHtml(it.full_name||it.name||'—')}</div>
+        <div class="acc-sub">Emp No: ${escapeHtml(it.emp_no||'—')} • Dept: ${escapeHtml(it.department_name||it.department_id||'—')}</div>
+      </div><div class="acc-pill slate">${escapeHtml(it.emp_no||'—')}</div>`,
+      (it)=> `
+        <div class="emp-list">${compactEmployeeRow(it)}</div>
+        <div class="drawer-actions mt-3">
+          <button class="btn btn-ghost btn-sm" onclick="setTab('master'); closeKpiDrawer();">
+            <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i> Go to Master Data
+          </button>
+        </div>`
+    );
+    return;
+  }
+
+  if(type==='vehicles'){
+    drawerSetTitle('Vehicles & Capacity', `Total: ${(VEHICLES||[]).length || 0}`);
+    if(VEHICLES===null){
+      body.innerHTML = `<div class="alert alert-warn">ℹ️ Vehicles endpoint not available in this backend.</div>`;
+      return;
+    }
+    const items = (VEHICLES||[]).slice(0,500).map((v,i)=>({...v, _key:`veh-${v.vehicle_no||v.registration_no||v.id||i}`}));
+    body.innerHTML = renderAccordion(
+      items,
+      (it)=> `<div class="acc-sum-main">
+        <div class="acc-title">${escapeHtml(it.vehicle_no||it.registration_no||'—')}</div>
+        <div class="acc-sub">Capacity: ${escapeHtml(it.capacity||it.seat_capacity||'—')} • Type: ${escapeHtml(it.vehicle_type||it.type||'—')}</div>
+      </div><div class="acc-pill slate">${escapeHtml(it.capacity||it.seat_capacity||'—')}</div>`,
+      (it)=> `
+        <div class="drawer-block">
+          <div class="drawer-kv"><div class="k">Owner</div><div class="v">${escapeHtml(it.owner||it.owner_name||'—')}</div></div>
+          <div class="drawer-kv"><div class="k">Route</div><div class="v">${escapeHtml(it.route_id||it.route||'—')}</div></div>
+          <div class="drawer-kv"><div class="k">Driver</div><div class="v">${escapeHtml(it.driver_name||'—')} ${it.driver_phone?('• '+escapeHtml(it.driver_phone)):""}</div></div>
+        </div>`
+    );
+    return;
+  }
+
+  // fallback
+  drawerSetTitle('Details', '');
+  body.innerHTML = `<div class="text-sm text-slate-500">No drawer type selected.</div>`;
+}
+
+function refreshDrawerIfOpen(){
+  if(__DRAWER_OPEN && __DRAWER_TYPE){
+    renderKpiDrawer(__DRAWER_TYPE);
+    try{ lucide.createIcons(); }catch(e){}
+  }
+}
+
+// Drawer accordion click handler
+document.addEventListener('click', (e)=>{
+  const card = e.target.closest('.dash-kpi-card');
+  if(card && card.dataset.drawer){
+    openKpiDrawer(card.dataset.drawer);
+    return;
+  }
+  const btn = e.target.closest('[data-acc-btn]');
+  if(btn){
+    const item = e.target.closest('.acc-item');
+    const key = item?.getAttribute('data-acc-key');
+    if(!key) return;
+    __DRAWER_EXPANDED_KEY = (__DRAWER_EXPANDED_KEY===key ? null : key);
+    refreshDrawerIfOpen();
+  }
+});
+
+document.addEventListener('keydown', (e)=>{
+  if(e.key==='Escape' && __DRAWER_OPEN) closeKpiDrawer();
+});
+
 
 /* ── Guard / Auth — ORIGINAL ─────────────────── */
 async function guard(){
@@ -611,7 +1197,9 @@ async function loadRequests(){
     const d = await api("/admin/requests");
     REQS = d.requests || [];
     renderRequests();
-  } catch(e) {
+  
+    updateKpis();
+} catch(e) {
     document.getElementById("reqList").innerHTML =
       `<div class="alert alert-error">දෝෂයක්: ${e.message}</div>`;
   }
@@ -724,6 +1312,8 @@ async function renderHodRegs(){
     const deps = await api('/admin/departments');
     const d = await loadPendingHodRegs();
     const list = d.pending_hod || [];
+    HOD_PENDING = list;
+    updateKpis();
     const depName = (id)=> (deps.departments||[]).find(x=>x.id===id)?.name || id || '';
     if(list.length===0){
       tbody.innerHTML = `<tr><td colspan='4' class='text-center py-6 text-slate-400 text-sm'>
@@ -771,6 +1361,7 @@ async function loadDepartments(){
   try {
     const d = await api("/admin/departments");
     DEPS = d.departments || [];
+    updateKpis();
     let html = `<table class="data-table">
       <thead><tr><th>Department Name</th><th style="width:100px">Action</th></tr></thead><tbody>`;
     for(const dep of DEPS){
@@ -884,7 +1475,14 @@ async function loadRunSummary(){
   try {
     const d = await api(`/admin/run/${date}/summary`);
     const locked = !!d.master_request;
-    document.getElementById('runMeta').innerHTML = locked
+    
+    RUN_SUMMARY = d;
+    RUN_DEPARTMENTS = d.departments || [];
+    RUN_MISSING = d.missing_departments || [];
+    RUN_LOCKED = locked;
+    RUN_LOCK_STATUS_TEXT = locked ? (`Locked — ${d.master_request.status||''}`.trim()) : 'Not Locked';
+    updateKpis();
+document.getElementById('runMeta').innerHTML = locked
       ? `<span class="badge badge-green px-3 py-1.5 text-sm">🔒 Locked — ${d.master_request.status}</span>`
       : `<span class="badge badge-amber px-3 py-1.5 text-sm">🔓 Not Locked</span>`;
 
@@ -983,6 +1581,33 @@ function downloadRouteReport(){
   previewPdfWithAuth(url,`route-wise-${d}.pdf`);
 }
 
+
+/* ── Optional KPIs: Employees / Vehicles ─────── */
+async function loadEmployeesKpi(){
+  try{
+    const d = await api('/admin/employees');
+    EMPLOYEES = d.employees || d.data || d.items || [];
+  }catch(e){
+    // If backend doesn't have this endpoint, show N/A (do not break page)
+    EMPLOYEES = null;
+    console.warn('Employees KPI unavailable:', e?.message||e);
+  }finally{
+    updateKpis();
+  }
+}
+
+async function loadVehiclesKpi(){
+  try{
+    const d = await api('/admin/vehicles');
+    VEHICLES = d.vehicles || d.data || d.items || [];
+  }catch(e){
+    VEHICLES = null;
+    console.warn('Vehicles KPI unavailable:', e?.message||e);
+  }finally{
+    updateKpis();
+  }
+}
+
 /* ── Init — ORIGINAL ─────────────────────────── */
 (async()=>{
   // Init icons
@@ -1002,6 +1627,8 @@ function downloadRouteReport(){
   await loadRequests();
   await loadDepartments();
   await loadRoutes();
+  await loadEmployeesKpi();
+  await loadVehiclesKpi();
 
   setTimeout(()=>{
     try{ renderHodRegs(); }catch(e){ console.error('HOD Regs init error:',e); }
