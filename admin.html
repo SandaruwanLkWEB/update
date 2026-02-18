@@ -186,7 +186,7 @@
           </div>
           <div>
             <h2 class="text-white font-700 text-base leading-none">Daily Run Lock</h2>
-            <p class="text-slate-400 text-xs mt-1">Lock submissions before dispatching to TA</p>
+            <p class="text-white/75 text-xs mt-1">Lock submissions before dispatching to TA</p>
           </div>
         </div>
         <!-- Run date picker -->
@@ -262,17 +262,19 @@
     <!-- ════════════════════════════════════════════
          TAB NAV BAR
     ═══════════════════════════════════════════════ -->
-    <div class="section-card px-5 py-3 flex items-center gap-2 flex-wrap">
-      <button class="tab-btn active" id="tabApprovalsContent" onclick="setTab('approvals')">
-        <i data-lucide="check-circle" class="w-4 h-4"></i> Approvals
+    <div class="section-card tabbar" role="tablist" aria-label="Admin Sections">
+      <button class="tab-btn active" id="tabApprovalsContent" onclick="setTab('approvals')" role="tab" aria-controls="pane_approvals" aria-selected="true">
+        <i data-lucide="check-circle" class="w-4 h-4"></i><span>Approvals</span>
       </button>
-      <button class="tab-btn" id="tabMasterContent" onclick="setTab('master')">
-        <i data-lucide="database" class="w-4 h-4"></i> Master Data
+      <button class="tab-btn" id="tabMasterContent" onclick="setTab('master')" role="tab" aria-controls="pane_master" aria-selected="false">
+        <i data-lucide="database" class="w-4 h-4"></i><span>Master Data</span>
       </button>
-      <button class="tab-btn" id="tabReportsContent" onclick="setTab('reports')">
-        <i data-lucide="bar-chart-2" class="w-4 h-4"></i> Reports
+      <button class="tab-btn" id="tabReportsContent" onclick="setTab('reports')" role="tab" aria-controls="pane_reports" aria-selected="false">
+        <i data-lucide="bar-chart-2" class="w-4 h-4"></i><span>Reports</span>
       </button>
     </div>
+
+
 
     <!-- ════════════════════════════════════════════
          PANE: APPROVALS
@@ -567,8 +569,10 @@ function setTab(tab){
     const cBtn = document.getElementById(contentBtnMap[t]);
 
     if(pane)  pane.classList.toggle("hidden", t !== tab);
+    if(pane)  pane.setAttribute("aria-hidden", (t!==tab) ? "true":"false");
     if(sBtn)  sBtn.classList.toggle("active",  t === tab);
     if(cBtn)  cBtn.classList.toggle("active",  t === tab);
+    if(cBtn)  cBtn.setAttribute("aria-selected", (t===tab) ? "true":"false");
   }
 
   if(tab === "master"){

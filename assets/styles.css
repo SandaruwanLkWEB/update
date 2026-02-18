@@ -308,6 +308,52 @@ input:focus, select:focus, textarea:focus{
   border-color: rgba(var(--accent), .18);
 }
 
+/* --- Admin/Shared Tab Bar (mobile-first) --- */
+.tabbar{
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 10px 12px;
+  border-radius: 16px;
+}
+.tabbar::-webkit-scrollbar{ height: 6px; }
+.tabbar::-webkit-scrollbar-thumb{ background: rgba(0,0,0,.10); border-radius: 999px; }
+
+.tabbar .tab-btn{
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+  flex: 0 0 auto;
+}
+
+/* Make tabs compact + equal-width on small screens */
+@media (max-width: 640px){
+  .tabbar{
+    position: sticky;
+    top: 64px;
+    z-index: 30;
+    backdrop-filter: blur(10px);
+    background: rgba(255,255,255,.86);
+    border: 1px solid rgba(var(--border), .85);
+    box-shadow: 0 10px 30px rgba(15,23,42,.08);
+  }
+  :root[data-theme="dark"] .tabbar{
+    background: rgba(15,23,42,.80);
+    border-color: rgba(255,255,255,.10);
+  }
+  .tabbar .tab-btn{
+    flex: 1 1 0;
+    justify-content: center;
+    padding: 10px 10px;
+    font-size: 12.5px;
+  }
+  .tabbar .tab-btn svg{ width: 16px; height: 16px; }
+}
+
 /* --- Alerts --- */
 .alert{ padding: 12px 12px; border-radius: 14px; border: 1px solid rgba(var(--border), .92); background: rgba(var(--surface), .96); }
 .alert.ok{ border-color: rgba(22,163,74,.22); background: rgba(22,163,74,.08); }
@@ -863,7 +909,7 @@ input:focus, select:focus, textarea:focus{
     }
     /* Route checkboxes in vehicle form */
     .route-check-item { display: flex; align-items: center; gap: 8px; padding: 7px 10px;
-                        border-radius: 8px; cursor: pointer; transition: background 0.12s; font-size: 13px; }
+                        border-radius: 8px; cursor: pointer; transition: background 0.12s; font-size: 13px; color: #0f172a; }
     .route-check-item:hover { background: #fff7ed; }
     .route-check-item input[type="checkbox"] { accent-color: #f97316; width: 15px; height: 15px; flex-shrink: 0; }
 
@@ -1359,3 +1405,5 @@ input:focus, select:focus, textarea:focus{
     ::-webkit-scrollbar { width: 5px; }
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px; }
+
+:root[data-theme="dark"] .route-check-item{ color: #e5e7eb; }
