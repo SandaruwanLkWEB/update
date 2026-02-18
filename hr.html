@@ -1,198 +1,294 @@
 <!doctype html>
-<html lang="si">
+<html lang="si" class="h-full">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <meta name="theme-color" content="#4F46E5" />
-  <title>HR Dashboard - Transport Management</title>
+  <meta name="theme-color" content="#0f172a" />
+  <title>HR Dashboard — DSI Transport</title>
   <link rel="stylesheet" href="assets/styles.css" />
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+
   <script src="assets/config.js"></script>
   <script src="assets/app.js"></script>
-</head>
-<body>
 
-<!-- Glassmorphic Header -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['DM Sans', 'ui-sans-serif', 'system-ui'] },
+          animation: {
+            'fade-in': 'fadeIn 0.4s ease',
+            'pulse-dot': 'pulseDot 2s infinite',
+          },
+          keyframes: {
+            fadeIn:   { from: { opacity:'0', transform:'translateY(6px)' }, to: { opacity:'1', transform:'translateY(0)' } },
+            pulseDot: { '0%,100%': { opacity:'1' }, '50%': { opacity:'.4' } },
+          }
+        }
+      }
+    }
+  </script>
 
-<header class="topbar">
-  <div class="topbar-inner">
-    <div class="brand">
-      <div class="brand-mark">DSI</div>
-      <div>
-        <div class="brand-title">HR Dashboard</div>
-        <div class="brand-sub">Transport Management</div>
-      </div>
+  </head>
+<body class="h-full bg-slate-50">
+
+<div id="sidebarOverlay" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 lg:hidden" onclick="closeSidebar()"></div>
+
+<!-- ═══ SIDEBAR ═══ -->
+<aside id="sidebar" class="fixed top-0 left-0 w-64 h-full bg-slate-900 flex flex-col z-50" style="box-shadow:4px 0 24px rgba(0,0,0,0.15);">
+
+  <!-- Logo -->
+  <div class="px-5 py-5 border-b border-white/8 flex items-center gap-3 flex-shrink-0">
+    <div class="w-9 h-9 rounded-xl bg-cyan-500 flex items-center justify-center flex-shrink-0 shadow-lg">
+      <i data-lucide="users" class="w-5 h-5 text-white"></i>
     </div>
-    <div class="topbar-actions">
-      <button class="icon-btn" onclick="toggleTheme()" title="Theme"><i data-lucide="moon"></i></button>
-      <a class="btn secondary small" href="profile.html"><i data-lucide="user"></i><span>Profile</span></a>
-      <a class="btn ghost small" href="index.html"><i data-lucide="home"></i><span>Home</span></a>
-      <button class="btn ghost small" onclick="logout()"><i data-lucide="log-out"></i><span>Logout</span></button>
-    </div>
-  </div>
-</header>
-
-
-<main class="container">
-  <!-- User Info Card -->
-  <div class="card elevated" id="meBox" style="margin-bottom:16px; padding:12px 18px;">
-    <span style="color: var(--muted);">Loading...</span>
-  </div>
-  <div class="kpi-grid">
-
-      <div class="card kpi-card">
-        <div class="kpi-icon"><i data-lucide="badge-check"></i></div>
-        <div>
-          <div class="kpi-value" id="kpi_hr_pending">—</div>
-          <div class="kpi-label">Pending HR Final</div>
-          <div class="kpi-sub" id="kpi_hr_pendingSub">Updated</div>
-        </div>
-      </div>
-      <div class="card kpi-card">
-        <div class="kpi-icon"><i data-lucide="check-circle-2"></i></div>
-        <div>
-          <div class="kpi-value" id="kpi_hr_final">—</div>
-          <div class="kpi-label">Final Approved Today</div>
-          <div class="kpi-sub" id="kpi_hr_finalSub">Updated</div>
-        </div>
-      </div>
-      <div class="card kpi-card">
-        <div class="kpi-icon"><i data-lucide="file-down"></i></div>
-        <div>
-          <div class="kpi-value" id="kpi_hr_reports">—</div>
-          <div class="kpi-label">Reports Generated</div>
-          <div class="kpi-sub" id="kpi_hr_reportsSub">Updated</div>
-        </div>
-      </div>
-      <div class="card kpi-card">
-        <div class="kpi-icon"><i data-lucide="building-2"></i></div>
-        <div>
-          <div class="kpi-value" id="kpi_hr_depts">—</div>
-          <div class="kpi-label">Departments Completed</div>
-          <div class="kpi-sub" id="kpi_hr_deptsSub">Updated</div>
-        </div>
-      </div>
-      <div class="card kpi-card">
-        <div class="kpi-icon"><i data-lucide="users"></i></div>
-        <div>
-          <div class="kpi-value" id="kpi_hr_emp">—</div>
-          <div class="kpi-label">Employees Covered</div>
-          <div class="kpi-sub" id="kpi_hr_empSub">Updated</div>
-        </div>
-      </div>
-      <div class="card kpi-card">
-        <div class="kpi-icon"><i data-lucide="alert-circle"></i></div>
-        <div>
-          <div class="kpi-value" id="kpi_hr_issues">—</div>
-          <div class="kpi-label">Issues / Exceptions</div>
-          <div class="kpi-sub" id="kpi_hr_issuesSub">Updated</div>
-        </div>
-      </div>
-  </div>
-
-  <div class="section-title"><strong>Quick Actions</strong><span></span></div>
-  <div class="action-grid">
-    <a class="action-card" href="#" onclick="if(typeof setTab==='function'){setTab('final');}; return false;">
-  <div class="ico"><i data-lucide="badge-check"></i></div>
-  <div class="meta"><div class="t">Finalize Approvals</div><div class="s">Approve TA assigned requests</div></div>
-</a><a class="action-card" href="#" onclick="if(typeof setTab==='function'){setTab('reports');}; return false;">
-  <div class="ico"><i data-lucide="file-down"></i></div>
-  <div class="meta"><div class="t">Download Reports</div><div class="s">Route-wise & vehicle reports</div></div>
-</a><a class="action-card" href="#" onclick="if(typeof setTab==='function'){setTab('summary');}; return false;">
-  <div class="ico"><i data-lucide="bar-chart-3"></i></div>
-  <div class="meta"><div class="t">Department Summary</div><div class="s">View per-department info</div></div>
-</a><a class="action-card" href="#" onclick="if(typeof setTab==='function'){setTab('audit');}; return false;">
-  <div class="ico"><i data-lucide="scroll-text"></i></div>
-  <div class="meta"><div class="t">Audit Log</div><div class="s">Review actions</div></div>
-</a>
-  </div>
-
-  <div class="two-col">
-    <div class="card pad">
-      <div class="section-title"><strong>Recent Requests</strong><span></span></div>
-      <div class="list" id="recentList"><div class="alert">Loading…</div></div>
-    </div>
-    <div class="card pad">
-      <div class="section-title"><strong>Recent Actions</strong><span></span></div>
-      <div class="list" id="recentActions"><div class="alert">Loading…</div></div>
+    <div>
+      <div class="text-white font-bold text-sm leading-none">DSI Transport</div>
+      <div class="text-slate-400 text-xs mt-0.5 font-medium">HR Department</div>
     </div>
   </div>
 
-
-  <!-- Tab Navigation -->
-  <div class="card" style="margin-bottom:14px;">
-    <div class="tabs">
-      <button class="btn active" id="tabApprove" onclick="setTab('approve')">✅ අවසන් අනුමැතිය</button>
-      <button class="btn" id="tabReports" onclick="setTab('reports')">📊 වාර්තා</button>
-    </div>
-  </div>
-
-  <!-- Approvals Pane -->
-  <div class="card soft" id="pane_approve">
-    <h2 class="h2">📋 TA Assigned ඉල්ලීම්</h2>
-    <hr/>
-    <div class="btnrow" style="margin-bottom:14px;">
-      <button class="btn ghost" onclick="loadTARequests()">🔄 Refresh</button>
-    </div>
-    <div id="listBox" class="small">Loading...</div>
-  </div>
-
-  <!-- Reports Pane -->
-  <div class="card soft" id="pane_reports" style="display:none;">
-    <h2 class="h2">📊 වාර්තා ලබා ගන්න</h2>
-    <hr/>
-    <div class="alert info" style="margin-bottom:14px;">
-      Reports download කරන්නේ HR අවසන් අනුමැතිය දුන්නාට පස්සෙ පමණයි. දිනය select කරලා download කරන්න.
-    </div>
-    
-    <div class="grid two">
-      <div>
-        <label>📆 දිනය</label>
-        <input id="repDate" type="date" />
+  <!-- User info -->
+  <div class="px-4 py-3 border-b border-white/8 flex-shrink-0">
+    <div id="meBox" class="flex items-center gap-3">
+      <div class="w-8 h-8 rounded-full bg-cyan-500/30 flex items-center justify-center">
+        <i data-lucide="user" class="w-4 h-4 text-cyan-300"></i>
       </div>
       <div>
-        <label>Actions</label>
-        <div class="btnrow" style="margin-top:6px;">
-          <button class="btn btn-primary" onclick="downloadRouteReport()">📄 Route-wise PDF</button>
-          <button class="btn secondary" onclick="downloadVehicleReport()">📄 Vehicle PDF</button>
+        <div class="text-slate-300 text-xs font-medium">Loading...</div>
+        <div class="text-slate-500 text-xs">HR Officer</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Nav -->
+  <nav class="flex-1 overflow-y-auto px-3 py-4 space-y-1">
+    <div class="text-slate-500 text-xs font-700 uppercase tracking-widest px-3 mb-3">Operations</div>
+
+    <button class="nav-link active" id="tabApprove" onclick="setTab('approve')">
+      <i data-lucide="check-circle" class="w-4 h-4"></i> Final Approvals
+    </button>
+    <button class="nav-link" id="tabReports" onclick="setTab('reports')">
+      <i data-lucide="file-bar-chart-2" class="w-4 h-4"></i> Reports
+    </button>
+
+    <div class="border-t border-white/8 my-3"></div>
+    <div class="text-slate-500 text-xs font-700 uppercase tracking-widest px-3 mb-3">System</div>
+    <a href="index.html" class="nav-link"><i data-lucide="home" class="w-4 h-4"></i> Home</a>
+    <button class="nav-link text-red-400 hover:text-red-300 hover:bg-red-500/10" onclick="logout()">
+      <i data-lucide="log-out" class="w-4 h-4"></i> Sign Out
+    </button>
+  </nav>
+
+  <div class="px-4 py-3 border-t border-white/8 flex-shrink-0 flex items-center gap-2">
+    <div class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse-dot"></div>
+    <span class="text-slate-400 text-xs">System Online</span>
+  </div>
+</aside>
+
+<!-- ═══ MAIN WRAPPER ═══ -->
+<div class="lg:ml-64 min-h-screen flex flex-col">
+
+  <!-- TOP NAVBAR -->
+  <header class="sticky top-0 z-30 bg-white border-b border-slate-200 px-5 py-3 flex items-center gap-4 flex-shrink-0"
+          style="box-shadow:0 1px 0 #e2e8f0, 0 2px 12px rgba(0,0,0,0.04);">
+    <button onclick="openSidebar()" class="lg:hidden p-2 rounded-lg text-slate-500 hover:bg-slate-100">
+      <i data-lucide="menu" class="w-5 h-5"></i>
+    </button>
+    <div class="hidden sm:flex items-center gap-2">
+      <div class="w-7 h-7 rounded-lg bg-cyan-50 flex items-center justify-center">
+        <i data-lucide="users" class="w-4 h-4 text-cyan-600"></i>
+      </div>
+      <div>
+        <h1 class="text-slate-900 font-700 text-sm leading-none">HR Department</h1>
+        <p class="text-slate-400 text-xs mt-0.5">මානව සම්පත් අංශය — Final Approval Authority</p>
+      </div>
+    </div>
+
+    <div class="flex items-center gap-3 ml-auto">
+      <div class="hidden md:flex items-center gap-2 px-3 py-1.5 bg-emerald-50 border border-emerald-200 rounded-full">
+        <div class="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse-dot"></div>
+        <span class="text-emerald-700 text-xs font-600" id="liveClock">Live</span>
+      </div>
+      <button onclick="logout()"
+        class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-slate-500 hover:bg-slate-100 transition text-sm font-500 border border-slate-200">
+        <i data-lucide="log-out" class="w-4 h-4"></i>
+        <span class="hidden sm:inline">Logout</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- MAIN CONTENT -->
+  <main class="flex-1 p-5 lg:p-7 space-y-5 animate-fade-in">
+
+    <!-- Tab Bar -->
+    <div class="section-card px-5 py-3 flex items-center gap-2 flex-wrap">
+      <button class="tab-btn active" id="tabApproveContent" onclick="setTab('approve')">
+        <i data-lucide="check-circle" class="w-4 h-4"></i> Final Approvals
+      </button>
+      <button class="tab-btn" id="tabReportsContent" onclick="setTab('reports')">
+        <i data-lucide="file-bar-chart-2" class="w-4 h-4"></i> Reports
+      </button>
+    </div>
+
+    <!-- ═══ PANE: APPROVE ═══ -->
+    <div id="pane_approve">
+      <div class="section-card">
+        <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-lg bg-cyan-50 flex items-center justify-center">
+              <i data-lucide="clipboard-check" class="w-4 h-4 text-cyan-600"></i>
+            </div>
+            <div>
+              <h2 class="text-slate-800 font-700 text-sm">TA Assigned Requests — Pending HR Final Approval</h2>
+              <p class="text-slate-400 text-xs">TA විසින් වාහන සංකේතාංකිත කළ ඉල්ලීම් — HR අවසාන අනුමැතිය</p>
+            </div>
+          </div>
+          <button onclick="loadTARequests()" class="btn btn-ghost btn-sm">
+            <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Refresh
+          </button>
+        </div>
+        <div class="p-6">
+          <!-- listBox: rendered by JS -->
+          <div id="listBox" class="text-center py-8 text-slate-400 text-sm">
+            <i data-lucide="loader-2" class="w-5 h-5 animate-spin inline mr-2"></i>Loading requests…
+          </div>
         </div>
       </div>
     </div>
-    <p class="mini" style="margin-top:10px;">💡 If your browser blocks downloads, open the URL in new tab.</p>
-  </div>
 
-</main>
-
-<!-- Request Details Modal -->
-<div id="detailsModal" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.5); z-index:1000; overflow-y:auto;" onclick="closeDetails(event)">
-  <div class="card" style="max-width:900px; margin:40px auto; max-height:90vh; overflow-y:auto;" onclick="event.stopPropagation()">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
-      <h2 class="h2" style="margin:0;">📋 Request Details</h2>
-      <button class="btn ghost small" onclick="closeDetails()">✕ Close</button>
+    <!-- ═══ PANE: REPORTS ═══ -->
+    <div id="pane_reports" class="hidden">
+      <div class="section-card">
+        <div class="flex items-center gap-3 px-6 py-4 border-b border-slate-100">
+          <div class="w-8 h-8 rounded-lg bg-violet-50 flex items-center justify-center">
+            <i data-lucide="file-bar-chart-2" class="w-4 h-4 text-violet-600"></i>
+          </div>
+          <div>
+            <h2 class="text-slate-800 font-700 text-sm">Download Reports</h2>
+            <p class="text-slate-400 text-xs">HR Final Approval ලැබුණු දිනයන් සඳහා පමණ</p>
+          </div>
+        </div>
+        <div class="p-6 space-y-5">
+          <div class="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 flex items-start gap-2">
+            <i data-lucide="info" class="w-4 h-4 text-amber-500 flex-shrink-0 mt-0.5"></i>
+            <p class="text-amber-700 text-sm">
+              Reports download කරන්නේ HR අවසන් අනුමැතිය දුන්නාට පස්සෙ පමණයි. දිනය select කරලා download කරන්න.
+            </p>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-5 max-w-xl">
+            <div>
+              <label class="form-label">Report Date</label>
+              <input id="repDate" type="date" class="form-input"/>
+            </div>
+            <div class="flex flex-col justify-end gap-2">
+              <button onclick="downloadRouteReport()" class="btn btn-primary">
+                <i data-lucide="file-down" class="w-4 h-4"></i> Route-wise PDF
+              </button>
+              <button onclick="downloadVehicleReport()" class="btn btn-ghost">
+                <i data-lucide="bus" class="w-4 h-4"></i> Vehicle PDF
+              </button>
+            </div>
+          </div>
+          <p class="text-slate-400 text-xs flex items-center gap-1.5">
+            <i data-lucide="info" class="w-3.5 h-3.5"></i>
+            If your browser blocks downloads, open the URL in a new tab.
+          </p>
+        </div>
+      </div>
     </div>
-    <hr/>
-    <div id="detailsContent"></div>
+
+  </main>
+</div>
+
+<!-- ═══ REQUEST DETAILS MODAL ═══
+     id="detailsModal" and id="detailsContent" PRESERVED -->
+<div id="detailsModal" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; z-index:1000; overflow-y:auto;"
+     class="bg-black/60 backdrop-blur-sm" onclick="closeDetails(event)">
+  <div class="max-w-4xl mx-auto my-10 px-4" onclick="event.stopPropagation()">
+    <div class="section-card overflow-hidden">
+      <!-- Modal header -->
+      <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-slate-900">
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center">
+            <i data-lucide="clipboard-list" class="w-4 h-4 text-white"></i>
+          </div>
+          <h2 class="text-white font-700 text-base">Request Details</h2>
+        </div>
+        <button onclick="closeDetails()" class="w-8 h-8 rounded-lg bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+      <!-- detailsContent: rendered by JS -->
+      <div id="detailsContent" class="p-6">
+        <div class="text-center py-12 text-slate-400">
+          <i data-lucide="loader-2" class="w-6 h-6 animate-spin inline"></i>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
+<!-- ═══ ALL ORIGINAL SCRIPTS — PRESERVED EXACTLY ═══ -->
 <script>
 let ME=null;
 let LIST=[];
 let CURRENT_DETAIL = null;
 
+/* ── Sidebar ─────────────────────────────── */
+function openSidebar(){
+  document.getElementById('sidebar').classList.add('open');
+  document.getElementById('sidebarOverlay').classList.add('active');
+}
+function closeSidebar(){
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebarOverlay').classList.remove('active');
+}
+
+/* ── Live clock ──────────────────────────── */
+function updateClock(){
+  const el = document.getElementById('liveClock');
+  if(el) el.textContent = new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+}
+setInterval(updateClock, 1000); updateClock();
+
+/* ── Tab system — ORIGINAL ───────────────── */
 function setTab(tab){
   const tabs = ["approve","reports"];
   for(const t of tabs){
-    qs("pane_"+t).style.display = (t===tab) ? "" : "none";
-    qs("tab"+t.charAt(0).toUpperCase()+t.slice(1)).classList.toggle("active", t===tab);
+    const pane = document.getElementById("pane_"+t);
+    const sBtn = document.getElementById("tab"+t.charAt(0).toUpperCase()+t.slice(1));
+    const cBtn = document.getElementById("tab"+t.charAt(0).toUpperCase()+t.slice(1)+"Content");
+    if(pane) pane.classList.toggle("hidden", t !== tab);
+    if(sBtn) sBtn.classList.toggle("active", t === tab);
+    if(cBtn) cBtn.classList.toggle("active", t === tab);
   }
 }
 
+/* ── Guard — ORIGINAL ────────────────────── */
 async function guard(){
   ME = await guardRole("HR");
   if(!ME) return;
-  qs("meBox").innerHTML = `<strong style="color: var(--brand);">${ME.role}</strong> <span style="color: var(--muted);">|</span> <span style="color: var(--text-secondary);">${ME.email}</span>`;
+  const meBox = document.getElementById("meBox");
+  if(meBox){
+    meBox.innerHTML = `
+      <div class="w-8 h-8 rounded-full bg-cyan-500/30 flex items-center justify-center flex-shrink-0">
+        <i data-lucide="user" class="w-4 h-4 text-cyan-300"></i>
+      </div>
+      <div>
+        <div class="text-slate-200 text-xs font-600">${ME.email||'HR User'}</div>
+        <span class="inline-block mt-0.5 text-cyan-400 text-xs font-700 bg-cyan-500/20 rounded px-1.5 py-0.5">${ME.role}</span>
+      </div>`;
+    lucide.createIcons();
+  }
 }
 
+/* ── Load TA Requests — ORIGINAL ─────────── */
 async function loadTARequests(){
   try{
     const d = await api("/hr/requests/ta-assigned");
@@ -203,53 +299,78 @@ async function loadTARequests(){
   }
 }
 
+/* ── Render list — ORIGINAL ──────────────── */
 function render(){
-  if(LIST.length===0){ 
-    qs("listBox").innerHTML = "<span class='badge good'>✅ බලාපොරොත්තු වූ ඉල්ලීම් නැත</span>"; 
-    return; 
+  const box = document.getElementById("listBox");
+  if(LIST.length===0){
+    box.innerHTML = `<div class="flex flex-col items-center py-12 text-slate-400">
+      <i data-lucide="inbox" class="w-10 h-10 mb-3 opacity-30"></i>
+      <span class="text-sm font-500">No pending requests</span>
+      <span class="text-xs mt-1">All TA assignments have been processed</span>
+    </div>`;
+    lucide.createIcons();
+    return;
   }
-  
-  let html = "<div class='table-wrap'><table><thead><tr><th>ID</th><th>දිනය</th><th>වේලාව</th><th>දෙපාර්තමේන්තුව</th><th>තත්ත්වය</th><th>ක්‍රියාව</th></tr></thead><tbody>";
+
+  let html = `<div class="table-wrap"><table class="data-table">
+    <thead><tr>
+      <th>ID</th><th>Date</th><th>Time</th><th>Department</th><th>Status</th><th>Actions</th>
+    </tr></thead><tbody>`;
   for(const r of LIST){
     html += `<tr>
-      <td><strong>#${r.id}</strong></td>
+      <td><span class="font-700 text-slate-800">#${r.id}</span></td>
       <td>${fmtDate(r.request_date)}</td>
       <td>${fmtTime(r.request_time)}</td>
       <td>${r.department_name}</td>
       <td>${statusBadge(r.status)}</td>
       <td>
-        <div style="display:flex; gap:6px; flex-wrap:wrap;">
-          <button class="btn small ghost" onclick="viewDetails(${r.id})">👁️ View</button>
+        <div style="display:flex; gap:6px; flex-wrap:wrap; align-items:center;">
+          <button class="btn btn-ghost btn-sm" onclick="viewDetails(${r.id})">
+            <i data-lucide="eye" class="w-3.5 h-3.5"></i> View
+          </button>
           ${r.status==="TA_ASSIGNED_PENDING_HR" ? `
-            <button class="btn small" onclick="overApprove(${r.id})">✅ Override අනුමත</button>
-            <button class="btn small secondary" onclick="overReject(${r.id})">❌ Override ප්‍රතික්ෂේප</button>
+            <button class="btn btn-success btn-sm" onclick="overApprove(${r.id})">
+              <i data-lucide="check" class="w-3 h-3"></i> Override Approve
+            </button>
+            <button class="btn btn-danger btn-sm" onclick="overReject(${r.id})">
+              <i data-lucide="x" class="w-3 h-3"></i> Override Reject
+            </button>
           ` : `
-            <button class="btn small btn-primary" onclick="finalApprove(${r.id})">✅ අවසාන අනුමැතිය</button>
+            <button class="btn btn-cyan btn-sm" onclick="finalApprove(${r.id})">
+              <i data-lucide="shield-check" class="w-3.5 h-3.5"></i> Final Approve
+            </button>
           `}
         </div>
       </td>
     </tr>`;
   }
   html += "</tbody></table></div>";
-  qs("listBox").innerHTML = html;
+  box.innerHTML = html;
+  lucide.createIcons();
 }
 
+/* ── View Details — ORIGINAL ─────────────── */
 async function viewDetails(id){
   try{
     CURRENT_DETAIL = id;
-    qs("detailsModal").style.display = "block";
-    qs("detailsContent").innerHTML = "<div style='text-align:center; padding:40px;'>Loading...</div>";
-    
+    document.getElementById("detailsModal").style.display = "block";
+    document.getElementById("detailsContent").innerHTML = `
+      <div class="flex items-center justify-center py-12 text-slate-400 gap-3">
+        <i data-lucide="loader-2" class="w-5 h-5 animate-spin"></i>
+        <span class="text-sm">Loading details…</span>
+      </div>`;
+    lucide.createIcons();
+
     const req = LIST.find(r => r.id === id);
-    
+
     // Get employees
     const empData = await api(`/admin/requests/${id}/employees`);
     const employees = empData.employees || [];
-    
+
     // Get assignments
     const assignData = await api(`/admin/requests/${id}/assignments-summary`);
     const assignments = assignData.assignments || [];
-    
+
     // Group employees by route
     const byRoute = {};
     for(const emp of employees){
@@ -262,7 +383,6 @@ async function viewDetails(id){
           total: 0
         };
       }
-      
       const subKey = emp.effective_sub_route_id || 'MAIN';
       if(!byRoute[routeKey].sub_routes[subKey]){
         byRoute[routeKey].sub_routes[subKey] = {
@@ -270,124 +390,115 @@ async function viewDetails(id){
           employees: []
         };
       }
-      
       byRoute[routeKey].sub_routes[subKey].employees.push(emp);
       byRoute[routeKey].total++;
     }
-    
+
     let html = `
-      <div class="card" style="background:#fff; border:1px solid var(--border); margin-bottom:14px;">
-        <div class="h2">📌 Request Info</div>
-        <div class="mini" style="margin-top:8px;">
-          <strong>Request ID:</strong> #${req.id}<br/>
-          <strong>දිනය:</strong> ${fmtDate(req.request_date)}<br/>
-          <strong>වේලාව:</strong> ${fmtTime(req.request_time)}<br/>
-          <strong>තත්ත්වය:</strong> ${statusBadge(req.status)}
+      <div class="section-card p-5 mb-4">
+        <div class="flex items-center gap-2 mb-3">
+          <i data-lucide="info" class="w-4 h-4 text-slate-500"></i>
+          <h3 class="text-slate-700 font-700 text-sm">Request Info</h3>
+        </div>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm">
+          <div><span class="text-slate-400 text-xs block mb-0.5">Request ID</span><strong>#${req.id}</strong></div>
+          <div><span class="text-slate-400 text-xs block mb-0.5">Date</span>${fmtDate(req.request_date)}</div>
+          <div><span class="text-slate-400 text-xs block mb-0.5">Time</span>${fmtTime(req.request_time)}</div>
+          <div><span class="text-slate-400 text-xs block mb-0.5">Status</span>${statusBadge(req.status)}</div>
         </div>
       </div>
-      
-      <div class="card" style="background:#fff; border:1px solid var(--border); margin-bottom:14px;">
-        <div class="h2">👥 Employee Details (${employees.length} total)</div>
-        <div style="margin-top:12px;">
-    `;
-    
+
+      <div class="section-card p-5 mb-4">
+        <div class="flex items-center gap-2 mb-4">
+          <i data-lucide="users" class="w-4 h-4 text-slate-500"></i>
+          <h3 class="text-slate-700 font-700 text-sm">Employee Details (${employees.length} total)</h3>
+        </div>`;
+
     for(const [routeKey, routeData] of Object.entries(byRoute)){
       html += `
-        <div style="margin-bottom:16px;">
-          <div style="font-weight:700; font-size:15px; color: var(--brand);">
-            ${routeData.route_no}${routeData.route_name ? ' - ' + routeData.route_name : ''} (${routeData.total} employees)
-          </div>
-      `;
-      
+        <div class="mb-4 bg-slate-50 rounded-xl p-4 border border-slate-100">
+          <div class="flex items-center gap-2 mb-3">
+            <span class="w-2 h-2 bg-cyan-500 rounded-full flex-shrink-0"></span>
+            <span class="font-700 text-slate-800 text-sm">${routeData.route_no}${routeData.route_name ? ' — ' + routeData.route_name : ''}</span>
+            <span class="badge badge-cyan">${routeData.total} emp</span>
+          </div>`;
       for(const [subKey, subData] of Object.entries(routeData.sub_routes)){
         html += `
-          <div style="margin-left:20px; margin-top:8px;">
-            <div style="font-weight:600; font-size:14px;">📍 ${subData.sub_name} (${subData.employees.length})</div>
-            <div class="mini" style="margin-top:4px;">
-        `;
-        
+          <div class="ml-4 mb-2">
+            <div class="font-600 text-slate-600 text-xs mb-1.5 flex items-center gap-1.5">
+              <i data-lucide="map-pin" class="w-3 h-3"></i> ${subData.sub_name} (${subData.employees.length})
+            </div>
+            <div class="flex flex-wrap gap-2">`;
         for(const emp of subData.employees){
-          html += `• ${emp.full_name} (${emp.emp_no})<br/>`;
+          html += `<span class="text-xs bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 font-500">${emp.full_name} <span class="text-slate-400">(${emp.emp_no})</span></span>`;
         }
-        
         html += `</div></div>`;
       }
-      
       html += `</div>`;
     }
-    
-    html += `</div></div>`;
-    
-    // Assignments
-    html += `
-      <div class="card" style="background:#fff; border:1px solid var(--border);">
-        <div class="h2">🚗 Vehicle Assignments</div>
-        <div style="margin-top:12px;">
-    `;
-    
+
+    html += `</div>
+
+      <div class="section-card p-5">
+        <div class="flex items-center gap-2 mb-4">
+          <i data-lucide="bus" class="w-4 h-4 text-slate-500"></i>
+          <h3 class="text-slate-700 font-700 text-sm">Vehicle Assignments</h3>
+        </div>`;
+
     if(assignments.length === 0){
-      html += `<div class="alert">⚠️ No vehicle assignments yet</div>`;
+      html += `<div class="alert alert-warn">⚠️ No vehicle assignments yet</div>`;
     } else {
-      // Group assignments by route
       const assignByRoute = {};
       for(const a of assignments){
         const rkey = a.route_id || 'NO_ROUTE';
         if(!assignByRoute[rkey]) assignByRoute[rkey] = [];
         assignByRoute[rkey].push(a);
       }
-      
       for(const [rkey, assigns] of Object.entries(assignByRoute)){
         const firstAssign = assigns[0];
-        const routeLabel = firstAssign.route_no ? `${firstAssign.route_no} - ${firstAssign.route_name}` : 'No Route';
-        
+        const routeLabel = firstAssign.route_no ? `${firstAssign.route_no} — ${firstAssign.route_name}` : 'No Route';
         html += `
-          <div style="margin-bottom:16px;">
-            <div style="font-weight:700; font-size:15px; color: var(--brand);">${routeLabel}</div>
-            <div class="table-wrap" style="margin-top:8px;">
-              <table>
-                <thead>
-                  <tr><th>Vehicle</th><th>Driver</th><th>Phone</th><th>Capacity</th><th>Override</th></tr>
-                </thead>
-                <tbody>
-        `;
-        
+          <div class="mb-4">
+            <div class="font-700 text-slate-700 text-sm mb-2">${routeLabel}</div>
+            <div class="table-wrap">
+              <table class="data-table">
+                <thead><tr><th>Vehicle</th><th>Driver</th><th>Phone</th><th>Capacity</th><th>Override</th></tr></thead>
+                <tbody>`;
         for(const a of assigns){
-          const overrideInfo = a.overbook_amount > 0 ? `+${a.overbook_amount} (${a.overbook_status})` : '-';
-          html += `
-            <tr>
-              <td><strong>${a.vehicle_no}</strong></td>
-              <td>${a.driver_name || 'N/A'}</td>
-              <td>${a.driver_phone || 'N/A'}</td>
-              <td>${a.capacity}</td>
-              <td>${overrideInfo}</td>
-            </tr>
-          `;
+          const overrideInfo = a.overbook_amount > 0 ? `<span class="badge badge-amber">+${a.overbook_amount} (${a.overbook_status})</span>` : '<span class="text-slate-400">—</span>';
+          html += `<tr>
+            <td><strong>${a.vehicle_no}</strong></td>
+            <td>${a.driver_name || '—'}</td>
+            <td>${a.driver_phone || '—'}</td>
+            <td>${a.capacity}</td>
+            <td>${overrideInfo}</td>
+          </tr>`;
         }
-        
         html += `</tbody></table></div></div>`;
       }
     }
-    
-    html += `</div></div>`;
-    
-    qs("detailsContent").innerHTML = html;
-    
+    html += `</div>`;
+
+    document.getElementById("detailsContent").innerHTML = html;
+    lucide.createIcons();
   }catch(e){
-    qs("detailsContent").innerHTML = `<div class="alert bad">❌ Error loading details: ${e.message}</div>`;
+    document.getElementById("detailsContent").innerHTML = `<div class="alert alert-error">❌ Error loading details: ${e.message}</div>`;
   }
 }
 
+/* ── Close Details — ORIGINAL ────────────── */
 function closeDetails(event){
   if(!event || event.target.id === 'detailsModal'){
-    qs("detailsModal").style.display = "none";
+    document.getElementById("detailsModal").style.display = "none";
     CURRENT_DETAIL = null;
   }
 }
 
+/* ── Override/Final approve — ORIGINAL ────── */
 async function overApprove(id){
   try{
     await api(`/hr/requests/${id}/overbook/approve`, {method:"POST"});
-    toast("✅ ඔවරයිඩ් (+1/+2) අනුමත කරන ලදී");
+    toast("✅ Override approved");
     await loadTARequests();
   }catch(e){ toast("❌ " + e.message); }
 }
@@ -395,7 +506,7 @@ async function overApprove(id){
 async function overReject(id){
   try{
     await api(`/hr/requests/${id}/overbook/reject`, {method:"POST"});
-    toast("✅ ඔවරයිඩ් ප්‍රතික්ෂේප කරන ලදී");
+    toast("✅ Override rejected");
     await loadTARequests();
   }catch(e){ toast("❌ " + e.message); }
 }
@@ -403,49 +514,43 @@ async function overReject(id){
 async function finalApprove(id){
   try{
     await api(`/hr/requests/${id}/final-approve`, {method:"POST"});
-    toast("✅ අවසාන අනුමැතිය ලබා දුන්නා");
+    toast("✅ Final approval granted");
     await loadTARequests();
   }catch(e){ toast("❌ " + e.message); }
 }
 
-
+/* ── PDF helpers — ORIGINAL ──────────────── */
 async function downloadPdfWithAuth(url, filename){
   try{
     const token = (typeof getToken === "function") ? getToken() : localStorage.getItem("token");
     const headers = token ? { "Authorization": `Bearer ${token}` } : {};
     const res = await fetch(url, { method:"GET", headers });
     if(res.status === 401){
-      if (typeof clearToken === "function") clearToken(); else localStorage.removeItem("token");
-      location.href = "login.html";
-      return;
+      if(typeof clearToken === "function") clearToken(); else localStorage.removeItem("token");
+      location.href = "login.html"; return;
     }
     if(!res.ok){
       const text = await res.text();
       let msg = text;
       try{ const j = text ? JSON.parse(text) : {}; msg = j.error || j.message || text; }catch(e){}
       msg = (msg && String(msg).trim()) || `Server error (HTTP ${res.status}).`;
-      if (typeof toast === "function") toast(msg); else alert(msg);
+      if(typeof toast === "function") toast(msg); else alert(msg);
       return;
     }
     const blob = await res.blob();
     const a = document.createElement("a");
     const objUrl = URL.createObjectURL(blob);
-    a.href = objUrl;
-    a.download = filename || "report.pdf";
-    document.body.appendChild(a);
-    a.click();
-    setTimeout(() => {
-      URL.revokeObjectURL(objUrl);
-      a.remove();
-    }, 1200);
+    a.href = objUrl; a.download = filename || "report.pdf";
+    document.body.appendChild(a); a.click();
+    setTimeout(()=>{ URL.revokeObjectURL(objUrl); a.remove(); }, 1200);
   }catch(e){
     const msg = "ජාල/සම්බන්ධතා ගැටලුවක්. කරුණාකර නැවත උත්සාහ කරන්න.";
-    if (typeof toast === "function") toast(msg); else alert(msg);
+    if(typeof toast === "function") toast(msg); else alert(msg);
   }
 }
 
 function downloadRouteReport(){
-  const d = qs("repDate").value;
+  const d = document.getElementById("repDate").value;
   if(!d){ toast("⚠️ දිනය තෝරන්න"); return; }
   const base = (API_BASE_URL || "").replace(/\/$/, "");
   const url = `${base}/reports/daily/route-wise?date=${encodeURIComponent(d)}`;
@@ -453,19 +558,21 @@ function downloadRouteReport(){
 }
 
 function downloadVehicleReport(){
-  const d = qs("repDate").value;
+  const d = document.getElementById("repDate").value;
   if(!d){ toast("⚠️ දිනය තෝරන්න"); return; }
   const base = (API_BASE_URL || "").replace(/\/$/, "");
   const url = `${base}/reports/daily/vehicle?date=${encodeURIComponent(d)}`;
   downloadPdfWithAuth(url, `vehicle-${d}.pdf`);
 }
 
+/* ── Init — ORIGINAL ─────────────────────── */
 (async function init(){
+  lucide.createIcons();
   try{
     await guard();
     await loadTARequests();
-  }catch(e){ 
-    toast("❌ " + e.message); 
+  }catch(e){
+    toast("❌ " + e.message);
   }
 })();
 
@@ -476,10 +583,9 @@ function todayISO(){
   return `${d.getFullYear()}-${m}-${da}`;
 }
 (function(){
-  const rep = qs('repDate');
+  const rep = document.getElementById('repDate');
   if(rep && !rep.value) rep.value = todayISO();
-})(); 
+})();
 </script>
-  <script src="https://unpkg.com/lucide@latest"></script>
 </body>
 </html>

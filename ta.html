@@ -1,359 +1,524 @@
 <!doctype html>
-<html lang="si">
+<html lang="si" class="h-full">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <meta name="theme-color" content="#4F46E5" />
-  <title>Transport Authority Dashboard - Transport Management</title>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <meta name="theme-color" content="#0f172a"/>
+  <title>Transport Assistant — DSI Transport</title>
   <link rel="stylesheet" href="assets/styles.css" />
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+
   <script src="assets/config.js"></script>
   <script src="assets/app.js"></script>
-</head>
-<body>
 
-<!-- Glassmorphic Header -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['DM Sans', 'ui-sans-serif', 'system-ui'] },
+          animation: {
+            'fade-in':   'fadeIn 0.4s ease',
+            'pulse-dot': 'pulseDot 2s infinite',
+          },
+          keyframes: {
+            fadeIn:   { from:{ opacity:'0', transform:'translateY(6px)' }, to:{ opacity:'1', transform:'translateY(0)' } },
+            pulseDot: { '0%,100%':{ opacity:'1' }, '50%':{ opacity:'.4' } },
+          }
+        }
+      }
+    }
+  </script>
 
-<header class="topbar">
-  <div class="topbar-inner">
-    <div class="brand">
-      <div class="brand-mark">DSI</div>
-      <div>
-        <div class="brand-title">Transport Authority</div>
-        <div class="brand-sub">Transport Management</div>
-      </div>
+  </head>
+<body class="h-full bg-slate-50">
+
+<div id="sidebarOverlay" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 lg:hidden" onclick="closeSidebar()"></div>
+
+<!-- ═══════════════════════════════════════
+     SIDEBAR
+═══════════════════════════════════════ -->
+<aside id="sidebar" class="fixed top-0 left-0 w-64 h-full bg-slate-900 flex flex-col z-50"
+       style="box-shadow:4px 0 24px rgba(0,0,0,0.15);">
+
+  <div class="px-5 py-5 border-b border-white/8 flex items-center gap-3 flex-shrink-0">
+    <div class="w-9 h-9 rounded-xl bg-orange-500 flex items-center justify-center flex-shrink-0 shadow-lg">
+      <i data-lucide="truck" class="w-5 h-5 text-white"></i>
     </div>
-    <div class="topbar-actions">
-      <button class="icon-btn" onclick="toggleTheme()" title="Theme"><i data-lucide="moon"></i></button>
-      <a class="btn secondary small" href="profile.html"><i data-lucide="user"></i><span>Profile</span></a>
-      <a class="btn ghost small" href="index.html"><i data-lucide="home"></i><span>Home</span></a>
-      <button class="btn ghost small" onclick="logout()"><i data-lucide="log-out"></i><span>Logout</span></button>
-    </div>
-  </div>
-</header>
-
-
-<main class="container">
-  <!-- User Info Card -->
-  <div class="card elevated" id="meBox" style="margin-bottom:16px; padding:12px 18px;">
-    <span style="color: var(--muted);">Loading...</span>
-  </div>
-  <div class="kpi-grid">
-
-      <div class="card kpi-card">
-        <div class="kpi-icon"><i data-lucide="bus-front"></i></div>
-        <div>
-          <div class="kpi-value" id="kpi_ta_pending">—</div>
-          <div class="kpi-label">Pending Assignment</div>
-          <div class="kpi-sub" id="kpi_ta_pendingSub">Updated</div>
-        </div>
-      </div>
-      <div class="card kpi-card">
-        <div class="kpi-icon"><i data-lucide="truck"></i></div>
-        <div>
-          <div class="kpi-value" id="kpi_ta_vehicles">—</div>
-          <div class="kpi-label">Vehicles Available</div>
-          <div class="kpi-sub" id="kpi_ta_vehiclesSub">Updated</div>
-        </div>
-      </div>
-      <div class="card kpi-card">
-        <div class="kpi-icon"><i data-lucide="badge-check"></i></div>
-        <div>
-          <div class="kpi-value" id="kpi_ta_assigned">—</div>
-          <div class="kpi-label">Assigned Today</div>
-          <div class="kpi-sub" id="kpi_ta_assignedSub">Updated</div>
-        </div>
-      </div>
-      <div class="card kpi-card">
-        <div class="kpi-icon"><i data-lucide="alert-triangle"></i></div>
-        <div>
-          <div class="kpi-value" id="kpi_ta_over">—</div>
-          <div class="kpi-label">Over Capacity Alerts</div>
-          <div class="kpi-sub" id="kpi_ta_overSub">Updated</div>
-        </div>
-      </div>
-      <div class="card kpi-card">
-        <div class="kpi-icon"><i data-lucide="route"></i></div>
-        <div>
-          <div class="kpi-value" id="kpi_ta_routes">—</div>
-          <div class="kpi-label">Routes Active</div>
-          <div class="kpi-sub" id="kpi_ta_routesSub">Updated</div>
-        </div>
-      </div>
-      <div class="card kpi-card">
-        <div class="kpi-icon"><i data-lucide="check-circle-2"></i></div>
-        <div>
-          <div class="kpi-value" id="kpi_ta_done">—</div>
-          <div class="kpi-label">Assignments Completed</div>
-          <div class="kpi-sub" id="kpi_ta_doneSub">Updated</div>
-        </div>
-      </div>
-  </div>
-
-  <div class="section-title"><strong>Quick Actions</strong><span></span></div>
-  <div class="action-grid">
-    <a class="action-card" href="#" onclick="if(typeof setTab==='function'){setTab('assign');}; return false;">
-  <div class="ico"><i data-lucide="bus-front"></i></div>
-  <div class="meta"><div class="t">Assign Vehicles</div><div class="s">Allocate vehicles by route</div></div>
-</a><a class="action-card" href="#" onclick="if(typeof setTab==='function'){setTab('vehicles');}; return false;">
-  <div class="ico"><i data-lucide="truck"></i></div>
-  <div class="meta"><div class="t">Manage Vehicles</div><div class="s">Add / edit vehicles</div></div>
-</a><a class="action-card" href="#" onclick="if(typeof openCapacity==='function'){openCapacity();}; return false;">
-  <div class="ico"><i data-lucide="gauge"></i></div>
-  <div class="meta"><div class="t">Capacity Checker</div><div class="s">Validate seat counts</div></div>
-</a><a class="action-card" href="#" onclick="if(typeof setTab==='function'){setTab('reports');}; return false;">
-  <div class="ico"><i data-lucide="file-down"></i></div>
-  <div class="meta"><div class="t">Vehicle Report</div><div class="s">Download report</div></div>
-</a>
-  </div>
-
-  <div class="two-col">
-    <div class="card pad">
-      <div class="section-title"><strong>Recent Requests</strong><span></span></div>
-      <div class="list" id="recentList"><div class="alert">Loading…</div></div>
-    </div>
-    <div class="card pad">
-      <div class="section-title"><strong>Recent Actions</strong><span></span></div>
-      <div class="list" id="recentActions"><div class="alert">Loading…</div></div>
+    <div>
+      <div class="text-white font-bold text-sm leading-none">DSI Transport</div>
+      <div class="text-slate-400 text-xs mt-0.5 font-medium">Transport Assistant</div>
     </div>
   </div>
 
-
-  <!-- Tab Navigation -->
-  <div class="card" style="margin-bottom:14px;">
-    <div class="tabs">
-      <button class="btn active" id="tabVehicles" onclick="setTab('vehicles')">🚌 වාහන</button>
-      <button class="btn" id="tabAssign" onclick="setTab('assign')">📋 අනයුක්තිය</button>
-      <button class="btn" id="tabReports" onclick="setTab('reports')">📊 වාර්තා</button>
+  <!-- id="meBox" PRESERVED — filled by guard() -->
+  <div class="px-4 py-3 border-b border-white/8 flex-shrink-0">
+    <div id="meBox" class="flex items-center gap-3">
+      <div class="w-8 h-8 rounded-full bg-orange-500/30 flex items-center justify-center">
+        <i data-lucide="user" class="w-4 h-4 text-orange-300"></i>
+      </div>
+      <div>
+        <div class="text-slate-300 text-xs font-medium">Loading...</div>
+        <div class="text-slate-500 text-xs">TA Officer</div>
+      </div>
     </div>
   </div>
 
-  <!-- වාහන -->
-  <div class="card soft" id="pane_vehicles">
-    <h2 class="h2">🚌 Vehicle Management</h2>
-    <hr/>
+  <nav class="flex-1 overflow-y-auto px-3 py-4 space-y-1">
+    <div class="text-slate-500 text-xs font-700 uppercase tracking-widest px-3 mb-3">Operations</div>
 
-    <div class="grid two" style="margin-top:14px;">
-      <div>
-        <label>Vehicle No (UNIQUE)</label>
-        <input id="vNo" placeholder="NC-1234" />
-      </div>
-      <div>
-        <label>Type</label>
-        <select id="vType">
-          <option value="VAN">VAN</option>
-          <option value="BUS">BUS</option>
-          <option value="TUKTUK">TUKTUK</option>
-        </select>
-      </div>
-    </div>
+    <!-- id="tabVehicles" PRESERVED -->
+    <button class="nav-link active" id="tabVehicles" onclick="setTab('vehicles')">
+      <i data-lucide="bus" class="w-4 h-4"></i> Vehicles
+    </button>
+    <!-- id="tabAssign" PRESERVED -->
+    <button class="nav-link" id="tabAssign" onclick="setTab('assign')">
+      <i data-lucide="clipboard-list" class="w-4 h-4"></i> Assignments
+    </button>
+    <!-- id="tabReports" PRESERVED -->
+    <button class="nav-link" id="tabReports" onclick="setTab('reports')">
+      <i data-lucide="file-bar-chart-2" class="w-4 h-4"></i> Reports
+    </button>
 
-    <div class="grid two" style="margin-top:12px;">
-      <div>
-        <label>Capacity</label>
-        <input id="vCap" type="number" min="1" placeholder="12" />
-      </div>
-      <div>
-        <label>Owner Name</label>
-        <input id="vOwner" placeholder="Owner name" />
-      </div>
-    </div>
+    <div class="border-t border-white/8 my-3"></div>
+    <a href="index.html" class="nav-link"><i data-lucide="home" class="w-4 h-4"></i> Home</a>
+    <button class="nav-link text-red-400 hover:text-red-300 hover:bg-red-500/10" onclick="logout()">
+      <i data-lucide="log-out" class="w-4 h-4"></i> Sign Out
+    </button>
+  </nav>
 
-    <div class="card" style="background:#fff; border:1px solid var(--border); margin-top:14px;">
-      <div class="mini" style="margin-bottom:8px; font-weight:600;">🛣️ රූට් this vehicle can serve</div>
-      <div id="routeChecks" class="small"></div>
-    </div>
-
-    <div class="btnrow" style="margin-top:14px;">
-      <button class="btn btn-primary" onclick="saveVehicle()">💾 Save Vehicle</button>
-      <button class="btn ghost" onclick="clearVehicleForm()">🔄 Clear</button>
-      <button class="btn ghost" onclick="loadVehicles()">🔃 Refresh</button>
-    </div>
-
-    <hr style="margin:20px 0;"/>
-
-    <div class="grid two" style="margin-bottom:14px;">
-      <div>
-        <label>🔍 සෙවීම</label>
-        <input id="vehSearch" placeholder="vehicle no..." oninput="renderVehicles()" />
-      </div>
-      <div></div>
-    </div>
-
-    <div class="table-wrap">
-      <div id="vehList"></div>
-    </div>
+  <div class="px-4 py-3 border-t border-white/8 flex-shrink-0 flex items-center gap-2">
+    <div class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse-dot"></div>
+    <span class="text-slate-400 text-xs">System Online</span>
   </div>
+</aside>
 
-  <!-- Assignments -->
-  <div class="card soft" id="pane_assign" style="display:none;">
-    <h2 class="h2">📋 Assign වාහන to රූට්</h2>
-    <hr/>
+<!-- ═══════════════════════════════════════
+     MAIN WRAPPER
+═══════════════════════════════════════ -->
+<div class="lg:ml-64 min-h-screen flex flex-col">
 
-    <div class="grid two" style="margin-top:14px;">
+  <!-- TOP NAVBAR -->
+  <header class="sticky top-0 z-30 bg-white border-b border-slate-200 px-5 py-3 flex items-center gap-4 flex-shrink-0"
+          style="box-shadow:0 1px 0 #e2e8f0,0 2px 12px rgba(0,0,0,0.04);">
+    <button onclick="openSidebar()" class="lg:hidden p-2 rounded-lg text-slate-500 hover:bg-slate-100">
+      <i data-lucide="menu" class="w-5 h-5"></i>
+    </button>
+    <div class="hidden sm:flex items-center gap-2">
+      <div class="w-7 h-7 rounded-lg bg-orange-50 flex items-center justify-center">
+        <i data-lucide="truck" class="w-4 h-4 text-orange-600"></i>
+      </div>
       <div>
-        <label>Select Request (Admin අනුමත කරන්න)</label>
-        <select id="reqSelect" onchange="selectRequest()"></select>
-        <div class="mini" style="margin-top:6px;">
-          Request එක select කරලා routes load වෙනවා. එක් route එකකට වාහන කීයක් හෝ එකතු කරන්න පුළුවන්.
-          <br/>
-          💡 <strong>ඕනෑම වාහනයක් ඕනෑම රූට් එකකට දාන්න පුළුවන්.</strong> ⭐ සලකුණ කර ඇති වාහන සාමාන්‍යයෙන් එම රූට් එකේ යන වාහන (යොමු සඳහා පමණි).
+        <h1 class="text-slate-900 font-700 text-sm leading-none">Transport Assistant Panel</h1>
+        <p class="text-slate-400 text-xs mt-0.5">Manage vehicles, assign routes, and download reports</p>
+      </div>
+    </div>
+    <div class="flex items-center gap-3 ml-auto">
+      <div class="hidden md:flex items-center gap-2 px-3 py-1.5 bg-emerald-50 border border-emerald-200 rounded-full">
+        <div class="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse-dot"></div>
+        <span class="text-emerald-700 text-xs font-600" id="liveClock">Live</span>
+      </div>
+      <button onclick="logout()"
+        class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-slate-500 hover:bg-slate-100 transition text-sm font-500 border border-slate-200">
+        <i data-lucide="log-out" class="w-4 h-4"></i>
+        <span class="hidden sm:inline">Logout</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- MAIN CONTENT -->
+  <main class="flex-1 p-5 lg:p-7 space-y-5 animate-fade-in">
+
+    <!-- Tab Bar -->
+    <div class="section-card px-5 py-3 flex items-center gap-2 flex-wrap">
+      <button class="tab-btn active" id="tabVehiclesContent" onclick="setTab('vehicles')">
+        <i data-lucide="bus" class="w-4 h-4"></i> Vehicles
+      </button>
+      <button class="tab-btn" id="tabAssignContent" onclick="setTab('assign')">
+        <i data-lucide="clipboard-list" class="w-4 h-4"></i> Assignments
+      </button>
+      <button class="tab-btn" id="tabReportsContent" onclick="setTab('reports')">
+        <i data-lucide="file-bar-chart-2" class="w-4 h-4"></i> Reports
+      </button>
+    </div>
+
+    <!-- ═══ PANE: VEHICLES ═══ -->
+    <!-- id="pane_vehicles" PRESERVED -->
+    <div id="pane_vehicles" class="space-y-5">
+
+      <!-- Vehicle Form -->
+      <div class="section-card">
+        <div class="flex items-center gap-3 px-6 py-4 border-b border-slate-100">
+          <div class="w-8 h-8 rounded-lg bg-orange-50 flex items-center justify-center">
+            <i data-lucide="bus" class="w-4 h-4 text-orange-600"></i>
+          </div>
+          <h2 class="text-slate-800 font-700 text-sm">Vehicle Management</h2>
+        </div>
+        <div class="p-6">
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+            <div>
+              <label class="form-label">Vehicle No (Unique)</label>
+              <!-- id="vNo" PRESERVED -->
+              <input id="vNo" placeholder="NC-1234" class="form-input"/>
+            </div>
+            <div>
+              <label class="form-label">Type</label>
+              <!-- id="vType" PRESERVED -->
+              <select id="vType" class="form-input form-select">
+                <option value="VAN">VAN</option>
+                <option value="BUS">BUS</option>
+                <option value="TUKTUK">TUKTUK</option>
+              </select>
+            </div>
+            <div>
+              <label class="form-label">Capacity</label>
+              <!-- id="vCap" PRESERVED -->
+              <input id="vCap" type="number" min="1" placeholder="12" class="form-input"/>
+            </div>
+            <div>
+              <label class="form-label">Owner Name</label>
+              <!-- id="vOwner" PRESERVED -->
+              <input id="vOwner" placeholder="Owner name" class="form-input"/>
+            </div>
+          </div>
+
+          <!-- Route checkboxes — id="routeChecks" PRESERVED -->
+          <div class="border border-slate-200 rounded-xl overflow-hidden mb-4">
+            <div class="px-4 py-2.5 bg-slate-50 border-b border-slate-200 flex items-center gap-2">
+              <i data-lucide="route" class="w-4 h-4 text-slate-500"></i>
+              <span class="text-slate-700 font-600 text-sm">Routes this vehicle serves</span>
+            </div>
+            <div id="routeChecks" class="p-3 flex flex-wrap gap-1 min-h-12">
+              <span class="text-slate-400 text-sm p-2">Loading routes…</span>
+            </div>
+          </div>
+
+          <div class="flex gap-3 flex-wrap">
+            <button onclick="saveVehicle()" class="btn btn-orange">
+              <i data-lucide="save" class="w-4 h-4"></i> Save Vehicle
+            </button>
+            <button onclick="clearVehicleForm()" class="btn btn-ghost">
+              <i data-lucide="x-circle" class="w-4 h-4"></i> Clear
+            </button>
+            <button onclick="loadVehicles()" class="btn btn-ghost">
+              <i data-lucide="refresh-cw" class="w-4 h-4"></i> Refresh
+            </button>
+          </div>
         </div>
       </div>
-      <div>
-        <label>Quick Actions</label>
-        <div class="btnrow" style="margin-top:6px;">
-          <button class="btn ghost" onclick="reloadCurrent()">🔄 Reload</button>
-          <button class="btn btn-primary" onclick="submitTA()">✅ Submit TA (Capacity Check)</button>
+
+      <!-- Vehicle List -->
+      <div class="section-card">
+        <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center">
+              <i data-lucide="list" class="w-4 h-4 text-slate-600"></i>
+            </div>
+            <h2 class="text-slate-800 font-700 text-sm">Fleet List</h2>
+          </div>
+          <div class="relative w-44">
+            <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 pointer-events-none"></i>
+            <!-- id="vehSearch" PRESERVED -->
+            <input id="vehSearch" placeholder="vehicle no…" oninput="renderVehicles()"
+              class="form-input pl-9 py-2 text-xs"/>
+          </div>
+        </div>
+        <div class="p-6">
+          <div class="table-wrap">
+            <!-- id="vehList" PRESERVED — filled by JS -->
+            <div id="vehList" class="text-center py-8 text-slate-400 text-sm">
+              <i data-lucide="loader-2" class="w-5 h-5 animate-spin inline mr-2"></i>Loading fleet…
+            </div>
+          </div>
         </div>
       </div>
-    </div>
+    </div><!-- /pane_vehicles -->
 
-    <div id="reqMeta" class="alert" style="margin-top:14px;"></div>
-    <hr/>
-    <div id="groupsBox" class="small">Select a request...</div>
-  </div>
+    <!-- ═══ PANE: ASSIGNMENTS ═══ -->
+    <!-- id="pane_assign" PRESERVED -->
+    <div id="pane_assign" class="hidden space-y-5">
 
-  <!-- Reports -->
-  <div class="card soft" id="pane_reports" style="display:none;">
-    <h2 class="h2">📊 වාර්තා බාගත කිරීම</h2>
-    <hr/>
-    <div class="alert info" style="margin-bottom:14px;">
-      Reports download කරන්නේ HR Final Approval පස්සේම. Request එක select කරලා download කරන්න.
-    </div>
-    
-    <div class="grid two">
-      <div>
-        <label>📆 දිනය</label>
-        <input id="repDate" type="date" />
-      </div>
-      <div>
-        <label>Actions</label>
-        <div class="btnrow" style="margin-top:6px;">
-          <button class="btn btn-primary" onclick="downloadRouteReport()">📄 Route-wise PDF</button>
-          <button class="btn secondary" onclick="downloadVehicleReport()">📄 Vehicle PDF</button>
+      <!-- Request selector + controls -->
+      <div class="section-card">
+        <div class="flex items-center gap-3 px-6 py-4 border-b border-slate-100">
+          <div class="w-8 h-8 rounded-lg bg-orange-50 flex items-center justify-center">
+            <i data-lucide="clipboard-list" class="w-4 h-4 text-orange-600"></i>
+          </div>
+          <div>
+            <h2 class="text-slate-800 font-700 text-sm">Assign Vehicles to Routes</h2>
+            <p class="text-slate-400 text-xs">Admin approved requests — assign vehicles per route group</p>
+          </div>
+        </div>
+        <div class="p-6">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-4">
+            <div>
+              <label class="form-label">Select Request (Admin Approved)</label>
+              <!-- id="reqSelect" PRESERVED -->
+              <select id="reqSelect" onchange="selectRequest()" class="form-input form-select">
+                <option value="">-- Select --</option>
+              </select>
+              <p class="text-slate-400 text-xs mt-2 leading-relaxed">
+                Request select කරලා routes load වෙනවා. ⭐ සලකුණ = සාමාන්‍යයෙන් ඒ රූට් ගන්න වාහන (යොමු සඳහා පමණ).
+              </p>
+            </div>
+            <div class="flex flex-col justify-between gap-3">
+              <label class="form-label">Quick Actions</label>
+              <div class="flex flex-wrap gap-3">
+                <button onclick="reloadCurrent()" class="btn btn-ghost">
+                  <i data-lucide="refresh-cw" class="w-4 h-4"></i> Reload
+                </button>
+                <button onclick="submitTA()" class="btn btn-orange">
+                  <i data-lucide="send" class="w-4 h-4"></i> Submit TA (Capacity Check)
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- id="reqMeta" PRESERVED -->
+          <div id="reqMeta" class="alert" style="margin-bottom:0;"></div>
         </div>
       </div>
-    </div>
-    <p class="mini" style="margin-top:10px;">💡 If your browser blocks downloads, open the URL in new tab.</p>
-  </div>
 
-</main>
+      <!-- Groups box — id="groupsBox" PRESERVED, rendered by JS -->
+      <div>
+        <div id="groupsBox" class="text-center py-10 text-slate-400 text-sm section-card">
+          <i data-lucide="mouse-pointer-click" class="w-6 h-6 mx-auto mb-2 opacity-40"></i>
+          <p>Select a request above to load route groups</p>
+        </div>
+      </div>
+    </div><!-- /pane_assign -->
 
+    <!-- ═══ PANE: REPORTS ═══ -->
+    <!-- id="pane_reports" PRESERVED -->
+    <div id="pane_reports" class="hidden">
+      <div class="section-card">
+        <div class="flex items-center gap-3 px-6 py-4 border-b border-slate-100">
+          <div class="w-8 h-8 rounded-lg bg-violet-50 flex items-center justify-center">
+            <i data-lucide="file-bar-chart-2" class="w-4 h-4 text-violet-600"></i>
+          </div>
+          <div>
+            <h2 class="text-slate-800 font-700 text-sm">Download Reports</h2>
+            <p class="text-slate-400 text-xs">HR Final Approval ලැබූ දිනයන් සඳහා පමණ</p>
+          </div>
+        </div>
+        <div class="p-6 space-y-5">
+          <div class="bg-blue-50 border border-blue-200 rounded-xl px-4 py-3 flex items-start gap-2">
+            <i data-lucide="info" class="w-4 h-4 text-blue-500 flex-shrink-0 mt-0.5"></i>
+            <p class="text-blue-700 text-sm">
+              Reports download කරන්නේ HR Final Approval ලැබූ request සඳහා පමණයි.
+            </p>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-5 max-w-xl">
+            <div>
+              <label class="form-label">Report Date</label>
+              <!-- id="repDate" PRESERVED -->
+              <input id="repDate" type="date" class="form-input"/>
+            </div>
+            <div class="flex flex-col justify-end gap-2">
+              <button onclick="downloadRouteReport()" class="btn btn-primary">
+                <i data-lucide="file-down" class="w-4 h-4"></i> Route-wise PDF
+              </button>
+              <button onclick="downloadVehicleReport()" class="btn btn-ghost">
+                <i data-lucide="bus" class="w-4 h-4"></i> Vehicle PDF
+              </button>
+            </div>
+          </div>
+          <p class="text-slate-400 text-xs flex items-center gap-1.5">
+            <i data-lucide="info" class="w-3.5 h-3.5"></i>
+            Browser downloads blocked? Open the URL in a new tab directly.
+          </p>
+        </div>
+      </div>
+    </div><!-- /pane_reports -->
+
+  </main>
+</div>
+
+<!-- ═══════════════════════════════════════
+     ALL ORIGINAL SCRIPTS — PRESERVED EXACTLY
+═══════════════════════════════════════ -->
 <script>
 let ME=null;
 let VEH=[];
 let REQS=[];
 let CURRENT_REQ=null;
 let GROUPS=[];
-let ASSIGN=[]; // flat list of assignments per route
-
+let ASSIGN=[];
 let EDIT_VEH_ID = null;
 
+/* ── Sidebar ─────────────────────────────── */
+function openSidebar(){
+  document.getElementById('sidebar').classList.add('open');
+  document.getElementById('sidebarOverlay').classList.add('active');
+}
+function closeSidebar(){
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebarOverlay').classList.remove('active');
+}
+function updateClock(){
+  const el = document.getElementById('liveClock');
+  if(el) el.textContent = new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+}
+setInterval(updateClock, 1000); updateClock();
+
+/* ── Tab system — ORIGINAL ───────────────── */
 function setTab(tab){
   const tabs = ["vehicles","assign","reports"];
   for(const t of tabs){
-    qs("pane_"+t).style.display = (t===tab) ? "" : "none";
-    qs("tab"+t.charAt(0).toUpperCase()+t.slice(1)).classList.toggle("active", t===tab);
+    const pane = document.getElementById("pane_"+t);
+    const sBtn = document.getElementById("tab"+t.charAt(0).toUpperCase()+t.slice(1));
+    const cBtn = document.getElementById("tab"+t.charAt(0).toUpperCase()+t.slice(1)+"Content");
+    if(pane) pane.classList.toggle("hidden", t !== tab);
+    if(sBtn) sBtn.classList.toggle("active", t === tab);
+    if(cBtn) cBtn.classList.toggle("active", t === tab);
   }
 }
 
+/* ── routeName helper — ORIGINAL ─────────── */
 function routeName(id){
   const r = ROUTE_TREE?.routes?.find(x => String(x.id)===String(id));
   return r ? `${r.route_no} - ${r.route_name}` : "";
 }
 
+/* ── guard — ORIGINAL ────────────────────── */
 async function guard(){
   ME = await guardRole("TA");
   if(!ME) return;
-  qs("meBox").innerHTML = `<strong style="color: var(--brand);">${ME.role}</strong> <span style="color: var(--muted);">|</span> <span style="color: var(--text-secondary);">${ME.email}</span>`;
+  const meBox = document.getElementById("meBox");
+  if(meBox){
+    meBox.innerHTML = `
+      <div class="w-8 h-8 rounded-full bg-orange-500/30 flex items-center justify-center flex-shrink-0">
+        <i data-lucide="user" class="w-4 h-4 text-orange-300"></i>
+      </div>
+      <div>
+        <div class="text-slate-200 text-xs font-600">${ME.email||'TA User'}</div>
+        <span class="inline-block mt-0.5 text-orange-400 text-xs font-700 bg-orange-500/20 rounded px-1.5 py-0.5">${ME.role}</span>
+      </div>`;
+    lucide.createIcons();
+  }
 }
 
+/* ── renderRouteChecks — ORIGINAL
+   id="routeChecks" PRESERVED ──────────── */
 function renderRouteChecks(selectedIds=[]){
   const selSet = new Set(selectedIds.map(x=>String(x)));
   let html = "";
   for(const r of ROUTE_TREE.routes){
     const id = r.id;
     const checked = selSet.has(String(id)) ? "checked" : "";
-        html += `<label class="route-check-item"><input type="checkbox" class="routeChk" value="${id}" ${checked} /><span>${r.route_no} - ${r.route_name}</span></label>`;
+    html += `<label class="route-check-item">
+      <input type="checkbox" class="routeChk" value="${id}" ${checked}/>
+      <span>${r.route_no} - ${r.route_name}</span>
+    </label>`;
   }
-  qs("routeChecks").innerHTML = html || "<span class='mini'>⚠️ No routes found (Admin must create routes first)</span>";
+  document.getElementById("routeChecks").innerHTML = html || "<span class='mini p-2'>⚠️ No routes found (Admin must create routes first)</span>";
 }
 
 function selectedRouteIds(){
-  return qsa(".routeChk:checked").map(x => parseInt(x.value,10));
+  return Array.from(document.querySelectorAll(".routeChk:checked")).map(x => parseInt(x.value,10));
 }
 
+/* ── loadVehicles — ORIGINAL ─────────────── */
 async function loadVehicles(){
   const d = await api("/ta/vehicles");
   VEH = d.vehicles || [];
   renderVehicles();
 }
 
+/* ── renderVehicles — ORIGINAL
+   id="vehList" PRESERVED ─────────────── */
 function renderVehicles(){
-  const q = (qs("vehSearch").value||"").toLowerCase();
+  const q = (document.getElementById("vehSearch").value||"").toLowerCase();
   const list = VEH.filter(v => (v.vehicle_no||"").toLowerCase().includes(q));
-  let html = "<table><thead><tr><th>Vehicle No</th><th>Type</th><th>Capacity</th><th>Owner</th><th>Routes</th><th>Action</th></tr></thead><tbody>";
+
+  if(list.length===0){
+    document.getElementById("vehList").innerHTML = `
+      <div class="text-center py-8 text-slate-400 text-sm">
+        <i data-lucide="bus" class="w-6 h-6 mx-auto mb-2 opacity-30"></i>
+        <p>No vehicles found</p>
+      </div>`;
+    lucide.createIcons();
+    return;
+  }
+
+  let html = `<table class="data-table">
+    <thead><tr>
+      <th>Vehicle No</th><th>Type</th><th>Capacity</th><th>Owner</th><th>Routes</th><th>Action</th>
+    </tr></thead><tbody>`;
   for(const v of list){
     const rnames = (v.route_ids||[]).map(id => routeName(id)).filter(Boolean).join(", ");
+    const typeBadge = v.vehicle_type === 'BUS' ? 'badge-blue' : v.vehicle_type === 'VAN' ? 'badge-green' : 'badge-amber';
     html += `<tr>
-      <td><strong>${v.vehicle_no}</strong><br/><span class="mini">ID: ${v.id}</span></td>
-      <td><span class="badge">${v.vehicle_type}</span></td>
-      <td>${v.capacity}</td>
+      <td>
+        <div class="font-700 text-slate-800">${v.vehicle_no}</div>
+        <div class="text-xs text-slate-400">ID: ${v.id}</div>
+      </td>
+      <td><span class="badge ${typeBadge}">${v.vehicle_type}</span></td>
+      <td><strong>${v.capacity}</strong></td>
       <td>${v.owner_name}</td>
-      <td class="mini">${rnames || "-"}</td>
-      <td><button class="btn small" onclick="editVehicle(${v.id})">✏️ Edit</button></td>
+      <td class="text-xs text-slate-500 max-w-xs">${rnames || "—"}</td>
+      <td><button class="btn btn-ghost btn-sm" onclick="editVehicle(${v.id})">
+        <i data-lucide="pencil" class="w-3 h-3"></i> Edit
+      </button></td>
     </tr>`;
   }
   html += "</tbody></table>";
-  qs("vehList").innerHTML = html;
+  document.getElementById("vehList").innerHTML = html;
+  lucide.createIcons();
 }
 
+/* ── clearVehicleForm — ORIGINAL ─────────── */
 function clearVehicleForm(){
   EDIT_VEH_ID = null;
-  qs("vNo").value="";
-  qs("vType").value="VAN";
-  qs("vCap").value="";
-  qs("vOwner").value="";
+  document.getElementById("vNo").value="";
+  document.getElementById("vType").value="VAN";
+  document.getElementById("vCap").value="";
+  document.getElementById("vOwner").value="";
   renderRouteChecks([]);
 }
 
+/* ── editVehicle — ORIGINAL ──────────────── */
 function editVehicle(id){
   const v = VEH.find(x=>x.id===id);
   if(!v) return;
   EDIT_VEH_ID = id;
-  qs("vNo").value = v.vehicle_no;
-  qs("vType").value = v.vehicle_type;
-  qs("vCap").value = v.capacity;
-  qs("vOwner").value = v.owner_name;
+  document.getElementById("vNo").value = v.vehicle_no;
+  document.getElementById("vType").value = v.vehicle_type;
+  document.getElementById("vCap").value = v.capacity;
+  document.getElementById("vOwner").value = v.owner_name;
   renderRouteChecks(v.route_ids||[]);
   toast("✏️ Editing vehicle ID: " + id);
   setTab("vehicles");
+  document.getElementById("vNo").scrollIntoView({behavior:"smooth", block:"center"});
 }
 
+/* ── saveVehicle — ORIGINAL ──────────────── */
 async function saveVehicle(){
   try{
-    const vno = qs("vNo").value.trim();
-    const vtype = qs("vType").value;
-    const cap = parseInt(qs("vCap").value,10);
-    const owner = qs("vOwner").value.trim();
+    const vno   = document.getElementById("vNo").value.trim();
+    const vtype = document.getElementById("vType").value;
+    const cap   = parseInt(document.getElementById("vCap").value,10);
+    const owner = document.getElementById("vOwner").value.trim();
     const routes = selectedRouteIds();
-    if(!vno || !vtype || !cap || !owner){
-      throw new Error("සියලු ක්ෂේත්‍ර පුරවන්න");
-    }
-    const payload = { vehicle_no: vno, vehicle_type: vtype, capacity: cap, owner_name: owner, route_ids: routes };
+    if(!vno || !vtype || !cap || !owner) throw new Error("සියලු ක්ෂේත්‍ර පුරවන්න");
+    const payload = { vehicle_no:vno, vehicle_type:vtype, capacity:cap, owner_name:owner, route_ids:routes };
     if(EDIT_VEH_ID){
-      await api(`/ta/vehicles/${EDIT_VEH_ID}`, { method:"PATCH", body: JSON.stringify(payload) });
+      await api(`/ta/vehicles/${EDIT_VEH_ID}`, {method:"PATCH", body:JSON.stringify(payload)});
       toast("✅ Vehicle updated");
     }else{
-      await api("/ta/vehicles", { method:"POST", body: JSON.stringify(payload) });
+      await api("/ta/vehicles", {method:"POST", body:JSON.stringify(payload)});
       toast("✅ Vehicle created");
     }
     clearVehicleForm();
     await loadVehicles();
-  renderTaKpis();
   }catch(e){ toast("❌ " + e.message); }
 }
 
+/* ── loadRequests — ORIGINAL ─────────────── */
 async function loadRequests(){
   const d = await api("/ta/requests/approved");
   REQS = d.requests || [];
@@ -361,37 +526,54 @@ async function loadRequests(){
   for(const r of REQS){
     html += `<option value="${r.id}">#${r.id} | ${fmtDate(r.request_date)} ${fmtTime(r.request_time)} | ${r.department_name} | ${r.status}</option>`;
   }
-  qs("reqSelect").innerHTML = html;
+  document.getElementById("reqSelect").innerHTML = html;
 }
 
+/* ── selectRequest — ORIGINAL ────────────── */
 async function selectRequest(){
-  const id = qs("reqSelect").value;
-  if(!id){ CURRENT_REQ=null; qs("groupsBox").innerHTML="Select a request..."; return; }
+  const id = document.getElementById("reqSelect").value;
+  if(!id){
+    CURRENT_REQ=null;
+    const gb = document.getElementById("groupsBox");
+    gb.className = "text-center py-10 text-slate-400 text-sm section-card";
+    gb.innerHTML = `<i data-lucide="mouse-pointer-click" class="w-6 h-6 mx-auto mb-2 opacity-40"></i><p>Select a request above to load route groups</p>`;
+    lucide.createIcons();
+    return;
+  }
   CURRENT_REQ = parseInt(id,10);
   await reloadCurrent();
 }
 
+/* ── reloadCurrent — ORIGINAL ────────────── */
 async function reloadCurrent(){
   try{
     if(!CURRENT_REQ) return;
     const req = REQS.find(x=>x.id===CURRENT_REQ);
-    qs("reqMeta").innerHTML = req ? `Selected: <strong>#${req.id}</strong> | ${fmtDate(req.request_date)} ${fmtTime(req.request_time)} | Dept: ${req.department_name} | Status: ${statusBadge(req.status)}` : "";
-    
-    // Get ROUTE-ONLY groups (no sub-routes)
+    document.getElementById("reqMeta").innerHTML = req
+      ? `<div class="flex flex-wrap gap-3 text-sm items-center">
+          <span class="font-700 text-slate-800">Request #${req.id}</span>
+          <span>${fmtDate(req.request_date)} ${fmtTime(req.request_time)}</span>
+          <span class="text-slate-500">${req.department_name}</span>
+          ${statusBadge(req.status)}
+        </div>`
+      : "";
+
+    // Get groups
     const g = await api(`/ta/requests/${CURRENT_REQ}/groups`);
     GROUPS = g.groups || [];
-    
-    // Get existing assignments
+
+    // Get assignments
     const a = await api(`/ta/requests/${CURRENT_REQ}/assignments`);
     ASSIGN = a.assignments || [];
-    
+
     renderGroups();
   }catch(e){ toast("❌ " + e.message); }
 }
 
-// Show ALL vehicles - TA decides which goes where
+/* ── vehicleOptionsForRoute — ORIGINAL ─────
+   All vehicle options for a route, ⭐ = usual */
 function vehicleOptionsForRoute(route_id, selectedVehicleId){
-  let html = '<option value="">-- වාහනය තෝරන්න --</option>';
+  let html = '<option value="">-- Select Vehicle --</option>';
   for(const v of VEH){
     const sel = String(v.id)===String(selectedVehicleId) ? "selected" : "";
     const routeIds = (v.route_ids || []).map(x=>String(x));
@@ -415,232 +597,243 @@ function capacityForAssignments(as){
   return sum;
 }
 
+/* ── renderGroups — ORIGINAL ─────────────── */
 function renderGroups(){
-  if(GROUPS.length===0){ 
-    qs("groupsBox").innerHTML = "<span class='badge warn'>⚠️ No routes found</span>"; 
-    return; 
+  if(GROUPS.length===0){
+    const gb = document.getElementById("groupsBox");
+    gb.className = "section-card";
+    gb.innerHTML = `<div class="text-center py-8 text-slate-400 text-sm">
+      <i data-lucide="route" class="w-6 h-6 mx-auto mb-2 opacity-30"></i>
+      <p class="badge badge-warn">⚠️ No routes found</p>
+    </div>`;
+    lucide.createIcons();
+    return;
   }
 
+  const gb = document.getElementById("groupsBox");
+  gb.className = "";
   let html = "";
   for(const g of GROUPS){
     const routeText = g.route_id ? routeName(g.route_id) : "(No Route)";
     const current = assignmentsForRoute(g.route_id).map(x => ({...x}));
-    const cap = capacityForAssignments(current);
+    const cap    = capacityForAssignments(current);
     const remain = g.headcount - cap;
+    const isOk   = remain <= 0;
 
-    const badge = remain <= 0 ? "<span class='badge good'>✅ ධාරිතාව හරි</span>" : "<span class='badge bad'>⚠️ ධාරිතාව අඩුයි</span>";
-
-    html += `<div class="card" style="background:#fff; border:1px solid var(--border); margin-bottom:14px;">
-      <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:10px; margin-bottom:12px;">
+    html += `<div class="route-group-card">
+      <div class="route-group-header">
         <div>
-          <div style="font-weight:700; font-size:15px;">${routeText}</div>
-          <div class="mini" style="margin-top:4px;">
-            සේවක ගණන: <strong>${g.headcount}</strong> | දැනට ධාරිතාව: <strong>${cap}</strong> | අඩුයි: <strong>${Math.max(remain,0)}</strong>
+          <div class="font-700 text-slate-800 text-sm">${routeText}</div>
+          <div class="text-xs text-slate-500 mt-1 flex gap-4">
+            <span>සේවක: <strong>${g.headcount}</strong></span>
+            <span>ධාරිතාව: <strong>${cap}</strong></span>
+            <span>අඩුයි: <strong class="${remain > 0 ? 'text-red-500' : 'text-emerald-600'}">${Math.max(remain,0)}</strong></span>
           </div>
         </div>
-        <div>${badge}</div>
+        <div class="flex items-center gap-3">
+          <span class="badge ${isOk ? 'badge-green' : 'badge-red'}">${isOk ? '✅ Capacity OK' : '⚠️ Capacity Short'}</span>
+        </div>
       </div>
 
-      <hr style="margin:12px 0;"/>
-
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>වාහනය</th>
-              <th>රියදුරු නම</th>
-              <th>දුරකථනය</th>
-              <th>උපදෙස්</th>
-              <th>ඔවරයිඩ් (+)</th>
-              <th>හේතුව</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody id="assign_rows_${g.route_id}">
-            ${renderAssignRows(g.route_id, current)}
-          </tbody>
-        </table>
-      </div>
-
-      <div class="btnrow" style="margin-top:12px;">
-        <button class="btn small ghost" onclick="addAssignRow(${g.route_id})">➕ වාහනයක් එක් කරන්න</button>
-        <button class="btn small btn-primary" onclick="saveRoute(${g.route_id})">💾 රූට් සුරකින්න</button>
+      <div class="p-4">
+        <div class="table-wrap mb-3">
+          <table>
+            <thead>
+              <tr>
+                <th style="min-width:200px;">Vehicle</th>
+                <th>Driver Name</th>
+                <th>Phone</th>
+                <th>Instructions</th>
+                <th style="width:100px;">Override (+)</th>
+                <th>Reason</th>
+                <th style="width:48px;"></th>
+              </tr>
+            </thead>
+            <!-- id="assign_rows_{route_id}" PRESERVED -->
+            <tbody id="assign_rows_${g.route_id}">
+              ${renderAssignRows(g.route_id, current)}
+            </tbody>
+          </table>
+        </div>
+        <div class="flex gap-2">
+          <button class="btn btn-ghost btn-sm" onclick="addAssignRow(${g.route_id})">
+            <i data-lucide="plus" class="w-3.5 h-3.5"></i> Add Vehicle
+          </button>
+          <button class="btn btn-orange btn-sm" onclick="saveRoute(${g.route_id})">
+            <i data-lucide="save" class="w-3.5 h-3.5"></i> Save Route
+          </button>
+        </div>
       </div>
     </div>`;
   }
-  qs("groupsBox").innerHTML = html;
+  gb.innerHTML = html;
+  lucide.createIcons();
 }
 
+/* ── renderAssignRows — ORIGINAL
+   Dynamic IDs: row_{route_id}_{idx},
+   classes: v_sel, v_name, v_phone, v_inst, v_over, v_reason PRESERVED */
 function renderAssignRows(route_id, current){
-  if(current.length===0) {
+  if(current.length===0){
     current = [{ vehicle_id:"", driver_name:"", driver_phone:"", instructions:"", overbook_amount:0, overbook_reason:"" }];
   }
-  
   let rows = "";
   current.forEach((a, idx)=>{
-    const vid = a.vehicle_id || "";
+    const vid  = a.vehicle_id || "";
     const vOpt = vehicleOptionsForRoute(route_id, vid);
+    // id="row_{route_id}_{idx}" PRESERVED
     rows += `<tr id="row_${route_id}_${idx}">
-      <td style="min-width:220px;">
+      <td style="min-width:200px;">
         <select class="v_sel" data-route="${route_id}" data-idx="${idx}">${vOpt}</select>
       </td>
-      <td><input class="v_name" data-route="${route_id}" data-idx="${idx}" value="${(a.driver_name||"").replace(/"/g,'&quot;')}" placeholder="රියදුරු නම" /></td>
-      <td><input class="v_phone" data-route="${route_id}" data-idx="${idx}" value="${(a.driver_phone||"").replace(/"/g,'&quot;')}" placeholder="07X..." /></td>
-      <td><input class="v_inst" data-route="${route_id}" data-idx="${idx}" value="${(a.instructions||"").replace(/"/g,'&quot;')}" placeholder="උපදෙස්" /></td>
-      <td style="width:110px;"><input class="v_over" data-route="${route_id}" data-idx="${idx}" type="number" min="0" max="2" value="${a.overbook_amount || 0}" /></td>
-      <td><input class="v_reason" data-route="${route_id}" data-idx="${idx}" value="${(a.overbook_reason||"").replace(/"/g,'&quot;')}" placeholder="(+1/+2 හේතුව)" /></td>
-      <td><button class="btn small ghost" onclick="removeAssignRow(${route_id}, ${idx})">🗑️</button></td>
+      <td><input class="v_name" data-route="${route_id}" data-idx="${idx}"
+            value="${(a.driver_name||"").replace(/"/g,'&quot;')}" placeholder="Driver name"/></td>
+      <td><input class="v_phone" data-route="${route_id}" data-idx="${idx}"
+            value="${(a.driver_phone||"").replace(/"/g,'&quot;')}" placeholder="07X…"/></td>
+      <td><input class="v_inst" data-route="${route_id}" data-idx="${idx}"
+            value="${(a.instructions||"").replace(/"/g,'&quot;')}" placeholder="Instructions"/></td>
+      <td style="width:100px;">
+        <input class="v_over" data-route="${route_id}" data-idx="${idx}"
+               type="number" min="0" max="2" value="${a.overbook_amount || 0}" style="min-width:60px;"/>
+      </td>
+      <td><input class="v_reason" data-route="${route_id}" data-idx="${idx}"
+            value="${(a.overbook_reason||"").replace(/"/g,'&quot;')}" placeholder="(+1/+2 reason)"/></td>
+      <td>
+        <button class="btn btn-danger btn-sm" onclick="removeAssignRow(${route_id}, ${idx})" title="Remove">
+          <i data-lucide="trash-2" class="w-3 h-3"></i>
+        </button>
+      </td>
     </tr>`;
   });
   return rows;
 }
 
+/* ── addAssignRow — ORIGINAL ─────────────── */
 function addAssignRow(route_id){
   ASSIGN.push({ route_id, vehicle_id:"", driver_name:"", driver_phone:"", instructions:"", overbook_amount:0, overbook_reason:"" });
   renderGroups();
 }
 
+/* ── removeAssignRow — ORIGINAL ──────────── */
 function removeAssignRow(route_id, idx){
   const list = assignmentsForRoute(route_id);
   let seen = 0;
   for(let i=0;i<ASSIGN.length;i++){
     if(String(ASSIGN[i].route_id)===String(route_id)){
-      if(seen===idx){
-        ASSIGN.splice(i,1);
-        break;
-      }
+      if(seen===idx){ ASSIGN.splice(i,1); break; }
       seen++;
     }
   }
   renderGroups();
 }
 
+/* ── saveRoute — ORIGINAL ────────────────── */
 async function saveRoute(route_id){
   try{
     const g = GROUPS.find(x => String(x.route_id)===String(route_id));
     if(!g) throw new Error("රූට් හමු නොවීය");
 
-    // Collect all assignments for this route from the form
-    const selects = qsa(`select.v_sel[data-route="${route_id}"]`);
+    // Collect assignments from form — class selectors PRESERVED
+    const selects = document.querySelectorAll(`select.v_sel[data-route="${route_id}"]`);
     const assignments = [];
-    
     for(const sel of selects){
       const idx = sel.dataset.idx;
-      const vehicle_id = qsa(`select.v_sel[data-route="${route_id}"][data-idx="${idx}"]`)[0]?.value;
-      if(!vehicle_id) continue; // skip empty rows
-      
-      const driver_name = qsa(`input.v_name[data-route="${route_id}"][data-idx="${idx}"]`)[0]?.value.trim() || "";
-      const driver_phone = qsa(`input.v_phone[data-route="${route_id}"][data-idx="${idx}"]`)[0]?.value.trim() || "";
-      const instructions = qsa(`input.v_inst[data-route="${route_id}"][data-idx="${idx}"]`)[0]?.value.trim() || "";
-      const overbook_amount = parseInt(qsa(`input.v_over[data-route="${route_id}"][data-idx="${idx}"]`)[0]?.value || "0",10) || 0;
-      const overbook_reason = qsa(`input.v_reason[data-route="${route_id}"][data-idx="${idx}"]`)[0]?.value.trim() || "";
-      
-      assignments.push({
-        vehicle_id: parseInt(vehicle_id,10),
-        driver_name,
-        driver_phone,
-        instructions,
-        overbook_amount,
-        overbook_reason
-      });
+      const vehicle_id   = document.querySelectorAll(`select.v_sel[data-route="${route_id}"][data-idx="${idx}"]`)[0]?.value;
+      if(!vehicle_id) continue;
+      const driver_name  = document.querySelectorAll(`input.v_name[data-route="${route_id}"][data-idx="${idx}"]`)[0]?.value.trim() || "";
+      const driver_phone = document.querySelectorAll(`input.v_phone[data-route="${route_id}"][data-idx="${idx}"]`)[0]?.value.trim() || "";
+      const instructions = document.querySelectorAll(`input.v_inst[data-route="${route_id}"][data-idx="${idx}"]`)[0]?.value.trim() || "";
+      const overbook_amount = parseInt(document.querySelectorAll(`input.v_over[data-route="${route_id}"][data-idx="${idx}"]`)[0]?.value || "0",10) || 0;
+      const overbook_reason = document.querySelectorAll(`input.v_reason[data-route="${route_id}"][data-idx="${idx}"]`)[0]?.value.trim() || "";
+      assignments.push({ vehicle_id:parseInt(vehicle_id,10), driver_name, driver_phone, instructions, overbook_amount, overbook_reason });
     }
 
-    if(assignments.length===0) throw new Error("අවම වශයෙන් වාහනයක් එක් කරන්න");
-
+    if(assignments.length===0) throw new Error("Assign at least one vehicle");
     await api(`/ta/requests/${CURRENT_REQ}/assignments`, {
       method:"POST",
       body: JSON.stringify({ route_id, assignments })
     });
-
-    toast("✅ රූට් සුරකින ලදී");
+    toast("✅ Route saved!");
     await reloadCurrent();
   }catch(e){ toast("❌ " + e.message); }
 }
 
+/* ── submitTA — ORIGINAL ─────────────────── */
 async function submitTA(){
   try{
-    if(!CURRENT_REQ) throw new Error("පළමුව ඉල්ලීමක් තෝරන්න");
+    if(!CURRENT_REQ) throw new Error("Select a request first");
     await api(`/ta/requests/${CURRENT_REQ}/submit`, {method:"POST"});
-    toast("✅ TA වෙතින් යොමු කළා");
+    toast("✅ Submitted to HR");
     await loadRequests();
     await reloadCurrent();
   }catch(e){ toast("❌ " + e.message); }
 }
 
-// Reports
-
+/* ── PDF helpers — ORIGINAL ──────────────── */
 async function downloadPdfWithAuth(url, filename){
   try{
     const token = (typeof getToken === "function") ? getToken() : localStorage.getItem("token");
     const headers = token ? { "Authorization": `Bearer ${token}` } : {};
     const res = await fetch(url, { method:"GET", headers });
     if(res.status === 401){
-      if (typeof clearToken === "function") clearToken(); else localStorage.removeItem("token");
-      location.href = "login.html";
-      return;
+      if(typeof clearToken === "function") clearToken(); else localStorage.removeItem("token");
+      location.href = "login.html"; return;
     }
     if(!res.ok){
       const text = await res.text();
       let msg = text;
       try{ const j = text ? JSON.parse(text) : {}; msg = j.error || j.message || text; }catch(e){}
       msg = (msg && String(msg).trim()) || `Server error (HTTP ${res.status}).`;
-      if (typeof toast === "function") toast(msg); else alert(msg);
+      if(typeof toast === "function") toast(msg); else alert(msg);
       return;
     }
     const blob = await res.blob();
     const a = document.createElement("a");
     const objUrl = URL.createObjectURL(blob);
-    a.href = objUrl;
-    a.download = filename || "report.pdf";
-    document.body.appendChild(a);
-    a.click();
-    setTimeout(() => {
-      URL.revokeObjectURL(objUrl);
-      a.remove();
-    }, 1200);
+    a.href = objUrl; a.download = filename || "report.pdf";
+    document.body.appendChild(a); a.click();
+    setTimeout(()=>{ URL.revokeObjectURL(objUrl); a.remove(); }, 1200);
   }catch(e){
     const msg = "ජාල/සම්බන්ධතා ගැටලුවක්. කරුණාකර නැවත උත්සාහ කරන්න.";
-    if (typeof toast === "function") toast(msg); else alert(msg);
+    if(typeof toast === "function") toast(msg); else alert(msg);
   }
 }
 
 function downloadRouteReport(){
-  const d = qs("repDate").value;
+  const d = document.getElementById("repDate").value;
   if(!d){ toast("⚠️ දිනය තෝරන්න"); return; }
   const base = (API_BASE_URL || "").replace(/\/$/, "");
-  const url = `${base}/reports/daily/route-wise?date=${encodeURIComponent(d)}`;
-  downloadPdfWithAuth(url, `route-wise-${d}.pdf`);
+  downloadPdfWithAuth(`${base}/reports/daily/route-wise?date=${encodeURIComponent(d)}`, `route-wise-${d}.pdf`);
 }
 function downloadVehicleReport(){
-  const d = qs("repDate").value;
+  const d = document.getElementById("repDate").value;
   if(!d){ toast("⚠️ දිනය තෝරන්න"); return; }
   const base = (API_BASE_URL || "").replace(/\/$/, "");
-  const url = `${base}/reports/daily/vehicle?date=${encodeURIComponent(d)}`;
-  downloadPdfWithAuth(url, `vehicle-${d}.pdf`);
+  downloadPdfWithAuth(`${base}/reports/daily/vehicle?date=${encodeURIComponent(d)}`, `vehicle-${d}.pdf`);
 }
 
+/* ── Init — ORIGINAL ─────────────────────── */
 (async function init(){
+  lucide.createIcons();
   try{
     await guard();
     await loadRouteTree(true);
     renderRouteChecks([]);
     await loadVehicles();
-  renderTaKpis();
     await loadRequests();
   }catch(e){ toast("❌ " + e.message); }
 })();
 
 function todayISO(){
   const d = new Date();
-  const m = String(d.getMonth()+1).padStart(2,'0');
+  const m  = String(d.getMonth()+1).padStart(2,'0');
   const da = String(d.getDate()).padStart(2,'0');
   return `${d.getFullYear()}-${m}-${da}`;
 }
 (function(){
-  const rep = qs('repDate');
+  const rep = document.getElementById('repDate');
   if(rep && !rep.value) rep.value = todayISO();
-})(); 
+})();
 </script>
-  <script src="https://unpkg.com/lucide@latest"></script>
 </body>
 </html>

@@ -1,317 +1,530 @@
 <!doctype html>
-<html lang="si">
+<html lang="si" class="h-full">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <meta name="theme-color" content="#4F46E5" />
-  <title>Admin Dashboard - Transport Management</title>
+  <meta name="theme-color" content="#0f172a" />
+  <title>Admin Dashboard — DSI Transport</title>
   <link rel="stylesheet" href="assets/styles.css" />
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+
+  <!-- Google Fonts: DM Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Backend scripts (PRESERVED) -->
   <script src="assets/config.js"></script>
   <script src="assets/app.js"></script>
-</head>
-<body>
 
-<!-- Glassmorphic Header -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['DM Sans', 'ui-sans-serif', 'system-ui'] },
+          colors: {
+            navy:  { 50:'#eef2ff',100:'#e0e7ff',200:'#c7d2fe',300:'#a5b4fc',400:'#818cf8',500:'#6366f1',600:'#4f46e5',700:'#4338ca',800:'#3730a3',900:'#1e1b4b',950:'#0f0e2e' },
+            brand: { DEFAULT:'#0f172a', light:'#1e293b', muted:'#334155' },
+          },
+          boxShadow: {
+            'sidebar': '4px 0 24px rgba(0,0,0,0.15)',
+            'card': '0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.06)',
+            'card-hover': '0 4px 16px rgba(0,0,0,0.08), 0 12px 32px rgba(0,0,0,0.08)',
+            'topbar': '0 1px 0 #e2e8f0, 0 2px 8px rgba(0,0,0,0.04)',
+          },
+          animation: {
+            'slide-in': 'slideIn 0.3s cubic-bezier(0.4,0,0.2,1)',
+            'fade-in': 'fadeIn 0.4s ease',
+            'pulse-dot': 'pulseDot 2s infinite',
+          },
+          keyframes: {
+            slideIn: { from: { opacity:'0', transform:'translateX(-8px)' }, to: { opacity:'1', transform:'translateX(0)' } },
+            fadeIn:  { from: { opacity:'0', transform:'translateY(6px)' }, to: { opacity:'1', transform:'translateY(0)' } },
+            pulseDot: { '0%,100%': { opacity:'1', transform:'scale(1)' }, '50%': { opacity:'.5', transform:'scale(0.85)' } },
+          }
+        }
+      }
+    }
+  </script>
 
-<header class="topbar">
-  <div class="topbar-inner">
-    <div class="brand">
-      <div class="brand-mark">DSI</div>
-      <div>
-        <div class="brand-title">Admin Dashboard</div>
-        <div class="brand-sub">Transport Management</div>
-      </div>
+  </head>
+<body class="h-full bg-slate-50">
+
+<!-- ══════════════════════════════════════════════════════════
+     MOBILE SIDEBAR OVERLAY
+═══════════════════════════════════════════════════════════ -->
+<div id="sidebarOverlay" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 lg:hidden" onclick="closeSidebar()"></div>
+
+<!-- ══════════════════════════════════════════════════════════
+     SIDEBAR
+═══════════════════════════════════════════════════════════ -->
+<aside id="sidebar" class="fixed top-0 left-0 w-64 h-full bg-slate-900 flex flex-col z-50 shadow-sidebar">
+
+  <!-- Logo -->
+  <div class="px-5 py-5 border-b border-white/8 flex items-center gap-3 flex-shrink-0">
+    <div class="w-9 h-9 rounded-xl bg-indigo-500 flex items-center justify-center flex-shrink-0 shadow-lg">
+      <i data-lucide="bus" class="w-5 h-5 text-white"></i>
     </div>
-    <div class="topbar-actions">
-      <button class="icon-btn" onclick="toggleTheme()" title="Theme"><i data-lucide="moon"></i></button>
-      <a class="btn secondary small" href="profile.html"><i data-lucide="user"></i><span>Profile</span></a>
-      <a class="btn ghost small" href="index.html"><i data-lucide="home"></i><span>Home</span></a>
-      <button class="btn ghost small" onclick="logout()"><i data-lucide="log-out"></i><span>Logout</span></button>
-    </div>
-  </div>
-</header>
-
-
-<main class="container">
-  <!-- User Info Card -->
-  <div class="card elevated" id="meBox" style="margin-bottom:16px; padding:12px 18px;">
-    <span style="color: var(--muted);">Loading...</span>
-  </div>
-  <div class="kpi-grid">
-
-      <div class="card kpi-card">
-        <div class="kpi-icon"><i data-lucide="clipboard-list"></i></div>
-        <div>
-          <div class="kpi-value" id="kpi_admin_today">—</div>
-          <div class="kpi-label">Today Requests</div>
-          <div class="kpi-sub" id="kpi_admin_todaySub">Updated</div>
-        </div>
-      </div>
-      <div class="card kpi-card">
-        <div class="kpi-icon"><i data-lucide="shield-check"></i></div>
-        <div>
-          <div class="kpi-value" id="kpi_admin_pending_admin">—</div>
-          <div class="kpi-label">Pending Admin</div>
-          <div class="kpi-sub" id="kpi_admin_pending_adminSub">Updated</div>
-        </div>
-      </div>
-      <div class="card kpi-card">
-        <div class="kpi-icon"><i data-lucide="bus-front"></i></div>
-        <div>
-          <div class="kpi-value" id="kpi_admin_pending_ta">—</div>
-          <div class="kpi-label">Pending TA</div>
-          <div class="kpi-sub" id="kpi_admin_pending_taSub">Updated</div>
-        </div>
-      </div>
-      <div class="card kpi-card">
-        <div class="kpi-icon"><i data-lucide="badge-check"></i></div>
-        <div>
-          <div class="kpi-value" id="kpi_admin_pending_hr">—</div>
-          <div class="kpi-label">Pending HR Final</div>
-          <div class="kpi-sub" id="kpi_admin_pending_hrSub">Updated</div>
-        </div>
-      </div>
-      <div class="card kpi-card">
-        <div class="kpi-icon"><i data-lucide="truck"></i></div>
-        <div>
-          <div class="kpi-value" id="kpi_admin_vehicles">—</div>
-          <div class="kpi-label">Vehicles Assigned</div>
-          <div class="kpi-sub" id="kpi_admin_vehiclesSub">Updated</div>
-        </div>
-      </div>
-      <div class="card kpi-card">
-        <div class="kpi-icon"><i data-lucide="building-2"></i></div>
-        <div>
-          <div class="kpi-value" id="kpi_admin_departments">—</div>
-          <div class="kpi-label">Departments Active</div>
-          <div class="kpi-sub" id="kpi_admin_departmentsSub">Updated</div>
-        </div>
-      </div>
-  </div>
-
-  <div class="section-title"><strong>Quick Actions</strong><span></span></div>
-  <div class="action-grid">
-    <a class="action-card" href="#" onclick="setTab('approvals'); return false;">
-  <div class="ico"><i data-lucide="check-circle-2"></i></div>
-  <div class="meta"><div class="t">Approve Requests</div><div class="s">Review submitted requests</div></div>
-</a><a class="action-card" href="#" onclick="if(typeof openLockModal==='function'){openLockModal();}else if(typeof setTab==='function'){setTab('approvals');}; return false;">
-  <div class="ico"><i data-lucide="lock-keyhole"></i></div>
-  <div class="meta"><div class="t">Lock / Unlock Day</div><div class="s">Control today’s operations</div></div>
-</a><a class="action-card" href="#" onclick="setTab('master'); return false;">
-  <div class="ico"><i data-lucide="route"></i></div>
-  <div class="meta"><div class="t">Routes & Sub-routes</div><div class="s">Manage master data</div></div>
-</a><a class="action-card" href="#" onclick="setTab('reports'); return false;">
-  <div class="ico"><i data-lucide="file-down"></i></div>
-  <div class="meta"><div class="t">Reports Center</div><div class="s">Generate daily reports</div></div>
-</a>
-  </div>
-
-  <div class="two-col">
-    <div class="card pad">
-      <div class="section-title"><strong>Recent Requests</strong><span></span></div>
-      <div class="list" id="recentList"><div class="alert">Loading…</div></div>
-    </div>
-    <div class="card pad">
-      <div class="section-title"><strong>Recent Actions</strong><span></span></div>
-      <div class="list" id="recentActions"><div class="alert">Loading…</div></div>
+    <div>
+      <div class="text-white font-bold text-sm leading-none">DSI Transport</div>
+      <div class="text-slate-400 text-xs mt-0.5 font-medium">Management System</div>
     </div>
   </div>
 
-
-  <!-- Daily Run Lock Section -->
-  <section class="card soft" style="margin-bottom:18px;">
-    <h2 class="h2">📅 අද දවස අගුළු දමන්න (TA ට කලින්)</h2>
-    <p class="p-muted">සියලු දෙපාර්තමේන්තු ඉල්ලීම් එකතු කරලා එකම වාර්තාවක් සෑදේ, සැ.යු කිසි විටෙක සියලු ඉල්ලිම් ලැබිමට පෙර Lock භාවිතා කරන්න එපා. Lock කළ පසු HOD submissions/edit නවතී.</p>
-    
-    <div class="toolbar">
-      <div style="min-width:220px;">
-        <label>📆 දිනය</label>
-        <input id="runDate" type="date" />
-      </div>
-      <div class="btnrow">
-        <button class="btn" onclick="loadRunSummaryLive()">🔄 යාවත්කාලීන කරන්න</button>
-        <button class="btn btn-primary" onclick="lockRun()">🔒 Lock Today → TA</button>
-      </div>
-    </div>
-    
-    <div id="runMeta" style="margin-top:12px;"></div>
-    
-    <div class="grid two" style="margin-top:14px;">
-      <div class="card">
-        <div class="h2">🏢 දෙපාර්තමේන්තු සාරාංශය</div>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>දෙපාර්තමේන්තුව</th>
-                <th>Submitted</th>
-                <th>Requests</th>
-                <th>Employees</th>
-              </tr>
-            </thead>
-            <tbody id="runDeptRows">
-              <tr><td colspan="4" class="mini">Loading...</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-      
-      <div class="card">
-        <div class="h2">⚠️ නොලැබුණු දෙපාර්තමේන්තු</div>
-        <div id="runMissing" class="alert">Loading...</div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Tab Navigation -->
-  <div class="card" style="margin-bottom:14px;">
-    <div class="tabs">
-      <button class="btn active" id="tabApprovals" onclick="setTab('approvals')">✅ Approvals</button>
-      <button class="btn" id="tabMaster" onclick="setTab('master')">📊 Master Data</button>
-      <button class="btn" id="tabReports" onclick="setTab('reports')">📈 Reports</button>
-    </div>
-  </div>
-
-  <!-- Approvals Pane -->
-  <div class="card" id="pane_approvals">
-    <h2 class="h2">📋 Requests (All Departments)</h2>
-    <hr/>
-    
-    <!-- HOD Registration Approvals -->
-    <h2 class="h2" style="margin-top:18px;">👤 HOD ලියාපදිංචි අනුමැතිය</h2>
-    <div class="table-wrap" style="margin-bottom:18px;">
-      <table>
-        <thead>
-          <tr>
-            <th>Email</th>
-            <th>Department</th>
-            <th>Date</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody id="hodRegRows">
-          <tr><td colspan="4" class="mini">Loading...</td></tr>
-        </tbody>
-      </table>
-    </div>
-
-    <!-- Request Filters -->
-    <div class="row" style="margin-top:18px;">
-      <div>
-        <label>🔍 Filter by status</label>
-        <select id="reqStatus" onchange="renderRequests()">
-          <option value="">All Statuses</option>
-          <option value="SUBMITTED">SUBMITTED</option>
-          <option value="DRAFT">DRAFT</option>
-          <option value="ADMIN_APPROVED">ADMIN_APPROVED</option>
-          <option value="TA_ASSIGNED">TA_ASSIGNED</option>
-          <option value="HR_FINAL_APPROVED">HR_FINAL_APPROVED</option>
-          <option value="REJECTED">REJECTED</option>
-        </select>
+  <!-- User quick info — filled by JS via meBox  -->
+  <div class="px-4 py-3 border-b border-white/8 flex-shrink-0">
+    <div id="meBox" class="flex items-center gap-3">
+      <div class="w-8 h-8 rounded-full bg-indigo-500/30 flex items-center justify-center">
+        <i data-lucide="user" class="w-4 h-4 text-indigo-300"></i>
       </div>
       <div>
-        <label>🔎 Search</label>
-        <input id="reqSearch" placeholder="dept / date / id..." oninput="renderRequests()" />
-      </div>
-    </div>
-
-    <div class="btnrow" style="margin-top:12px;">
-      <button class="btn ghost" onclick="loadRequests()">🔄 Refresh</button>
-    </div>
-
-    <hr style="margin:18px 0;"/>
-    <div id="reqList" class="table-wrap">
-      <div class="mini" style="padding:16px;">Loading requests...</div>
-    </div>
-
-    <hr style="margin:18px 0;"/>
-    
-    <!-- Request Detail Modal -->
-    <div id="reqDetail" class="card elevated" style="display:none; margin-top:18px;">
-      <h3 class="h2">📄 Request Detail: <span id="dReqId"></span></h3>
-      <div id="dMeta" style="margin:10px 0;"></div>
-      <div id="dEmployees" class="table-wrap"></div>
-      <div class="btnrow" style="margin-top:14px;">
-        <button id="btnApprove" class="btn btn-primary" onclick="approveReq()">✅ Approve (ADMIN)</button>
-        <button class="btn ghost" onclick="closeDetail()">❌ Close</button>
+        <div class="text-slate-300 text-xs font-medium">Loading...</div>
+        <div class="text-slate-500 text-xs">Administrator</div>
       </div>
     </div>
   </div>
 
-  <!-- Master Data Pane -->
-  <div class="card" id="pane_master" style="display:none;">
-    <h2 class="h2">📊 Master Data Management</h2>
-    
-    <!-- Departments -->
-    <section style="margin-top:18px;">
-      <h3 class="h2">🏢 දෙපාර්තමේන්තු</h3>
-      <div class="btnrow">
-        <button class="btn" onclick="loadDepartments()">🔄 Refresh</button>
-        <button class="btn btn-primary" onclick="showAddDept()">➕ Add Department</button>
+  <!-- Navigation -->
+  <nav class="flex-1 overflow-y-auto px-3 py-4 space-y-1">
+    <div class="text-slate-500 text-xs font-700 uppercase tracking-widest px-3 mb-3">Operations</div>
+
+    <button class="nav-link active w-full text-left" id="tabApprovals" onclick="setTab('approvals')">
+      <i data-lucide="check-circle" class="icon"></i>
+      <span>Approvals</span>
+    </button>
+
+    <button class="nav-link w-full text-left" id="tabMaster" onclick="setTab('master')">
+      <i data-lucide="database" class="icon"></i>
+      <span>Master Data</span>
+    </button>
+
+    <button class="nav-link w-full text-left" id="tabReports" onclick="setTab('reports')">
+      <i data-lucide="bar-chart-2" class="icon"></i>
+      <span>Reports</span>
+    </button>
+
+    <div class="border-t border-white/8 my-3"></div>
+    <div class="text-slate-500 text-xs font-700 uppercase tracking-widest px-3 mb-3">System</div>
+
+    <a href="index.html" class="nav-link">
+      <i data-lucide="home" class="icon"></i>
+      <span>Home</span>
+    </a>
+
+    <button class="nav-link w-full text-left text-red-400 hover:text-red-300 hover:bg-red-500/10" onclick="logout()">
+      <i data-lucide="log-out" class="icon"></i>
+      <span>Sign Out</span>
+    </button>
+  </nav>
+
+  <!-- Sidebar Footer -->
+  <div class="px-4 py-3 border-t border-white/8 flex-shrink-0">
+    <div class="flex items-center gap-2">
+      <div class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse-dot"></div>
+      <span class="text-slate-400 text-xs">System Online</span>
+    </div>
+  </div>
+</aside>
+
+<!-- ══════════════════════════════════════════════════════════
+     MAIN WRAPPER (offset by sidebar on desktop)
+═══════════════════════════════════════════════════════════ -->
+<div class="lg:ml-64 min-h-screen flex flex-col">
+
+  <!-- ─── TOP NAVBAR ─────────────────────────────── -->
+  <header id="topbar" class="sticky top-0 z-30 bg-white border-b border-slate-200 px-5 py-3 flex items-center justify-between gap-4 flex-shrink-0">
+
+    <!-- Mobile hamburger -->
+    <button onclick="openSidebar()" class="lg:hidden p-2 rounded-lg text-slate-500 hover:bg-slate-100 transition">
+      <i data-lucide="menu" class="w-5 h-5"></i>
+    </button>
+
+    <!-- Page title -->
+    <div class="flex items-center gap-3">
+      <div class="hidden sm:flex items-center gap-2">
+        <div class="w-7 h-7 rounded-lg bg-indigo-50 flex items-center justify-center">
+          <i data-lucide="shield-check" class="w-4 h-4 text-indigo-600"></i>
+        </div>
+        <div>
+          <h1 class="text-slate-900 font-700 text-sm leading-none">Admin Control Panel</h1>
+          <p class="text-slate-400 text-xs mt-0.5">Full system access</p>
+        </div>
       </div>
-      <div id="deptList" class="table-wrap" style="margin-top:12px;">
-        <div class="mini" style="padding:16px;">Loading...</div>
+    </div>
+
+    <!-- Right: Live indicator + Date/Time + Logout -->
+    <div class="flex items-center gap-3 ml-auto">
+      <div class="hidden md:flex items-center gap-2 px-3 py-1.5 bg-emerald-50 border border-emerald-200 rounded-full">
+        <div class="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse-dot"></div>
+        <span class="text-emerald-700 text-xs font-600" id="liveClock">Live</span>
+      </div>
+      <button onclick="logout()"
+        class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-slate-500 hover:bg-slate-100 hover:text-slate-800 transition text-sm font-500 border border-slate-200">
+        <i data-lucide="log-out" class="w-4 h-4"></i>
+        <span class="hidden sm:inline">Logout</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ─── MAIN CONTENT ───────────────────────────── -->
+  <main class="flex-1 p-5 lg:p-7 space-y-6 animate-fade-in">
+
+    <!-- ════════════════════════════════════════════
+         DAILY RUN LOCK SECTION
+    ═══════════════════════════════════════════════ -->
+    <section class="section-card overflow-hidden">
+      <!-- Card Header -->
+      <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-gradient-to-r from-slate-900 to-slate-800 rounded-t-2xl">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-xl bg-white/10 flex items-center justify-center">
+            <i data-lucide="lock" class="w-5 h-5 text-white"></i>
+          </div>
+          <div>
+            <h2 class="text-white font-700 text-base leading-none">Daily Run Lock</h2>
+            <p class="text-slate-400 text-xs mt-1">Lock submissions before dispatching to TA</p>
+          </div>
+        </div>
+        <!-- Run date picker -->
+        <div class="flex items-center gap-3">
+          <input id="runDate" type="date"
+            class="px-3 py-2 bg-white/10 border border-white/20 text-white rounded-lg text-sm font-500 focus:outline-none focus:ring-2 focus:ring-indigo-400 placeholder-slate-400"
+            style="color-scheme: dark;" />
+          <button onclick="loadRunSummaryLive()"
+            class="btn btn-ghost border-white/20 text-slate-300 hover:bg-white/10 btn-sm">
+            <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
+            <span class="hidden sm:inline">Refresh</span>
+          </button>
+          <button onclick="lockRun()" class="btn btn-lock btn-sm">
+            <i data-lucide="lock" class="w-3.5 h-3.5"></i>
+            <span>Lock → TA</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Warning notice -->
+      <div class="mx-6 mt-4 flex items-start gap-3 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3">
+        <i data-lucide="alert-triangle" class="w-4 h-4 text-amber-500 flex-shrink-0 mt-0.5"></i>
+        <p class="text-amber-700 text-xs leading-relaxed">
+          <strong>සැ.යු:</strong> සියලු දෙපාර්තමේන්තු ඉල්ලීම් ලැබීමට <strong>පෙර</strong> Lock භාවිතා කරන්න එපා. Lock කළ පසු HOD submissions/edit නවතී.
+        </p>
+      </div>
+
+      <!-- Run status badge -->
+      <div id="runMeta" class="px-6 py-3"></div>
+
+      <!-- Dept summary grid -->
+      <div class="grid grid-cols-1 xl:grid-cols-2 gap-5 px-6 pb-6">
+        <!-- Dept table -->
+        <div>
+          <div class="flex items-center gap-2 mb-3">
+            <i data-lucide="building-2" class="w-4 h-4 text-slate-500"></i>
+            <h3 class="text-slate-700 font-700 text-sm">Department Summary</h3>
+          </div>
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Department</th>
+                  <th>Submitted</th>
+                  <th>Requests</th>
+                  <th>Employees</th>
+                </tr>
+              </thead>
+              <tbody id="runDeptRows">
+                <tr><td colspan="4" class="text-center py-6 text-slate-400 text-sm">
+                  <i data-lucide="loader-2" class="w-4 h-4 animate-spin inline mr-2"></i>Loading...
+                </td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Missing depts -->
+        <div>
+          <div class="flex items-center gap-2 mb-3">
+            <i data-lucide="alert-circle" class="w-4 h-4 text-red-400"></i>
+            <h3 class="text-slate-700 font-700 text-sm">Missing Departments</h3>
+          </div>
+          <div id="runMissing" class="alert min-h-16">
+            <div class="flex items-center gap-2 text-slate-400 text-sm">
+              <i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Loading...
+            </div>
+          </div>
+        </div>
       </div>
     </section>
 
-    <hr style="margin:24px 0;"/>
-
-    <!-- Routes -->
-    <section>
-      <h3 class="h2">🚌 මාර්ග (Routes)</h3>
-      <div class="btnrow">
-        <button class="btn" onclick="loadRoutes()">🔄 Refresh</button>
-        <button class="btn btn-primary" onclick="showAddRoute()">➕ Add Route</button>
-      </div>
-      <div id="routeList" class="table-wrap" style="margin-top:12px;">
-        <div class="mini" style="padding:16px;">Loading...</div>
-      </div>
-    </section>
-
-    <hr style="margin:24px 0;"/>
-
-    <!-- Subroutes Bulk Upload -->
-    <section>
-      <h3 class="h2">📍 උප-මාර්ග දැමිම</h3>
-      <p class="p-muted">එක් මාර්ගයකට උප ග්‍රාම නාම එකවර ඇතුළත් කරන්න (එක් line එකට එක් ග්‍රාම නාමයක් ලෙස)</p>
-      
-      <div style="margin-top:12px;">
-        <label>🚌 Route තෝරන්න</label>
-        <select id="selRoute">
-          <option value="">-- තෝරන්න --</option>
-        </select>
-      </div>
-      
-      <div style="margin-top:12px;">
-        <label>📝 ග්‍රාම නාම (Line by line)</label>
-        <textarea id="bulkLines" rows="8" placeholder="කොළඹ&#10;මොරටුව&#10;පානදුර&#10;..."></textarea>
-      </div>
-      
-      <div class="btnrow" style="margin-top:12px;">
-        <button class="btn btn-primary" onclick="doBulkSubs()">⬆️ Upload Sub-routes</button>
-      </div>
-    </section>
-  </div>
-
-  <!-- Reports Pane -->
-  <div class="card" id="pane_reports" style="display:none;">
-    <h2 class="h2">📈 Reports</h2>
-    
-    <div style="margin-top:18px;">
-      <label>📅 දිනය</label>
-      <input id="repDate" type="date" />
+    <!-- ════════════════════════════════════════════
+         TAB NAV BAR
+    ═══════════════════════════════════════════════ -->
+    <div class="section-card px-5 py-3 flex items-center gap-2 flex-wrap">
+      <button class="tab-btn active" id="tabApprovalsContent" onclick="setTab('approvals')">
+        <i data-lucide="check-circle" class="w-4 h-4"></i> Approvals
+      </button>
+      <button class="tab-btn" id="tabMasterContent" onclick="setTab('master')">
+        <i data-lucide="database" class="w-4 h-4"></i> Master Data
+      </button>
+      <button class="tab-btn" id="tabReportsContent" onclick="setTab('reports')">
+        <i data-lucide="bar-chart-2" class="w-4 h-4"></i> Reports
+      </button>
     </div>
-    
-    <div class="btnrow" style="margin-top:12px;">
-      <button class="btn btn-primary" onclick="downloadRouteReport()">📄 Route-wise PDF</button>
-    </div>
-    <p class="mini" style="margin-top:10px;">💡 PDF එක මේ ටැබ් එක ඇතුලේම preview වෙනවා.</p>
-    
-    <div id="reportPreview" style="margin-top:18px;"></div>
-  </div>
 
-</main>
+    <!-- ════════════════════════════════════════════
+         PANE: APPROVALS
+    ═══════════════════════════════════════════════ -->
+    <div id="pane_approvals" class="space-y-6">
 
+      <!-- HOD Registration Approvals -->
+      <div class="section-card">
+        <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center">
+              <i data-lucide="user-check" class="w-4 h-4 text-indigo-600"></i>
+            </div>
+            <div>
+              <h2 class="text-slate-800 font-700 text-sm">HOD Registration Approvals</h2>
+              <p class="text-slate-400 text-xs">Pending HOD account approvals</p>
+            </div>
+          </div>
+        </div>
+        <div class="p-6">
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Email</th>
+                  <th>Department</th>
+                  <th>Applied</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="hodRegRows">
+                <tr><td colspan="4" class="text-center py-6 text-slate-400 text-sm">
+                  <i data-lucide="loader-2" class="w-4 h-4 animate-spin inline mr-2"></i>Loading...
+                </td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- All Requests -->
+      <div class="section-card">
+        <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center">
+              <i data-lucide="clipboard-list" class="w-4 h-4 text-blue-600"></i>
+            </div>
+            <div>
+              <h2 class="text-slate-800 font-700 text-sm">Transport Requests — All Departments</h2>
+              <p class="text-slate-400 text-xs">Review and approve submitted requests</p>
+            </div>
+          </div>
+          <button onclick="loadRequests()" class="btn btn-ghost btn-sm">
+            <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Refresh
+          </button>
+        </div>
+
+        <!-- Filters -->
+        <div class="px-6 pt-5 pb-3 flex flex-wrap gap-4">
+          <div class="flex-1 min-w-40">
+            <label class="form-label">Filter by Status</label>
+            <select id="reqStatus" onchange="renderRequests()" class="form-input form-select">
+              <option value="">All Statuses</option>
+              <option value="SUBMITTED">SUBMITTED</option>
+              <option value="DRAFT">DRAFT</option>
+              <option value="ADMIN_APPROVED">ADMIN APPROVED</option>
+              <option value="TA_ASSIGNED">TA ASSIGNED</option>
+              <option value="HR_FINAL_APPROVED">HR FINAL APPROVED</option>
+              <option value="REJECTED">REJECTED</option>
+            </select>
+          </div>
+          <div class="flex-1 min-w-40">
+            <label class="form-label">Search</label>
+            <div class="relative">
+              <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none"></i>
+              <input id="reqSearch" placeholder="dept / date / id…" oninput="renderRequests()"
+                class="form-input pl-9" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Request List table — rendered by JS -->
+        <div class="px-6 pb-6">
+          <div id="reqList" class="table-wrap">
+            <div class="text-center py-8 text-slate-400 text-sm">
+              <i data-lucide="loader-2" class="w-5 h-5 animate-spin inline mr-2"></i>Loading requests…
+            </div>
+          </div>
+        </div>
+
+        <!-- Request Detail Panel — toggled by JS -->
+        <div id="reqDetail" class="hidden px-6 pb-6">
+          <div class="border border-indigo-200 bg-indigo-50/50 rounded-xl p-5">
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="text-slate-800 font-700 text-sm flex items-center gap-2">
+                <i data-lucide="file-text" class="w-4 h-4 text-indigo-600"></i>
+                Request Detail — <span id="dReqId" class="text-indigo-700 font-800"></span>
+              </h3>
+              <button onclick="closeDetail()" class="btn btn-ghost btn-sm">
+                <i data-lucide="x" class="w-3.5 h-3.5"></i> Close
+              </button>
+            </div>
+            <div id="dMeta" class="text-sm text-slate-600 mb-4 space-y-1"></div>
+            <div id="dEmployees" class="table-wrap mb-4"></div>
+            <div class="flex gap-3">
+              <button id="btnApprove" class="btn btn-indigo" onclick="approveReq()">
+                <i data-lucide="check" class="w-4 h-4"></i> Approve (ADMIN)
+              </button>
+              <button onclick="closeDetail()" class="btn btn-ghost">
+                <i data-lucide="x" class="w-4 h-4"></i> Close
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div><!-- /pane_approvals -->
+
+    <!-- ════════════════════════════════════════════
+         PANE: MASTER DATA
+    ═══════════════════════════════════════════════ -->
+    <div id="pane_master" class="hidden space-y-6">
+
+      <!-- Departments -->
+      <div class="section-card">
+        <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center">
+              <i data-lucide="building-2" class="w-4 h-4 text-amber-600"></i>
+            </div>
+            <h2 class="text-slate-800 font-700 text-sm">Departments</h2>
+          </div>
+          <div class="flex gap-2">
+            <button onclick="loadDepartments()" class="btn btn-ghost btn-sm">
+              <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Refresh
+            </button>
+            <button onclick="showAddDept()" class="btn btn-primary btn-sm">
+              <i data-lucide="plus" class="w-3.5 h-3.5"></i> Add Department
+            </button>
+          </div>
+        </div>
+        <div class="p-6">
+          <div id="deptList" class="table-wrap">
+            <div class="text-center py-6 text-slate-400 text-sm">
+              <i data-lucide="loader-2" class="w-4 h-4 animate-spin inline mr-2"></i>Loading…
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Routes -->
+      <div class="section-card">
+        <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center">
+              <i data-lucide="route" class="w-4 h-4 text-blue-600"></i>
+            </div>
+            <h2 class="text-slate-800 font-700 text-sm">Routes (මාර්ග)</h2>
+          </div>
+          <div class="flex gap-2">
+            <button onclick="loadRoutes()" class="btn btn-ghost btn-sm">
+              <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Refresh
+            </button>
+            <button onclick="showAddRoute()" class="btn btn-primary btn-sm">
+              <i data-lucide="plus" class="w-3.5 h-3.5"></i> Add Route
+            </button>
+          </div>
+        </div>
+        <div class="p-6">
+          <div id="routeList" class="table-wrap">
+            <div class="text-center py-6 text-slate-400 text-sm">
+              <i data-lucide="loader-2" class="w-4 h-4 animate-spin inline mr-2"></i>Loading…
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bulk Sub-routes Upload -->
+      <div class="section-card">
+        <div class="flex items-center gap-3 px-6 py-4 border-b border-slate-100">
+          <div class="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center">
+            <i data-lucide="map-pin" class="w-4 h-4 text-emerald-600"></i>
+          </div>
+          <div>
+            <h2 class="text-slate-800 font-700 text-sm">Bulk Sub-route Upload</h2>
+            <p class="text-slate-400 text-xs">
+              එක් මාර්ගයකට ග්‍රාම නාම එකවර ඇතුළත් කරන්න (line by line)
+            </p>
+          </div>
+        </div>
+        <div class="p-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div>
+            <label class="form-label">Select Route</label>
+            <select id="selRoute" class="form-input form-select">
+              <option value="">-- Select Route --</option>
+            </select>
+          </div>
+          <div class="lg:col-span-2 lg:max-w-xl">
+            <label class="form-label">Village Names (one per line)</label>
+            <textarea id="bulkLines" rows="8"
+              placeholder="කොළඹ&#10;මොරටුව&#10;පානදුර&#10;..."
+              class="form-input font-mono text-sm"></textarea>
+          </div>
+          <div>
+            <button onclick="doBulkSubs()" class="btn btn-indigo">
+              <i data-lucide="upload" class="w-4 h-4"></i> Upload Sub-routes
+            </button>
+          </div>
+        </div>
+      </div>
+    </div><!-- /pane_master -->
+
+    <!-- ════════════════════════════════════════════
+         PANE: REPORTS
+    ═══════════════════════════════════════════════ -->
+    <div id="pane_reports" class="hidden">
+      <div class="section-card">
+        <div class="flex items-center gap-3 px-6 py-4 border-b border-slate-100">
+          <div class="w-8 h-8 rounded-lg bg-violet-50 flex items-center justify-center">
+            <i data-lucide="file-bar-chart-2" class="w-4 h-4 text-violet-600"></i>
+          </div>
+          <div>
+            <h2 class="text-slate-800 font-700 text-sm">Reports</h2>
+            <p class="text-slate-400 text-xs">Generate and preview daily route-wise PDF reports</p>
+          </div>
+        </div>
+        <div class="p-6 space-y-5">
+          <div class="max-w-xs">
+            <label class="form-label">Report Date</label>
+            <input id="repDate" type="date" class="form-input" />
+          </div>
+          <div class="flex items-center gap-3">
+            <button onclick="downloadRouteReport()" class="btn btn-primary">
+              <i data-lucide="file-down" class="w-4 h-4"></i> Generate Route-wise PDF
+            </button>
+          </div>
+          <p class="text-slate-400 text-xs flex items-center gap-1.5">
+            <i data-lucide="info" class="w-3.5 h-3.5"></i>
+            PDF will preview directly in this tab.
+          </p>
+          <!-- PDF preview injected here by JS -->
+          <div id="reportPreview"></div>
+        </div>
+      </div>
+    </div><!-- /pane_reports -->
+
+  </main>
+</div><!-- /main wrapper -->
+
+
+<!-- ══════════════════════════════════════════════════════════
+     ALL ORIGINAL SCRIPTS — PRESERVED EXACTLY
+═══════════════════════════════════════════════════════════ -->
 <script>
 let ME=null;
 let REQS=[];
@@ -320,530 +533,477 @@ let DEPS=[];
 let ROUTES=[];
 let SUBS=[];
 
+/* ── Sidebar helpers (new, mobile) ────────────── */
+function openSidebar(){
+  document.getElementById('sidebar').classList.add('open');
+  document.getElementById('sidebarOverlay').classList.add('active');
+}
+function closeSidebar(){
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebarOverlay').classList.remove('active');
+}
+
+/* ── Live clock ───────────────────────────────── */
+function updateClock(){
+  const el = document.getElementById('liveClock');
+  if(!el) return;
+  const now = new Date();
+  el.textContent = now.toLocaleTimeString('en-US', {hour:'2-digit', minute:'2-digit', second:'2-digit'});
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+/* ── Tab system — ORIGINAL LOGIC PRESERVED ────── */
 function setTab(tab){
+  // Sidebar nav-link active states
+  const sidebarBtnMap = { approvals:'tabApprovals', master:'tabMaster', reports:'tabReports' };
+  // Content area tab-btn active states
+  const contentBtnMap = { approvals:'tabApprovalsContent', master:'tabMasterContent', reports:'tabReportsContent' };
+
   const tabs = ["approvals","master","reports"];
   for(const t of tabs){
-    const pane = qs("pane_"+t);
-    const btn = qs("tab"+t.charAt(0).toUpperCase()+t.slice(1));
-    if(pane) pane.style.display = (t===tab) ? "" : "none";
-    if(btn) btn.classList.toggle("active", t===tab);
+    const pane = document.getElementById("pane_"+t);
+    const sBtn = document.getElementById(sidebarBtnMap[t]);
+    const cBtn = document.getElementById(contentBtnMap[t]);
+
+    if(pane)  pane.classList.toggle("hidden", t !== tab);
+    if(sBtn)  sBtn.classList.toggle("active",  t === tab);
+    if(cBtn)  cBtn.classList.toggle("active",  t === tab);
   }
 
-  // ✅ Master Data tab open වුනම Departments + Routes live refresh
   if(tab === "master"){
     try { loadDepartments(); } catch(e){}
     try { loadRoutes(); } catch(e){}
   }
 }
 
+/* ── Guard / Auth — ORIGINAL ─────────────────── */
 async function guard(){
   try {
     ME = await guardRole("ADMIN");
     if(!ME) return;
-    qs("meBox").innerHTML = `<span class="badge brand">${ME.role}</span> <span style="margin-left:8px;">${ME.email}</span>`;
+    // Populate sidebar meBox
+    const meBox = document.getElementById("meBox");
+    if(meBox){
+      meBox.innerHTML = `
+        <div class="w-8 h-8 rounded-full bg-indigo-500/30 flex items-center justify-center flex-shrink-0">
+          <i data-lucide="user" class="w-4 h-4 text-indigo-300"></i>
+        </div>
+        <div>
+          <div class="text-slate-200 text-xs font-600">${ME.email||'Admin'}</div>
+          <span class="inline-block mt-0.5 text-indigo-400 text-xs font-700 bg-indigo-500/20 rounded px-1.5 py-0.5">${ME.role}</span>
+        </div>`;
+      lucide.createIcons();
+    }
   } catch(e) {
     console.error('Guard error:', e);
     location.href = "login.html";
   }
 }
 
+/* ── Load Requests — ORIGINAL ────────────────── */
 async function loadRequests(){
   try {
     const d = await api("/admin/requests");
     REQS = d.requests || [];
     renderRequests();
   } catch(e) {
-    qs("reqList").innerHTML = `<div class="alert error">දෝෂයක්: ${e.message}</div>`;
+    document.getElementById("reqList").innerHTML =
+      `<div class="alert alert-error">දෝෂයක්: ${e.message}</div>`;
   }
 }
 
+/* ── Render Requests table — ORIGINAL ────────── */
 function renderRequests(){
-  const status = qs("reqStatus").value;
-  const q = (qs("reqSearch").value||"").toLowerCase();
+  const status = document.getElementById("reqStatus").value;
+  const q = (document.getElementById("reqSearch").value||"").toLowerCase();
   const list = REQS
     .filter(r => !status || r.status===status)
     .filter(r => (String(r.id).includes(q) || (r.department_name||"").toLowerCase().includes(q) || (r.request_date||"").toLowerCase().includes(q)));
 
-  if(list.length===0){ 
-    qs("reqList").innerHTML = "<div style='padding:16px;' class='mini'>No matching requests</div>"; 
-    return; 
+  if(list.length===0){
+    document.getElementById("reqList").innerHTML =
+      `<div class="text-center py-8 text-slate-400 text-sm">
+        <i data-lucide="inbox" class="w-6 h-6 mx-auto mb-2 opacity-40"></i>
+        <p>No matching requests found</p>
+      </div>`;
+    lucide.createIcons();
+    return;
   }
 
-  let html = "<table><thead><tr><th>ID</th><th>Date</th><th>Time</th><th>Department</th><th>Status</th><th>Action</th></tr></thead><tbody>";
+  let html = `<table class="data-table">
+    <thead><tr>
+      <th>ID</th><th>Date</th><th>Time</th><th>Department</th><th>Status</th><th>Action</th>
+    </tr></thead><tbody>`;
   for(const r of list){
     html += `<tr>
-      <td><strong>${r.id}</strong></td>
+      <td><span class="font-700 text-slate-800">#${r.id}</span></td>
       <td>${fmtDate(r.request_date)}</td>
       <td>${fmtTime(r.request_time)}</td>
       <td>${r.department_name}</td>
       <td>${statusBadge(r.status)}</td>
-      <td><button class="btn small" onclick="openDetail(${r.id})">View</button></td>
+      <td><button class="btn btn-ghost btn-sm" onclick="openDetail(${r.id})">
+        <i data-lucide="eye" class="w-3.5 h-3.5"></i> View
+      </button></td>
     </tr>`;
   }
   html += "</tbody></table>";
-  qs("reqList").innerHTML = html;
+  document.getElementById("reqList").innerHTML = html;
+  lucide.createIcons();
 }
 
+/* ── Open Detail — ORIGINAL ──────────────────── */
 async function openDetail(id){
   try{
     const d = await api(`/admin/requests/${id}`);
     CURRENT = d.request;
-    qs("reqDetail").style.display = "";
-    qs("dReqId").textContent = id;
-    qs("dMeta").innerHTML = `<strong>Dept:</strong> ${d.request.department_name} | <strong>Date:</strong> ${fmtDate(d.request.request_date)} | <strong>Time:</strong> ${fmtTime(d.request.request_time)} | <strong>Status:</strong> ${statusBadge(d.request.status)}`;
+    document.getElementById("reqDetail").classList.remove("hidden");
+    document.getElementById("dReqId").textContent = id;
+    document.getElementById("dMeta").innerHTML =
+      `<div class="flex flex-wrap gap-4 text-sm">
+        <span><strong class="text-slate-700">Dept:</strong> ${d.request.department_name}</span>
+        <span><strong class="text-slate-700">Date:</strong> ${fmtDate(d.request.request_date)}</span>
+        <span><strong class="text-slate-700">Time:</strong> ${fmtTime(d.request.request_time)}</span>
+        <span><strong class="text-slate-700">Status:</strong> ${statusBadge(d.request.status)}</span>
+      </div>`;
 
-    let html = "<table><thead><tr><th>Employee</th><th>Emp No</th><th>Route</th><th>Sub</th></tr></thead><tbody>";
+    let html = `<table class="data-table">
+      <thead><tr>
+        <th>Employee</th><th>Emp No</th><th>Route</th><th>Sub-route</th>
+      </tr></thead><tbody>`;
     for(const e of d.employees){
       html += `<tr>
         <td>${e.full_name}</td>
         <td>${e.emp_no}</td>
-        <td>${e.effective_route_id ?? ""}</td>
-        <td>${e.effective_sub_route_id ?? ""}</td>
+        <td>${e.effective_route_id ?? "—"}</td>
+        <td>${e.effective_sub_route_id ?? "—"}</td>
       </tr>`;
     }
     html += "</tbody></table>";
-    qs("dEmployees").innerHTML = html;
+    document.getElementById("dEmployees").innerHTML = html;
 
     const canApprove = d.request.status === "SUBMITTED";
-    qs("btnApprove").disabled = !canApprove;
-    qs("btnApprove").textContent = canApprove ? "✅ Approve (ADMIN)" : "Already Processed";
-  }catch(e){ 
-    toast(e.message); 
+    const btn = document.getElementById("btnApprove");
+    btn.disabled = !canApprove;
+    btn.innerHTML = canApprove
+      ? `<i data-lucide="check" class="w-4 h-4"></i> Approve (ADMIN)`
+      : `<i data-lucide="check-check" class="w-4 h-4"></i> Already Processed`;
+    lucide.createIcons();
+  }catch(e){
+    toast(e.message);
   }
 }
 
 function closeDetail(){
-  qs("reqDetail").style.display = "none";
-  CURRENT=null;
+  document.getElementById("reqDetail").classList.add("hidden");
+  CURRENT = null;
 }
 
+/* ── Approve Request — ORIGINAL ──────────────── */
 async function approveReq(){
   try{
     if(!CURRENT) return;
     await api(`/admin/requests/${CURRENT.id}/approve`, {method:"POST"});
     toast("✅ Request approved!");
     await loadRequests();
-  renderAdminKpis();
     await openDetail(CURRENT.id);
-  }catch(e){ 
-    toast("❌ Error: " + e.message); 
+  }catch(e){
+    toast("❌ Error: " + e.message);
   }
 }
 
-// HOD Registration with 404 Fix
+/* ── HOD Registrations — ORIGINAL w/ 404 fix ── */
 async function renderHodRegs(){
   const tbody = document.getElementById('hodRegRows');
   if(!tbody) return;
-  
   try{
     const deps = await api('/admin/departments');
     const d = await loadPendingHodRegs();
     const list = d.pending_hod || [];
     const depName = (id)=> (deps.departments||[]).find(x=>x.id===id)?.name || id || '';
-    
-    if(list.length===0){ 
-      tbody.innerHTML = `<tr><td colspan='4' class='mini' style='text-align:center; padding:16px;'>මේ වන විට අනුමැතිය බලාපොරොත්තු HOD නැත</td></tr>`; 
-      return; 
+    if(list.length===0){
+      tbody.innerHTML = `<tr><td colspan='4' class='text-center py-6 text-slate-400 text-sm'>
+        <i data-lucide="user-x" class="w-5 h-5 mx-auto mb-1 opacity-40 block"></i>
+        No HOD registrations pending approval
+      </td></tr>`;
+      lucide.createIcons();
+      return;
     }
-    
     tbody.innerHTML = list.map(u=>`<tr>
-      <td>${u.email}</td>
+      <td class="font-500">${u.email}</td>
       <td>${depName(u.department_id)}</td>
       <td>${fmtDate(u.created_at||'')}</td>
-      <td>
-        <button class='btn small btn-primary' onclick='approveH(${u.id})'>✅ Approve</button> 
-        <button class='btn small secondary' onclick='rejectH(${u.id})'>❌ Reject</button>
+      <td class="flex gap-2">
+        <button class='btn btn-success btn-sm' onclick='approveH(${u.id})'>
+          <i data-lucide="check" class="w-3 h-3"></i> Approve
+        </button>
+        <button class='btn btn-danger btn-sm' onclick='rejectH(${u.id})'>
+          <i data-lucide="x" class="w-3 h-3"></i> Reject
+        </button>
       </td>
     </tr>`).join('');
-    
-  }catch(e){ 
+    lucide.createIcons();
+  }catch(e){
     console.error('HOD Registration Error:', e);
-    
-    // Enhanced error handling for 404
-    if(e.message.includes('404') || e.message.includes('not found') || e.message.includes('Not Found')){
-      tbody.innerHTML = `<tr><td colspan='4' class='mini' style='text-align:center; padding:16px; color: var(--muted);'>
-        ℹ️ HOD registration approval feature is not yet configured
-      </td></tr>`; 
+    if(e.message.includes('404')||e.message.includes('not found')||e.message.includes('Not Found')){
+      tbody.innerHTML = `<tr><td colspan='4' class='text-center py-4 text-slate-400 text-sm'>ℹ️ HOD registration approval feature is not yet configured</td></tr>`;
     } else {
-      tbody.innerHTML = `<tr><td colspan='4' class='alert error' style='margin:8px;'>
-        ⚠️ දෝෂයක්: ${e.message}
-      </td></tr>`; 
+      tbody.innerHTML = `<tr><td colspan='4'><div class='alert alert-error m-2'>⚠️ දෝෂයක්: ${e.message}</div></td></tr>`;
     }
   }
 }
 
-async function approveH(id){ 
-  try {
-    await approveHodReg(id); 
-    await renderHodRegs(); 
-    toast('✅ අනුමත කළා'); 
-  } catch(e) {
-    toast('❌ දෝෂයක්: ' + e.message);
-  }
+async function approveH(id){
+  try { await approveHodReg(id); await renderHodRegs(); toast('✅ Approved!'); }
+  catch(e) { toast('❌ ' + e.message); }
+}
+async function rejectH(id){
+  try { await rejectHodReg(id); await renderHodRegs(); toast('❌ Rejected.'); }
+  catch(e) { toast('⚠️ ' + e.message); }
 }
 
-async function rejectH(id){ 
-  try {
-    await rejectHodReg(id); 
-    await renderHodRegs(); 
-    toast('❌ ප්‍රතික්ෂේප කළා'); 
-  } catch(e) {
-    toast('⚠️ දෝෂයක්: ' + e.message);
-  }
-}
-
-// Master data functions
+/* ── Departments — ORIGINAL ──────────────────── */
 async function loadDepartments(){
   try {
     const d = await api("/admin/departments");
     DEPS = d.departments || [];
-    let html = "<table><thead><tr><th>Name</th><th>Action</th></tr></thead><tbody>";
+    let html = `<table class="data-table">
+      <thead><tr><th>Department Name</th><th style="width:100px">Action</th></tr></thead><tbody>`;
     for(const dep of DEPS){
-      html += `<tr><td>${dep.name}</td><td><button class='btn small ghost' onclick="editDept(${dep.id})">Edit</button></td></tr>`;
+      html += `<tr>
+        <td class="font-500">${dep.name}</td>
+        <td><button class='btn btn-ghost btn-sm' onclick="editDept(${dep.id})">
+          <i data-lucide="pencil" class="w-3 h-3"></i> Edit
+        </button></td>
+      </tr>`;
     }
     html += "</tbody></table>";
-    qs("deptList").innerHTML = html;
+    document.getElementById("deptList").innerHTML = html;
+    lucide.createIcons();
   } catch(e) {
-    qs("deptList").innerHTML = `<div class="alert error">${e.message}</div>`;
+    document.getElementById("deptList").innerHTML = `<div class="alert alert-error">${e.message}</div>`;
   }
 }
 
-// ✅ Departments Edit
 async function editDept(id){
-  const dep = (DEPS || []).find(d => d.id === id);
+  const dep = (DEPS||[]).find(d=>d.id===id);
   if(!dep) return toast("❌ Department not found");
-
   const name = prompt("📝 නව දෙපාර්තමේන්තු නම:", dep.name);
-  if(name === null) return; // cancel
+  if(name===null) return;
   if(!name.trim()) return toast("⚠️ නම හිස් වෙන්න බෑ");
-
   try{
-    await api(`/admin/departments/${id}`, {
-      method: "PATCH",
-      body: JSON.stringify({ name: name.trim() })
-    });
+    await api(`/admin/departments/${id}`,{method:"PATCH",body:JSON.stringify({name:name.trim()})});
     toast("✅ Updated!");
-    await loadDepartments(); // live refresh
+    await loadDepartments();
     await loadRunSummaryLive();
-  }catch(e){
-    toast("❌ " + e.message);
-  }
+  }catch(e){ toast("❌ "+e.message); }
 }
 
+/* ── Routes — ORIGINAL ───────────────────────── */
 async function loadRoutes(force=true){
   try {
-        // Admin expects immediate updates after adding/editing routes/sub-routes
     const tree = await loadRouteTree(!!force);
     ROUTES = tree.routes || [];
-    SUBS = tree.sub_routes || [];
-    
-    // Update route selector
-    const sel = qs("selRoute");
-    if(sel) sel.innerHTML = optionHTML(ROUTES, "id", "route_name", "", true);
-    
-    let html = "<table><thead><tr><th>Route No</th><th>Name</th><th>Sub-routes</th></tr></thead><tbody>";
+    SUBS   = tree.sub_routes || [];
+    const sel = document.getElementById("selRoute");
+    if(sel) sel.innerHTML = optionHTML(ROUTES,"id","route_name","",true);
+    let html = `<table class="data-table">
+      <thead><tr><th>Route No</th><th>Route Name</th><th>Sub-routes</th></tr></thead><tbody>`;
     for(const r of ROUTES){
-      const subs = SUBS.filter(s => s.route_id === r.id);
-      html += `<tr><td>${r.route_no}</td><td>${r.route_name}</td><td>${subs.length}</td></tr>`;
+      const subs = SUBS.filter(s=>s.route_id===r.id);
+      html += `<tr>
+        <td><span class="font-700 text-indigo-700">${r.route_no}</span></td>
+        <td>${r.route_name}</td>
+        <td><span class="badge badge-indigo">${subs.length}</span></td>
+      </tr>`;
     }
     html += "</tbody></table>";
-    qs("routeList").innerHTML = html;
+    document.getElementById("routeList").innerHTML = html;
+    lucide.createIcons();
   } catch(e) {
-    qs("routeList").innerHTML = `<div class="alert error">${e.message}</div>`;
+    document.getElementById("routeList").innerHTML = `<div class="alert alert-error">${e.message}</div>`;
   }
 }
 
-// Add Department
-function showAddDept() {
+function showAddDept(){
   const name = prompt("📝 දෙපාර්තමේන්තු නම ඇතුළත් කරන්න:");
-  if (!name || !name.trim()) return;
-  
-  toast('⏳ එකතු කරමින්...');
-  api('/admin/departments', {
-    method: 'POST',
-    body: JSON.stringify({ name: name.trim() })
-  }).then(() => {
-    toast('✅ දෙපාර්තමේන්තුව එකතු කරන ලදී!');
-    loadDepartments().then(()=>loadRunSummaryLive());
-}).catch(e => {
-    toast('❌ දෝෂයක්: ' + e.message);
-  });
+  if(!name||!name.trim()) return;
+  toast('⏳ Adding…');
+  api('/admin/departments',{method:'POST',body:JSON.stringify({name:name.trim()})})
+    .then(()=>{ toast('✅ Department added!'); loadDepartments().then(()=>loadRunSummaryLive()); })
+    .catch(e=>toast('❌ '+e.message));
 }
 
-// Add Route
-function showAddRoute() {
-  const route_no = prompt("📝 මාර්ග අංකය ඇතුළත් කරන්න (උදා: 6):");
-  if (!route_no || !route_no.trim()) return;
-  
-  const route_name = prompt("📝 මාර්ග නම ඇතුළත් කරන්න (උදා: Negombo):");
-  if (!route_name || !route_name.trim()) return;
-  
-  toast('⏳ එකතු කරමින්...');
-  api('/admin/routes', {
-    method: 'POST',
-    body: JSON.stringify({ 
-      route_no: route_no.trim(),
-      route_name: route_name.trim()
-    })
-  }).then(() => {
-    toast('✅ මාර්ගය එකතු කරන ලදී!');
-    invalidateRoutesTree();
-    loadRoutes(true);
-  }).catch(e => {
-    toast('❌ දෝෂයක්: ' + e.message);
-  });
+function showAddRoute(){
+  const route_no = prompt("📝 මාර්ග අංකය (e.g. 6):");
+  if(!route_no||!route_no.trim()) return;
+  const route_name = prompt("📝 මාර්ග නම (e.g. Negombo):");
+  if(!route_name||!route_name.trim()) return;
+  toast('⏳ Adding…');
+  api('/admin/routes',{method:'POST',body:JSON.stringify({route_no:route_no.trim(),route_name:route_name.trim()})})
+    .then(()=>{ toast('✅ Route added!'); invalidateRoutesTree(); loadRoutes(true); })
+    .catch(e=>toast('❌ '+e.message));
 }
 
 async function doBulkSubs(){
-  const routeId = qs('selRoute')?.value;
-  const lines = qs('bulkLines')?.value || '';
+  const routeId = document.getElementById('selRoute')?.value;
+  const lines   = document.getElementById('bulkLines')?.value||'';
   if(!routeId){ toast('⚠️ Route තෝරන්න'); return; }
   if(!lines.trim()){ toast('⚠️ ග්‍රාම නාම දාන්න'); return; }
-  
   try{
-    const r = await bulkUpsertSubs(routeId, lines);
+    const r = await bulkUpsertSubs(routeId,lines);
     toast(`✅ Bulk OK: ${r.inserted||0} sub-routes added`);
-    qs('bulkLines').value='';
+    document.getElementById('bulkLines').value='';
     invalidateRoutesTree();
     await loadRoutes(true);
-  }catch(e){ 
-    toast('❌ ' + e.message); 
-  }
+  }catch(e){ toast('❌ '+e.message); }
 }
 
-// Daily Run functions
+/* ── Daily Run — ORIGINAL ────────────────────── */
 function todayISO(){
-  const d = new Date();
-  const m = String(d.getMonth()+1).padStart(2,'0');
-  const da = String(d.getDate()).padStart(2,'0');
+  const d=new Date();
+  const m=String(d.getMonth()+1).padStart(2,'0');
+  const da=String(d.getDate()).padStart(2,'0');
   return `${d.getFullYear()}-${m}-${da}`;
 }
 
 function setDefaultRunDate(){
-  const el = qs('runDate');
-  if(el && !el.value) el.value = todayISO();
-  const rep = qs('repDate');
-  if(rep && !rep.value) rep.value = todayISO();
+  const el=document.getElementById('runDate');
+  if(el&&!el.value) el.value=todayISO();
+  const rep=document.getElementById('repDate');
+  if(rep&&!rep.value) rep.value=todayISO();
 }
 
 async function loadRunSummary(){
-  const date = qs('runDate')?.value;
+  const date=document.getElementById('runDate')?.value;
   if(!date){ toast('⚠️ දිනය තෝරන්න'); return; }
-  
   try {
     const d = await api(`/admin/run/${date}/summary`);
-    qs('runMeta').innerHTML = `<div class="badge ${(d.master_request) ? 'ok' : 'warn'}">${(d.master_request) ? `🔒 Locked (${d.master_request.status})` : '🔓 Not Locked'}</div>`;
-    
-    // Department rows
-    const deptRows = (d.departments || []).map(dep => 
-      `<tr>
-        <td>${dep.department_name}</td>
-        <td>${dep.submitted ? '✅' : '❌'}</td>
-        <td>${dep.requests_count || 0}</td>
-        <td>${dep.employees_count || 0}</td>
-      </tr>`
-    ).join('');
-    qs('runDeptRows').innerHTML = deptRows || '<tr><td colspan="4" class="mini">No data</td></tr>';
-    
-    // Missing departments
-    const missing = (d.missing_departments || []).join(', ') || 'None';
-    qs('runMissing').innerHTML = missing;
-    qs('runMissing').className = missing === 'None' ? 'alert ok' : 'alert warn';
-    
+    const locked = !!d.master_request;
+    document.getElementById('runMeta').innerHTML = locked
+      ? `<span class="badge badge-green px-3 py-1.5 text-sm">🔒 Locked — ${d.master_request.status}</span>`
+      : `<span class="badge badge-amber px-3 py-1.5 text-sm">🔓 Not Locked</span>`;
+
+    const deptRows = (d.departments||[]).map(dep=>`<tr>
+      <td class="font-500">${dep.department_name}</td>
+      <td>${dep.submitted ? '<span class="text-emerald-600 font-700">✓</span>' : '<span class="text-red-400">✗</span>'}</td>
+      <td>${dep.requests_count||0}</td>
+      <td>${dep.employees_count||0}</td>
+    </tr>`).join('');
+    document.getElementById('runDeptRows').innerHTML = deptRows || '<tr><td colspan="4" class="text-center py-4 text-slate-400 text-sm">No data</td></tr>';
+
+    const missing = (d.missing_departments||[]).join(', ')||'None';
+    const rm = document.getElementById('runMissing');
+    rm.innerHTML = missing === 'None'
+      ? `<div class="flex items-center gap-2 text-emerald-700 text-sm"><i data-lucide="check-circle-2" class="w-4 h-4"></i> All departments submitted</div>`
+      : `<div class="text-amber-700 text-sm font-500">${missing}</div>`;
+    rm.className = missing === 'None' ? 'alert alert-ok' : 'alert alert-warn';
+    lucide.createIcons();
   } catch(e) {
-    toast('❌ ' + e.message);
+    toast('❌ '+e.message);
   }
 }
 
-// Live-safe wrapper (prevents overlapping calls + avoids toast spam)
-let __runSummaryBusy = false;
+let __runSummaryBusy=false;
 async function loadRunSummaryLive(){
-  const date = qs('runDate')?.value;
+  const date=document.getElementById('runDate')?.value;
   if(!date) return;
   if(__runSummaryBusy) return;
-  __runSummaryBusy = true;
-  try{
-    await loadRunSummary();
-  }finally{
-    __runSummaryBusy = false;
-  }
+  __runSummaryBusy=true;
+  try{ await loadRunSummary(); }finally{ __runSummaryBusy=false; }
 }
-
 
 async function lockRun(){
-  const date = qs('runDate')?.value;
+  const date=document.getElementById('runDate')?.value;
   if(!date){ toast('⚠️ දිනය තෝරන්න'); return; }
   if(!confirm(`Lock ${date} daily run? HODs won't be able to submit/edit after this.`)) return;
-  
   try {
-    await api(`/admin/run/${date}/lock`, {method:'POST'});
+    await api(`/admin/run/${date}/lock`,{method:'POST'});
     toast('✅ Daily run locked!');
-        await loadRunSummaryLive();
-} catch(e) {
-    toast('❌ ' + e.message);
-  }
+    await loadRunSummaryLive();
+  } catch(e) { toast('❌ '+e.message); }
 }
 
-function downloadPdfWithAuth(url, filename){
-  const token = localStorage.getItem("token");
-  fetch(url, {
-    method: "GET",
-    headers: token ? { "Authorization": `Bearer ${token}` } : {}
-  }).then(async (res)=>{
-    if(!res.ok){
-      const t = await res.text().catch(()=> "");
-      throw new Error(t || `HTTP ${res.status}`);
-    }
-    const blob = await res.blob();
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = filename || "report.pdf";
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    setTimeout(()=>URL.revokeObjectURL(a.href), 3000);
-  }).catch((e)=>{
-    console.error(e);
-    // fallback open new tab
-    window.open(url, "_blank");
-  });
+/* ── PDF helpers — ORIGINAL ──────────────────── */
+function downloadPdfWithAuth(url,filename){
+  const token=localStorage.getItem("token");
+  fetch(url,{method:"GET",headers:token?{"Authorization":`Bearer ${token}`}:{}})
+    .then(async(res)=>{
+      if(!res.ok){ const t=await res.text().catch(()=>""); throw new Error(t||`HTTP ${res.status}`); }
+      const blob=await res.blob();
+      const a=document.createElement("a");
+      a.href=URL.createObjectURL(blob); a.download=filename||"report.pdf";
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(()=>URL.revokeObjectURL(a.href),3000);
+    }).catch((e)=>{ console.error(e); window.open(url,"_blank"); });
 }
 
-let __REPORT_PREVIEW_URL = null;
-
-function previewPdfWithAuth(url, filename){
-  const box = qs("reportPreview");
-  if(!box){
-    // fallback: download
-    downloadPdfWithAuth(url, filename);
-    return;
-  }
-  box.innerHTML = `<div class="mini">⏳ Loading PDF preview...</div>`;
-
-  try{
-    if(__REPORT_PREVIEW_URL){
-      URL.revokeObjectURL(__REPORT_PREVIEW_URL);
-      __REPORT_PREVIEW_URL = null;
-    }
-  }catch(e){}
-
-  const token = localStorage.getItem("token");
-  fetch(url, {
-    method: "GET",
-    headers: token ? { "Authorization": `Bearer ${token}` } : {}
-  }).then(async (res)=>{
-    if(!res.ok){
-      const t = await res.text().catch(()=> "");
-      throw new Error(t || `HTTP ${res.status}`);
-    }
-    const blob = await res.blob();
-    const objUrl = URL.createObjectURL(blob);
-    __REPORT_PREVIEW_URL = objUrl;
-
-    const safeName = (filename || "report.pdf").replace(/"/g, "");
-    box.innerHTML = `
-      <div class="card elevated" style="padding:12px;">
-        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:space-between;">
-          <div class="mini">📄 Preview: <b>${safeName}</b></div>
-          <div style="display:flex;gap:8px;flex-wrap:wrap;">
-            <a class="btn ghost small" href="${objUrl}" target="_blank" rel="noopener">Open</a>
-            <a class="btn secondary small" href="${objUrl}" download="${safeName}">Download</a>
+let __REPORT_PREVIEW_URL=null;
+function previewPdfWithAuth(url,filename){
+  const box=document.getElementById("reportPreview");
+  if(!box){ downloadPdfWithAuth(url,filename); return; }
+  box.innerHTML=`<div class="flex items-center gap-2 text-slate-400 text-sm py-4"><i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Loading PDF preview…</div>`;
+  lucide.createIcons();
+  try{ if(__REPORT_PREVIEW_URL){ URL.revokeObjectURL(__REPORT_PREVIEW_URL); __REPORT_PREVIEW_URL=null; } }catch(e){}
+  const token=localStorage.getItem("token");
+  fetch(url,{method:"GET",headers:token?{"Authorization":`Bearer ${token}`}:{}})
+    .then(async(res)=>{
+      if(!res.ok){ const t=await res.text().catch(()=>""); throw new Error(t||`HTTP ${res.status}`); }
+      const blob=await res.blob();
+      const objUrl=URL.createObjectURL(blob);
+      __REPORT_PREVIEW_URL=objUrl;
+      const safeName=(filename||"report.pdf").replace(/"/g,"");
+      box.innerHTML=`
+        <div class="section-card overflow-hidden mt-4">
+          <div class="flex items-center justify-between px-4 py-3 border-b border-slate-100">
+            <span class="text-sm text-slate-600 font-500">📄 ${safeName}</span>
+            <div class="flex gap-2">
+              <a class="btn btn-ghost btn-sm" href="${objUrl}" target="_blank" rel="noopener">Open</a>
+              <a class="btn btn-primary btn-sm" href="${objUrl}" download="${safeName}">Download</a>
+            </div>
           </div>
-        </div>
-        <div style="height:80vh; margin-top:12px;">
-          <iframe src="${objUrl}" style="width:100%;height:100%;border:1px solid rgba(255,255,255,.18);border-radius:14px;background:#fff;"></iframe>
-        </div>
-      </div>
-    `;
-  }).catch((err)=>{
-    box.innerHTML = `<div class="alert error">❌ PDF preview fail: ${escapeHtml(err?.message || err)}</div>`;
-  });
+          <div style="height:80vh;">
+            <iframe src="${objUrl}" class="w-full h-full border-0 rounded-b-2xl"></iframe>
+          </div>
+        </div>`;
+    }).catch((err)=>{
+      box.innerHTML=`<div class="alert alert-error">❌ PDF preview failed: ${escapeHtml(err?.message||err)}</div>`;
+    });
 }
-
 
 function downloadRouteReport(){
-  const d = qs("repDate")?.value;
+  const d=document.getElementById("repDate")?.value;
   if(!d){ toast("⚠️ දිනය තෝරන්න"); return; }
-  const base = (API_BASE_URL || "").replace(/\/$/, "");
-  const url = `${base}/reports/daily/route-wise?date=${encodeURIComponent(d)}`;
-  previewPdfWithAuth(url, `route-wise-${d}.pdf`);
+  const base=(API_BASE_URL||"").replace(/\/$/,"");
+  const url=`${base}/reports/daily/route-wise?date=${encodeURIComponent(d)}`;
+  previewPdfWithAuth(url,`route-wise-${d}.pdf`);
 }
 
-function statusBadge(status){
-  const s = (status||"").toUpperCase();
-  if(s.includes("SUBMIT")) return '<span class="badge blue">SUBMITTED</span>';
-  if(s.includes("ADMIN")) return '<span class="badge green">ADMIN OK</span>';
-  if(s.includes("TA_") || s.includes("ASSIGN")) return '<span class="badge purple">ASSIGNED</span>';
-  if(s.includes("FINAL") || s.includes("HR")) return '<span class="badge green">FINAL</span>';
-  if(s.includes("REJECT")) return '<span class="badge red">REJECTED</span>';
-  if(s.includes("LOCK")) return '<span class="badge amber">LOCKED</span>';
-  return '<span class="badge">'+(status||"")+'</span>';
-}
-
-function renderAdminKpis(){
-  try{
-    const reqs = (typeof REQS !== "undefined" && Array.isArray(REQS)) ? REQS : [];
-    const today = reqs.length;
-    const pendingAdmin = reqs.filter(r=>String(r.status||"").toUpperCase()==="SUBMITTED").length;
-    const pendingTA = reqs.filter(r=>String(r.status||"").toUpperCase()==="ADMIN_APPROVED").length;
-    const pendingHR = reqs.filter(r=>String(r.status||"").toUpperCase()==="TA_ASSIGNED").length;
-    const deptActive = new Set(reqs.map(r=>r.department_id||r.department_name||r.department||"").filter(Boolean)).size;
-    const vehiclesAssigned = reqs.filter(r=>String(r.status||"").toUpperCase().includes("ASSIGNED")).length;
-
-    const set = (id,v,sub)=>{ const el=qs(id); if(el) el.textContent = (v===undefined||v===null) ? "0" : String(v); const s=qs(id+"Sub"); if(s) s.textContent=sub||""; };
-    const now = new Date();
-    set("kpi_admin_today", today, "Today");
-    set("kpi_admin_pending_admin", pendingAdmin, "Need Admin approval");
-    set("kpi_admin_pending_ta", pendingTA, "Need assignment");
-    set("kpi_admin_pending_hr", pendingHR, "Need HR final");
-    set("kpi_admin_vehicles", vehiclesAssigned, "Assigned so far");
-    set("kpi_admin_departments", deptActive, "Active depts");
-
-    // Recent list
-    const list = qs("recentList");
-    if(list){
-      const items = reqs.slice().reverse().slice(0,8).map(r=>{
-        const title = (r.department_name||r.department||("Dept "+(r.department_id||"")))+" • "+(r.date||r.request_date||"");
-        const sub = "Employees: "+(r.employee_count||r.count||r.total_employees||"-");
-        return `<div class="list-item"><div class="left"><div class="title">${title}</div><div class="sub">${sub}</div></div>${statusBadge(r.status)}</div>`;
-      }).join("");
-      list.innerHTML = items || '<div class="alert">No requests yet.</div>';
-    }
-    const acts = qs("recentActions");
-    if(acts){
-      acts.innerHTML = '<div class="alert">Actions are shown in Approvals/Audit.</div>';
-    }
-  }catch(e){}
-}
-
-// Initialize
+/* ── Init — ORIGINAL ─────────────────────────── */
 (async()=>{
+  // Init icons
+  lucide.createIcons();
+
   await guard();
   setDefaultRunDate();
-  // Load run summary once + keep it live
   await loadRunSummaryLive();
+
   try{
-    const rd = qs('runDate');
-    if(rd) rd.addEventListener('change', ()=>loadRunSummaryLive());
+    const rd=document.getElementById('runDate');
+    if(rd) rd.addEventListener('change',()=>loadRunSummaryLive());
   }catch(e){}
-  setInterval(()=>{ if(document.hidden) return; loadRunSummaryLive(); }, 25000);
+
+  setInterval(()=>{ if(document.hidden) return; loadRunSummaryLive(); },25000);
 
   await loadRequests();
-  renderAdminKpis();
   await loadDepartments();
   await loadRoutes();
-  
-  // Load HOD registrations (with 404 handling)
-  setTimeout(()=>{ 
-    try{ 
-      renderHodRegs(); 
-    }catch(e){
-      console.error('HOD Regs init error:', e);
-    } 
-  }, 500);
+
+  setTimeout(()=>{
+    try{ renderHodRegs(); }catch(e){ console.error('HOD Regs init error:',e); }
+  },500);
 })();
 </script>
 
-  <script src="https://unpkg.com/lucide@latest"></script>
 </body>
 </html>

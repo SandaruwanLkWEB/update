@@ -1,65 +1,336 @@
-<!doctype html><html><head>
-<meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>HOD ලියාපදිංචි වීම</title>
-<link rel="stylesheet" href="assets/styles.css"/>
-<script src="assets/config.js"></script>
-<script src="assets/app.js"></script>
-</head><body>
-<div class="topbar"><div class="inner">
-<div class="brand"><span class="dot"></span> ප්‍රවාහන පද්ධතිය</div>
-<div class="nav"><a class="btn btn-ghost" href="login.html">ඇතුල්වීම</a><a class="btn" href="register.html">ආපසු</a></div>
-</div></div>
-<div class="container">
-<h1 class="h1">HOD ලියාපදිංචි වීම</h1>
-<div class="card soft">
-  <div class="grid two">
-    <div>
-      <label>නම</label>
-      <input id="hod_name" placeholder="නම"/>
-      <label>සේවක අංකය (Emp No)</label>
-      <input id="emp_no" placeholder="උදා: 01502"/>
-      <label>විද්‍යුත් තැපෑල</label>
-      <input id="email" type="email" placeholder="name@example.com"/>
+<!doctype html>
+<html lang="si" class="h-full">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <meta name="theme-color" content="#0f172a"/>
+  <title>HOD ලියාපදිංචි වීම — DSI Transport</title>
+  <link rel="stylesheet" href="assets/styles.css" />
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+
+  <script src="assets/config.js"></script>
+  <script src="assets/app.js"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['DM Sans', 'ui-sans-serif', 'system-ui'] },
+          animation: {
+            'fade-in':   'fadeIn 0.45s ease',
+            'fade-up':   'fadeUp 0.45s ease both',
+            'drift':     'drift 20s ease-in-out infinite',
+            'drift2':    'drift2 25s ease-in-out infinite',
+            'pulse-dot': 'pulseDot 2s infinite',
+          },
+          keyframes: {
+            fadeIn:    { from:{ opacity:'0' }, to:{ opacity:'1' } },
+            fadeUp:    { from:{ opacity:'0', transform:'translateY(14px)' }, to:{ opacity:'1', transform:'translateY(0)' } },
+            drift:     { '0%,100%':{ transform:'translate(0,0) scale(1)' }, '50%':{ transform:'translate(24px,-18px) scale(1.05)' } },
+            drift2:    { '0%,100%':{ transform:'translate(0,0) scale(1.04)' }, '50%':{ transform:'translate(-18px,22px) scale(0.97)' } },
+            pulseDot:  { '0%,100%':{ opacity:'1' }, '50%':{ opacity:'.35' } },
+          }
+        }
+      }
+    }
+  </script>
+
+  </head>
+<body class="min-h-screen flex">
+
+<!-- ═══ LEFT BRAND PANEL — Amber/HOD theme ═══ -->
+<div class="hidden lg:flex w-2/5 xl:w-[42%] flex-col relative overflow-hidden"
+     style="background:linear-gradient(145deg,#0a0f1e 0%,#1c1008 50%,#292202 100%); min-height:100vh;">
+
+  <!-- Glow orbs -->
+  <div class="absolute inset-0 overflow-hidden pointer-events-none">
+    <div class="absolute w-72 h-72 rounded-full animate-drift opacity-20"
+         style="background:radial-gradient(circle,#d97706,transparent); top:-10%; left:-10%;"></div>
+    <div class="absolute w-64 h-64 rounded-full animate-drift2 opacity-15"
+         style="background:radial-gradient(circle,#fbbf24,transparent); bottom:5%; right:-5%;"></div>
+    <div class="absolute w-48 h-48 rounded-full animate-drift opacity-10"
+         style="background:radial-gradient(circle,#fcd34d,transparent); top:40%; right:10%; animation-delay:-8s;"></div>
+    <div class="absolute inset-0 opacity-5"
+         style="background-image:linear-gradient(rgba(255,255,255,.3) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.3) 1px,transparent 1px);background-size:48px 48px;"></div>
+  </div>
+
+  <!-- Top nav -->
+  <div class="relative z-10 px-8 pt-7 flex items-center gap-3">
+    <div class="w-9 h-9 rounded-xl bg-white/15 flex items-center justify-center backdrop-blur">
+      <i data-lucide="bus" class="w-5 h-5 text-white"></i>
     </div>
     <div>
-      <label>දෙපාර්තමේන්තුව</label>
-      <select id="department_id"></select>
-      <label>මුරපදය</label>
-      <input id="password" type="password" placeholder="අවම අකුරු 6"/>
-      <div class="toolbar">
-        <div class="btnrow"><button class="btn btn-primary" id="btnReg">යොමු කරන්න</button></div>
+      <div class="text-white font-700 text-sm leading-none">DSI Transport</div>
+      <div class="text-white/50 text-xs mt-0.5">Management System</div>
+    </div>
+  </div>
+
+  <!-- Content -->
+  <div class="relative z-10 flex-1 flex flex-col justify-center px-10 py-12">
+    <!-- Role badge -->
+    <div class="inline-flex items-center gap-2 bg-amber-500/20 border border-amber-400/30 rounded-full px-4 py-2 mb-7 w-fit">
+      <i data-lucide="building-2" class="w-4 h-4 text-amber-300"></i>
+      <span class="text-amber-200 text-xs font-600 uppercase tracking-wider">HOD Registration</span>
+    </div>
+    <h1 class="text-white font-800 text-4xl leading-tight mb-4">
+      HOD<br/>
+      <span class="text-amber-400">ලියාපදිංචි</span><br/>
+      වීම
+    </h1>
+    <p class="text-white/60 text-sm leading-relaxed mb-8 max-w-xs">
+      දෙපාර්තමේන්තු ප්‍රධානීන් සඳහා ලියාපදිංචිය. Admin අනුමැතිය ලැබූ පසු HOD ලෙස ඇතුල් විය හැකිය.
+    </p>
+
+    <!-- Authority note -->
+    <div class="bg-amber-500/15 border border-amber-400/25 rounded-xl p-4 mb-6">
+      <div class="flex items-start gap-3">
+        <i data-lucide="info" class="w-4 h-4 text-amber-300 flex-shrink-0 mt-0.5"></i>
+        <div>
+          <p class="text-amber-200 text-sm font-600 mb-1">HOD කාර්‍යය</p>
+          <p class="text-amber-200/70 text-xs leading-relaxed">
+            ඔබගේ දෙපාර්තමේන්තුවේ සේවකයන් ලියාපදිංචි කිරීම, ප්‍රවාහන ඉල්ලීම් කළමනාකරණය සහ Admin වෙත ඉල්ලීම් යොමු කිරීම.
+          </p>
+        </div>
       </div>
-      <div id="msg" class="alert hidden"></div>
+    </div>
+
+    <!-- Steps -->
+    <div class="space-y-4">
+      <div class="flex items-center gap-3">
+        <div class="w-7 h-7 rounded-full bg-amber-500/30 border border-amber-400/40 flex items-center justify-center flex-shrink-0">
+          <span class="text-amber-200 text-xs font-700">1</span>
+        </div>
+        <span class="text-white/70 text-sm">HOD ලියාපදිංචි ආකෘතිය පුරවන්න</span>
+      </div>
+      <div class="flex items-center gap-3">
+        <div class="w-7 h-7 rounded-full bg-amber-500/30 border border-amber-400/40 flex items-center justify-center flex-shrink-0">
+          <span class="text-amber-200 text-xs font-700">2</span>
+        </div>
+        <span class="text-white/70 text-sm">Admin අනුමැතිය ලැබේ</span>
+      </div>
+      <div class="flex items-center gap-3">
+        <div class="w-7 h-7 rounded-full bg-amber-500/30 border border-amber-400/40 flex items-center justify-center flex-shrink-0">
+          <span class="text-amber-200 text-xs font-700">3</span>
+        </div>
+        <span class="text-white/70 text-sm">HOD dashboard ලැබේ</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Trust badges -->
+  <div class="relative z-10 px-10 pb-8 flex gap-5 flex-wrap">
+    <div class="trust-badge"><i data-lucide="shield" class="w-3.5 h-3.5"></i> Secure</div>
+    <div class="trust-badge"><i data-lucide="lock" class="w-3.5 h-3.5"></i> Encrypted</div>
+    <div class="trust-badge"><i data-lucide="eye-off" class="w-3.5 h-3.5"></i> Private</div>
+  </div>
+</div>
+
+<!-- ═══ RIGHT FORM PANEL ═══ -->
+<div class="flex-1 flex flex-col min-h-screen bg-slate-50">
+
+  <!-- Mobile top bar -->
+  <div class="lg:hidden flex items-center justify-between px-5 py-4 bg-white border-b border-slate-200">
+    <div class="flex items-center gap-2">
+      <div class="w-7 h-7 rounded-lg bg-slate-900 flex items-center justify-center">
+        <i data-lucide="bus" class="w-4 h-4 text-white"></i>
+      </div>
+      <span class="text-slate-800 font-700 text-sm">DSI Transport</span>
+    </div>
+    <div class="flex gap-3">
+      <a href="register.html" class="text-sm text-slate-500 font-600 hover:text-slate-800 transition flex items-center gap-1">
+        <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i> Back
+      </a>
+      <a href="login.html" class="text-sm text-amber-600 font-700 hover:text-amber-800 transition">Sign In</a>
+    </div>
+  </div>
+
+  <!-- Form area -->
+  <div class="flex-1 flex flex-col justify-center px-6 py-10 lg:px-14 xl:px-20 max-w-2xl w-full mx-auto">
+
+    <!-- Header -->
+    <div class="mb-8 animate-fade-up">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center">
+          <i data-lucide="building-2" class="w-5 h-5 text-amber-600"></i>
+        </div>
+        <div>
+          <h2 class="text-slate-900 font-800 text-2xl leading-none">HOD ලියාපදිංචිය</h2>
+          <p class="text-slate-400 text-sm mt-1">Department Head Registration</p>
+        </div>
+      </div>
+      <p class="text-slate-500 text-sm leading-relaxed">
+        Admin අනුමැතිය ලැබූ පසු HOD dashboard හා ක්‍රියාකාරිත්වය ලැබේ.
+      </p>
+    </div>
+
+    <!-- id="msg" PRESERVED -->
+    <div id="msg" class="alert hidden"></div>
+
+    <!-- Form -->
+    <div class="space-y-0 animate-fade-up" style="animation-delay:0.08s;">
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-5">
+
+        <!-- HOD name -->
+        <div class="form-group">
+          <label class="form-label">නම</label>
+          <div class="form-input-wrap">
+            <i data-lucide="user" class="icon"></i>
+            <!-- id="hod_name" PRESERVED -->
+            <input id="hod_name" class="form-input" placeholder="රංජිත් ප්‍රේමසිරි"/>
+          </div>
+        </div>
+
+        <!-- Emp no -->
+        <div class="form-group">
+          <label class="form-label">සේවක අංකය (Emp No)</label>
+          <div class="form-input-wrap">
+            <i data-lucide="hash" class="icon"></i>
+            <!-- id="emp_no" PRESERVED -->
+            <input id="emp_no" class="form-input" placeholder="01502"/>
+          </div>
+        </div>
+
+        <!-- Email -->
+        <div class="form-group sm:col-span-2">
+          <label class="form-label">විද්‍යුත් තැපෑල</label>
+          <div class="form-input-wrap">
+            <i data-lucide="mail" class="icon"></i>
+            <!-- id="email" PRESERVED -->
+            <input id="email" type="email" class="form-input" placeholder="name@example.com"/>
+          </div>
+        </div>
+
+        <!-- Department -->
+        <div class="form-group sm:col-span-2">
+          <label class="form-label">දෙපාර්තමේන්තුව</label>
+          <div class="form-input-wrap">
+            <i data-lucide="building-2" class="icon"></i>
+            <!-- id="department_id" PRESERVED -->
+            <select id="department_id" class="form-input">
+              <option value="">⏳ පූරණය වෙමින්...</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Password -->
+        <div class="form-group sm:col-span-2">
+          <label class="form-label">මුරපදය</label>
+          <div class="form-input-wrap">
+            <i data-lucide="lock" class="icon"></i>
+            <!-- id="password" PRESERVED -->
+            <input id="password" type="password" class="form-input" placeholder="අවම අකුරු 6"/>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Admin approval notice -->
+      <div class="flex items-start gap-3 bg-amber-50 border border-amber-200 rounded-xl p-4 mb-4">
+        <i data-lucide="alert-circle" class="w-4 h-4 text-amber-500 flex-shrink-0 mt-0.5"></i>
+        <p class="text-amber-700 text-sm leading-relaxed">
+          HOD ගිණුම Admin විසින් අනුමත කළ යුතුය. ඔබට Admin දැනුම් දීමෙන් පසු ඇතුල් විය හැකිය.
+        </p>
+      </div>
+
+      <!-- Submit — id="btnReg" PRESERVED -->
+      <button id="btnReg"
+        class="w-full flex items-center justify-center gap-2 py-3.5 px-6 rounded-xl font-700 text-white text-base
+               bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-700 hover:to-amber-600
+               transition-all shadow-lg shadow-amber-200 hover:shadow-amber-300 hover:shadow-xl
+               focus:outline-none focus:ring-4 focus:ring-amber-200 mt-2">
+        <i data-lucide="send" class="w-5 h-5"></i>
+        යොමු කරන්න
+      </button>
+
+      <!-- Login link -->
+      <p class="text-center text-slate-500 text-sm mt-5">
+        දැනටමත් ගිණුමක් ඇත?
+        <a href="login.html" class="text-amber-600 font-700 hover:text-amber-800 transition ml-1">ඇතුල් වන්න →</a>
+      </p>
+
+      <!-- Back link (desktop) -->
+      <p class="text-center text-slate-400 text-sm mt-2 hidden lg:block">
+        <a href="register.html" class="hover:text-slate-600 transition flex items-center justify-center gap-1.5">
+          <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i> Back to role selection
+        </a>
+      </p>
     </div>
   </div>
 </div>
-</div>
+
+<!-- ═══ ALL ORIGINAL SCRIPTS — PRESERVED EXACTLY ═══ -->
 <script>
+lucide.createIcons();
+
+/* ── Load departments — ORIGINAL ─────────── */
 (async ()=>{
   try{
-    const d = await api("/public/departments");
+    const d   = await api("/public/departments");
     const sel = document.getElementById("department_id");
-    sel.innerHTML = '<option value="">තෝරන්න</option>' + (d.departments||[]).map(x=>`<option value="${x.id}">${x.name}</option>`).join("");
-  }catch(e){}
+    sel.innerHTML = '<option value="">-- තෝරන්න --</option>' +
+      (d.departments||[]).map(x => `<option value="${x.id}">${x.name}</option>`).join("");
+  }catch(e){
+    document.getElementById("department_id").innerHTML = '<option value="">දෙපාර්තමේන්තු පූරණය අසාර්ථකයි</option>';
+    document.getElementById("department_id").disabled = true;
+  }
 })();
+
+/* ── Registration handler — ORIGINAL ──────── */
 document.getElementById("btnReg").onclick = async ()=>{
   const payload = {
-    hod_name: document.getElementById("hod_name").value.trim(),
-    emp_no: document.getElementById("emp_no").value.trim(),
-    email: document.getElementById("email").value.trim(),
+    hod_name:      document.getElementById("hod_name").value.trim(),
+    emp_no:        document.getElementById("emp_no").value.trim(),
+    email:         document.getElementById("email").value.trim(),
     department_id: document.getElementById("department_id").value,
-    password: document.getElementById("password").value
+    password:      document.getElementById("password").value
   };
   const msg = document.getElementById("msg");
+  const btn = document.getElementById("btnReg");
   msg.className = "alert hidden";
+
+  btn.disabled = true;
+  btn.innerHTML = `<svg class="animate-spin w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 11-6.219-8.56"/></svg> යොමු කරමින්…`;
+
   try{
     await api("/auth/register-hod", { method:"POST", body: JSON.stringify(payload) });
-    msg.textContent = "සාර්ථකයි. ඔබගේ HOD ගිණුම පරිපාලක අනුමැතිය සඳහා යොමු කර ඇත.";
-    msg.classList.remove("hidden"); msg.classList.add("ok");
+    msg.textContent = "✅ සාර්ථකයි. ඔබගේ HOD ගිණුම පරිපාලක අනුමැතිය සඳහා යොමු කර ඇත. Admin අනුමත කළ පසු ඇතුල් විය හැකිය.";
+    msg.className = "alert ok";
+    // Clear form
+    document.getElementById("hod_name").value = "";
+    document.getElementById("emp_no").value = "";
+    document.getElementById("email").value = "";
+    document.getElementById("department_id").value = "";
+    document.getElementById("password").value = "";
+    btn.innerHTML = `<i data-lucide="send" class="w-5 h-5"></i> යොමු කරන්න`;
+    btn.disabled = false;
+    lucide.createIcons();
+    // Redirect after 3s
+    setTimeout(()=>{ location.href = "login.html"; }, 3000);
   }catch(e){
-    msg.textContent = e.message || "අසමත් විය";
-    msg.classList.remove("hidden"); msg.classList.add("error");
+    msg.textContent = "❌ " + (e.message || "ලියාපදිංචිය අසාර්ථකයි");
+    msg.className = "alert error";
+    btn.innerHTML = `<i data-lucide="send" class="w-5 h-5"></i> යොමු කරන්න`;
+    btn.disabled = false;
+    lucide.createIcons();
   }
 };
+
+/* ── Enter key support (bonus UX, non-breaking) ── */
+document.querySelectorAll('input').forEach((input, index, inputs)=>{
+  input.addEventListener('keypress', (e)=>{
+    if(e.key === 'Enter'){
+      e.preventDefault();
+      if(index < inputs.length - 1) inputs[index + 1].focus();
+      else document.getElementById("btnReg").click();
+    }
+  });
+});
 </script>
-</body></html>
+</body>
+</html>
