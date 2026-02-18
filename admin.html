@@ -1,27 +1,23 @@
-<!doctype html>
-<html lang="si" class="h-full">
+<!DOCTYPE html>
+
+<html class="h-full" lang="si">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <meta name="theme-color" content="#0f172a" />
-  <title>Admin Dashboard — DSI Transport</title>
-
-  <!-- Tailwind CSS CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-
-  <!-- Lucide Icons -->
-  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
-
-  <!-- Google Fonts: DM Sans -->
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
-
-  <!-- Backend scripts (PRESERVED) -->
-  <script src="assets/config.js"></script>
-  <script src="assets/app.js"></script>
-
-  <script>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<meta content="#0f172a" name="theme-color"/>
+<title>Admin Dashboard — DSI Transport</title>
+<!-- Tailwind CSS CDN -->
+<script src="https://cdn.tailwindcss.com"></script>
+<!-- Lucide Icons -->
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+<!-- Google Fonts: DM Sans -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<!-- Backend scripts (PRESERVED) -->
+<script src="assets/config.js"></script>
+<script src="assets/app.js"></script>
+<script>
     tailwind.config = {
       theme: {
         extend: {
@@ -50,8 +46,7 @@
       }
     }
   </script>
-
-  <style>
+<style>
     *, *::before, *::after { box-sizing: border-box; }
     body { font-family: 'DM Sans', ui-sans-serif, system-ui; background: #f8fafc; }
 
@@ -179,576 +174,515 @@
     /* ─── Textarea ────────────────────────────────── */
     #bulkLines { font-family: 'DM Mono', 'Fira Code', monospace; }
   </style>
-</head>
+<link href="assets/styles.css" rel="stylesheet"/></head>
 <body class="h-full bg-slate-50">
-
 <!-- ══════════════════════════════════════════════════════════
      MOBILE SIDEBAR OVERLAY
 ═══════════════════════════════════════════════════════════ -->
-<div id="sidebarOverlay" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 lg:hidden" onclick="closeSidebar()"></div>
-
+<div class="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 lg:hidden" id="sidebarOverlay" onclick="closeSidebar()"></div>
 <!-- ══════════════════════════════════════════════════════════
      SIDEBAR
 ═══════════════════════════════════════════════════════════ -->
-<aside id="sidebar" class="fixed top-0 left-0 w-64 h-full bg-slate-900 flex flex-col z-50 shadow-sidebar">
-
-  <!-- Logo -->
-  <div class="px-5 py-5 border-b border-white/8 flex items-center gap-3 flex-shrink-0">
-    <div class="w-9 h-9 rounded-xl bg-indigo-500 flex items-center justify-center flex-shrink-0 shadow-lg">
-      <i data-lucide="bus" class="w-5 h-5 text-white"></i>
-    </div>
-    <div>
-      <div class="text-white font-bold text-sm leading-none">DSI Transport</div>
-      <div class="text-slate-400 text-xs mt-0.5 font-medium">Management System</div>
-    </div>
-  </div>
-
-  <!-- User quick info — filled by JS via meBox  -->
-  <div class="px-4 py-3 border-b border-white/8 flex-shrink-0">
-    <div id="meBox" class="flex items-center gap-3">
-      <div class="w-8 h-8 rounded-full bg-indigo-500/30 flex items-center justify-center">
-        <i data-lucide="user" class="w-4 h-4 text-indigo-300"></i>
-      </div>
-      <div>
-        <div class="text-slate-300 text-xs font-medium">Loading...</div>
-        <div class="text-slate-500 text-xs">Administrator</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Navigation -->
-  <nav class="flex-1 overflow-y-auto px-3 py-4 space-y-1">
-    <div class="text-slate-500 text-xs font-700 uppercase tracking-widest px-3 mb-3">Operations</div>
-
-    <button class="nav-link active w-full text-left" id="tabApprovals" onclick="setTab('approvals')">
-      <i data-lucide="check-circle" class="icon"></i>
-      <span>Approvals</span>
-    </button>
-
-    <button class="nav-link w-full text-left" id="tabMaster" onclick="setTab('master')">
-      <i data-lucide="database" class="icon"></i>
-      <span>Master Data</span>
-    </button>
-
-    <button class="nav-link w-full text-left" id="tabReports" onclick="setTab('reports')">
-      <i data-lucide="bar-chart-2" class="icon"></i>
-      <span>Reports</span>
-    </button>
-
-    <div class="border-t border-white/8 my-3"></div>
-    <div class="text-slate-500 text-xs font-700 uppercase tracking-widest px-3 mb-3">System</div>
-
-    <a href="index.html" class="nav-link">
-      <i data-lucide="home" class="icon"></i>
-      <span>Home</span>
-    </a>
-
-    <button class="nav-link w-full text-left text-red-400 hover:text-red-300 hover:bg-red-500/10" onclick="logout()">
-      <i data-lucide="log-out" class="icon"></i>
-      <span>Sign Out</span>
-    </button>
-  </nav>
-
-  <!-- Sidebar Footer -->
-  <div class="px-4 py-3 border-t border-white/8 flex-shrink-0">
-    <div class="flex items-center gap-2">
-      <div class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse-dot"></div>
-      <span class="text-slate-400 text-xs">System Online</span>
-    </div>
-  </div>
+<aside class="fixed top-0 left-0 w-64 h-full bg-slate-900 flex flex-col z-50 shadow-sidebar" id="sidebar">
+<!-- Logo -->
+<div class="px-5 py-5 border-b border-white/8 flex items-center gap-3 flex-shrink-0">
+<div class="w-9 h-9 rounded-xl bg-indigo-500 flex items-center justify-center flex-shrink-0 shadow-lg">
+<i class="w-5 h-5 text-white" data-lucide="bus"></i>
+</div>
+<div>
+<div class="text-white font-bold text-sm leading-none">DSI Transport</div>
+<div class="text-slate-400 text-xs mt-0.5 font-medium">Management System</div>
+</div>
+</div>
+<!-- User quick info — filled by JS via meBox  -->
+<div class="px-4 py-3 border-b border-white/8 flex-shrink-0">
+<div class="flex items-center gap-3" id="meBox">
+<div class="w-8 h-8 rounded-full bg-indigo-500/30 flex items-center justify-center">
+<i class="w-4 h-4 text-indigo-300" data-lucide="user"></i>
+</div>
+<div>
+<div class="text-slate-300 text-xs font-medium">Loading...</div>
+<div class="text-slate-500 text-xs">Administrator</div>
+</div>
+</div>
+</div>
+<!-- Navigation -->
+<nav class="flex-1 overflow-y-auto px-3 py-4 space-y-1">
+<div class="text-slate-500 text-xs font-700 uppercase tracking-widest px-3 mb-3">Operations</div>
+<button class="nav-link active w-full text-left" id="tabDashboard" onclick="setTab('dashboard')"><i class="icon" data-lucide="layout-dashboard"></i><span>Dashboard</span></button><button class="nav-link w-full text-left" id="tabApprovals" onclick="setTab('approvals')">
+<i class="icon" data-lucide="check-circle"></i>
+<span>Approvals</span>
+</button>
+<button class="nav-link w-full text-left" id="tabMaster" onclick="setTab('master')">
+<i class="icon" data-lucide="database"></i>
+<span>Master Data</span>
+</button>
+<button class="nav-link w-full text-left" id="tabReports" onclick="setTab('reports')">
+<i class="icon" data-lucide="bar-chart-2"></i>
+<span>Reports</span>
+</button>
+<div class="border-t border-white/8 my-3"></div>
+<div class="text-slate-500 text-xs font-700 uppercase tracking-widest px-3 mb-3">System</div>
+<a class="nav-link" href="index.html">
+<i class="icon" data-lucide="home"></i>
+<span>Home</span>
+</a>
+<button class="nav-link w-full text-left text-red-400 hover:text-red-300 hover:bg-red-500/10" onclick="logout()">
+<i class="icon" data-lucide="log-out"></i>
+<span>Sign Out</span>
+</button>
+</nav>
+<!-- Sidebar Footer -->
+<div class="px-4 py-3 border-t border-white/8 flex-shrink-0">
+<div class="flex items-center gap-2">
+<div class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse-dot"></div>
+<span class="text-slate-400 text-xs">System Online</span>
+</div>
+</div>
 </aside>
-
 <!-- ══════════════════════════════════════════════════════════
      MAIN WRAPPER (offset by sidebar on desktop)
 ═══════════════════════════════════════════════════════════ -->
 <div class="lg:ml-64 min-h-screen flex flex-col">
-
-  <!-- ─── TOP NAVBAR ─────────────────────────────── -->
-  <header id="topbar" class="sticky top-0 z-30 bg-white border-b border-slate-200 px-5 py-3 flex items-center justify-between gap-4 flex-shrink-0">
-
-    <!-- Mobile hamburger -->
-    <button onclick="openSidebar()" class="lg:hidden p-2 rounded-lg text-slate-500 hover:bg-slate-100 transition">
-      <i data-lucide="menu" class="w-5 h-5"></i>
-    </button>
-
-    <!-- Page title -->
-    <div class="flex items-center gap-3">
-      <div class="hidden sm:flex items-center gap-2">
-        <div class="w-7 h-7 rounded-lg bg-indigo-50 flex items-center justify-center">
-          <i data-lucide="shield-check" class="w-4 h-4 text-indigo-600"></i>
-        </div>
-        <div>
-          <h1 class="text-slate-900 font-700 text-sm leading-none">Admin Control Panel</h1>
-          <p class="text-slate-400 text-xs mt-0.5">Full system access</p>
-        </div>
-      </div>
-    </div>
-
-    <!-- Right: Live indicator + Date/Time + Logout -->
-    <div class="flex items-center gap-3 ml-auto">
-      <div class="hidden md:flex items-center gap-2 px-3 py-1.5 bg-emerald-50 border border-emerald-200 rounded-full">
-        <div class="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse-dot"></div>
-        <span class="text-emerald-700 text-xs font-600" id="liveClock">Live</span>
-      </div>
-      <button onclick="logout()"
-        class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-slate-500 hover:bg-slate-100 hover:text-slate-800 transition text-sm font-500 border border-slate-200">
-        <i data-lucide="log-out" class="w-4 h-4"></i>
-        <span class="hidden sm:inline">Logout</span>
-      </button>
-    </div>
-  </header>
-
-  <!-- ─── MAIN CONTENT ───────────────────────────── -->
-  <main class="flex-1 p-5 lg:p-7 space-y-6 animate-fade-in">
-
-    <!-- ════════════════════════════════════════════
+<!-- ─── TOP NAVBAR ─────────────────────────────── -->
+<header class="sticky top-0 z-30 bg-white border-b border-slate-200 px-5 py-3 flex items-center justify-between gap-4 flex-shrink-0" id="topbar">
+<!-- Mobile hamburger -->
+<button class="lg:hidden p-2 rounded-lg text-slate-500 hover:bg-slate-100 transition" onclick="openSidebar()">
+<i class="w-5 h-5" data-lucide="menu"></i>
+</button>
+<!-- Page title -->
+<div class="flex items-center gap-3">
+<div class="hidden sm:flex items-center gap-2">
+<div class="w-7 h-7 rounded-lg bg-indigo-50 flex items-center justify-center">
+<i class="w-4 h-4 text-indigo-600" data-lucide="shield-check"></i>
+</div>
+<div>
+<h1 class="text-slate-900 font-700 text-sm leading-none">Admin Control Panel</h1>
+<p class="text-slate-400 text-xs mt-0.5">Full system access</p>
+</div>
+</div>
+</div>
+<!-- Right: Live indicator + Date/Time + Logout -->
+<div class="flex items-center gap-3 ml-auto">
+<div class="hidden md:flex items-center gap-2 px-3 py-1.5 bg-emerald-50 border border-emerald-200 rounded-full">
+<div class="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse-dot"></div>
+<span class="text-emerald-700 text-xs font-600" id="liveClock">Live</span>
+</div>
+<button class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-slate-500 hover:bg-slate-100 hover:text-slate-800 transition text-sm font-500 border border-slate-200" onclick="logout()">
+<i class="w-4 h-4" data-lucide="log-out"></i>
+<span class="hidden sm:inline">Logout</span>
+</button>
+</div>
+</header>
+<!-- ─── MAIN CONTENT ───────────────────────────── -->
+<main class="flex-1 p-5 lg:p-7 space-y-6 animate-fade-in">
+<!-- ════════════════════════════════════════════
          DAILY RUN LOCK SECTION
     ═══════════════════════════════════════════════ -->
-    <section class="section-card overflow-hidden">
-      <!-- Card Header -->
-      <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-gradient-to-r from-slate-900 to-slate-800 rounded-t-2xl">
-        <div class="flex items-center gap-3">
-          <div class="w-9 h-9 rounded-xl bg-white/10 flex items-center justify-center">
-            <i data-lucide="lock" class="w-5 h-5 text-white"></i>
-          </div>
-          <div>
-            <h2 class="text-white font-700 text-base leading-none">Daily Run Lock</h2>
-            <p class="text-slate-400 text-xs mt-1">Lock submissions before dispatching to TA</p>
-          </div>
-        </div>
-        <!-- Run date picker -->
-        <div class="flex items-center gap-3">
-          <input id="runDate" type="date"
-            class="px-3 py-2 bg-white/10 border border-white/20 text-white rounded-lg text-sm font-500 focus:outline-none focus:ring-2 focus:ring-indigo-400 placeholder-slate-400"
-            style="color-scheme: dark;" />
-          <button onclick="loadRunSummaryLive()"
-            class="btn btn-ghost border-white/20 text-slate-300 hover:bg-white/10 btn-sm">
-            <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
-            <span class="hidden sm:inline">Refresh</span>
-          </button>
-          <button onclick="lockRun()" class="btn btn-lock btn-sm">
-            <i data-lucide="lock" class="w-3.5 h-3.5"></i>
-            <span>Lock → TA</span>
-          </button>
-        </div>
-      </div>
-
-      <!-- Warning notice -->
-      <div class="mx-6 mt-4 flex items-start gap-3 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3">
-        <i data-lucide="alert-triangle" class="w-4 h-4 text-amber-500 flex-shrink-0 mt-0.5"></i>
-        <p class="text-amber-700 text-xs leading-relaxed">
-          <strong>සැ.යු:</strong> සියලු දෙපාර්තමේන්තු ඉල්ලීම් ලැබීමට <strong>පෙර</strong> Lock භාවිතා කරන්න එපා. Lock කළ පසු HOD submissions/edit නවතී.
+<section class="section-card overflow-hidden" id="sectionMissingDepartments">
+<!-- Card Header -->
+<div class="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-gradient-to-r from-slate-900 to-slate-800 rounded-t-2xl">
+<div class="flex items-center gap-3">
+<div class="w-9 h-9 rounded-xl bg-white/10 flex items-center justify-center">
+<i class="w-5 h-5 text-white" data-lucide="lock"></i>
+</div>
+<div>
+<h2 class="text-white font-700 text-base leading-none">Daily Run Lock</h2>
+<p class="text-slate-400 text-xs mt-1">Lock submissions before dispatching to TA</p>
+</div>
+</div>
+<!-- Run date picker -->
+<div class="flex items-center gap-3">
+<input class="px-3 py-2 bg-white/10 border border-white/20 text-white rounded-lg text-sm font-500 focus:outline-none focus:ring-2 focus:ring-indigo-400 placeholder-slate-400" id="runDate" style="color-scheme: dark;" type="date"/>
+<button class="btn btn-ghost border-white/20 text-slate-300 hover:bg-white/10 btn-sm" onclick="loadRunSummaryLive()">
+<i class="w-3.5 h-3.5" data-lucide="refresh-cw"></i>
+<span class="hidden sm:inline">Refresh</span>
+</button>
+<button class="btn btn-lock btn-sm" onclick="lockRun()">
+<i class="w-3.5 h-3.5" data-lucide="lock"></i>
+<span>Lock → TA</span>
+</button>
+</div>
+</div>
+<!-- Warning notice -->
+<div class="mx-6 mt-4 flex items-start gap-3 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3">
+<i class="w-4 h-4 text-amber-500 flex-shrink-0 mt-0.5" data-lucide="alert-triangle"></i>
+<p class="text-amber-700 text-xs leading-relaxed">
+<strong>සැ.යු:</strong> සියලු දෙපාර්තමේන්තු ඉල්ලීම් ලැබීමට <strong>පෙර</strong> Lock භාවිතා කරන්න එපා. Lock කළ පසු HOD submissions/edit නවතී.
         </p>
-      </div>
-
-      <!-- Run status badge -->
-      <div id="runMeta" class="px-6 py-3"></div>
-
-      <!-- Dept summary grid -->
-      <div class="grid grid-cols-1 xl:grid-cols-2 gap-5 px-6 pb-6">
-        <!-- Dept table -->
-        <div>
-          <div class="flex items-center gap-2 mb-3">
-            <i data-lucide="building-2" class="w-4 h-4 text-slate-500"></i>
-            <h3 class="text-slate-700 font-700 text-sm">Department Summary</h3>
-          </div>
-          <div class="table-wrap">
-            <table class="data-table">
-              <thead>
-                <tr>
-                  <th>Department</th>
-                  <th>Submitted</th>
-                  <th>Requests</th>
-                  <th>Employees</th>
-                </tr>
-              </thead>
-              <tbody id="runDeptRows">
-                <tr><td colspan="4" class="text-center py-6 text-slate-400 text-sm">
-                  <i data-lucide="loader-2" class="w-4 h-4 animate-spin inline mr-2"></i>Loading...
+</div>
+<!-- Run status badge -->
+<div class="px-6 py-3" id="runMeta"></div>
+<!-- Dept summary grid -->
+<div class="grid grid-cols-1 xl:grid-cols-2 gap-5 px-6 pb-6">
+<!-- Dept table -->
+<div>
+<div class="flex items-center gap-2 mb-3">
+<i class="w-4 h-4 text-slate-500" data-lucide="building-2"></i>
+<h3 class="text-slate-700 font-700 text-sm">Department Summary</h3>
+</div>
+<div class="table-wrap">
+<table class="data-table">
+<thead>
+<tr>
+<th>Department</th>
+<th>Submitted</th>
+<th>Requests</th>
+<th>Employees</th>
+</tr>
+</thead>
+<tbody id="runDeptRows">
+<tr><td class="text-center py-6 text-slate-400 text-sm" colspan="4">
+<i class="w-4 h-4 animate-spin inline mr-2" data-lucide="loader-2"></i>Loading...
                 </td></tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <!-- Missing depts -->
-        <div>
-          <div class="flex items-center gap-2 mb-3">
-            <i data-lucide="alert-circle" class="w-4 h-4 text-red-400"></i>
-            <h3 class="text-slate-700 font-700 text-sm">Missing Departments</h3>
-          </div>
-          <div id="runMissing" class="alert min-h-16">
-            <div class="flex items-center gap-2 text-slate-400 text-sm">
-              <i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Loading...
+</tbody>
+</table>
+</div>
+</div>
+<!-- Missing depts -->
+<div>
+<div class="flex items-center gap-2 mb-3">
+<i class="w-4 h-4 text-red-400" data-lucide="alert-circle"></i>
+<h3 class="text-slate-700 font-700 text-sm">Missing Departments</h3>
+</div>
+<div class="alert min-h-16" id="runMissing">
+<div class="flex items-center gap-2 text-slate-400 text-sm">
+<i class="w-4 h-4 animate-spin" data-lucide="loader-2"></i> Loading...
             </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-
-    <!-- ═══ DASHBOARD CARDS (KPI + Quick Actions) ═══ -->
-    <div class="kpi-grid" aria-label="Dashboard KPI">
-      <a class="card kpi-card" href="javascript:void(0)" onclick="gotoKpi('lock')">
-        <div class="kpi-icon"><i data-lucide="lock"></i></div>
-        <div>
-          <div class="kpi-value" id="kpiLock">—</div>
-          <div class="kpi-label">Lock Button Dashboard</div>
-          <div class="kpi-sub" id="kpiLockSub">Lock status</div>
-        </div>
-      </a>
-
-      <a class="card kpi-card" href="javascript:void(0)" onclick="gotoKpi('day')">
-        <div class="kpi-icon"><i data-lucide="calendar-days"></i></div>
-        <div>
-          <div class="kpi-value" id="kpiDay">—</div>
-          <div class="kpi-label">Day Information</div>
-          <div class="kpi-sub">Selected date</div>
-        </div>
-      </a>
-
-      <a class="card kpi-card" href="javascript:void(0)" onclick="gotoKpi('deptTotal')">
-        <div class="kpi-icon"><i data-lucide="building-2"></i></div>
-        <div>
-          <div class="kpi-value" id="kpiTotalDepts">0</div>
-          <div class="kpi-label">දෙපාර්තමේන්තු සාරාංශය</div>
-          <div class="kpi-sub">Total Departments</div>
-        </div>
-      </a>
-
-      <a class="card kpi-card" href="javascript:void(0)" onclick="gotoKpi('submitted')">
-        <div class="kpi-icon"><i data-lucide="check-circle-2"></i></div>
-        <div>
-          <div class="kpi-value" id="kpiSubmitted">0</div>
-          <div class="kpi-label">Submitted Values</div>
-          <div class="kpi-sub">Departments submitted</div>
-        </div>
-      </a>
-
-      <a class="card kpi-card" href="javascript:void(0)" onclick="gotoKpi('notSubmitted')">
-        <div class="kpi-icon"><i data-lucide="alert-triangle"></i></div>
-        <div>
-          <div class="kpi-value" id="kpiNotSubmitted">0</div>
-          <div class="kpi-label">Not Submitted Values</div>
-          <div class="kpi-sub">Departments missing</div>
-        </div>
-      </a>
-
-      <a class="card kpi-card" href="javascript:void(0)" onclick="gotoKpi('hod')">
-        <div class="kpi-icon"><i data-lucide="user-check"></i></div>
-        <div>
-          <div class="kpi-value" id="kpiHodPending">0</div>
-          <div class="kpi-label">HOD Registration Approvals</div>
-          <div class="kpi-sub">Pending request values</div>
-        </div>
-      </a>
-
-      <a class="card kpi-card" href="javascript:void(0)" onclick="gotoKpi('requests')">
-        <div class="kpi-icon"><i data-lucide="clipboard-list"></i></div>
-        <div>
-          <div class="kpi-value" id="kpiReqTotal">0</div>
-          <div class="kpi-label">Transport Requests</div>
-          <div class="kpi-sub">Total transport request values</div>
-        </div>
-      </a>
-
-      <a class="card kpi-card" href="javascript:void(0)" onclick="gotoKpi('master')">
-        <div class="kpi-icon"><i data-lucide="database"></i></div>
-        <div>
-          <div class="kpi-value" id="kpiMaster">↗</div>
-          <div class="kpi-label">Master Data</div>
-          <div class="kpi-sub">Open master data tab</div>
-        </div>
-      </a>
-    </div>
-
-    <div class="section-title">
-      <strong>Quick Actions</strong>
-      <span class="text-slate-400 text-xs">Card එක click කරද්දි අදාළ tab/section එකට යයි</span>
-    </div>
-    <div class="action-grid">
-      <a class="action-card" href="javascript:void(0)" onclick="gotoKpi('approvals')">
-        <div class="ico"><i data-lucide="badge-check"></i></div>
-        <div class="meta"><span class="t">Approvals</span><span class="s">Review & approve</span></div>
-      </a>
-      <a class="action-card" href="javascript:void(0)" onclick="gotoKpi('master')">
-        <div class="ico"><i data-lucide="database"></i></div>
-        <div class="meta"><span class="t">Master Data</span><span class="s">Departments / Routes / Vehicles</span></div>
-      </a>
-      <a class="action-card" href="javascript:void(0)" onclick="gotoKpi('requests')">
-        <div class="ico"><i data-lucide="inbox"></i></div>
-        <div class="meta"><span class="t">Requests</span><span class="s">Transport requests list</span></div>
-      </a>
-      <a class="action-card" href="javascript:void(0)" onclick="gotoKpi('reports')">
-        <div class="ico"><i data-lucide="file-text"></i></div>
-        <div class="meta"><span class="t">Reports</span><span class="s">PDF/Excel</span></div>
-      </a>
-    </div>
-
-
-    <!-- ════════════════════════════════════════════
+</div>
+</div>
+</div>
+</section>
+<!-- ════════════════════════════════════════════
          TAB NAV BAR
     ═══════════════════════════════════════════════ -->
-    <div class="section-card px-5 py-3 flex items-center gap-2 flex-wrap">
-      <button class="tab-btn active" id="tabApprovalsContent" onclick="setTab('approvals')">
-        <i data-lucide="check-circle" class="w-4 h-4"></i> Approvals
+<div class="section-card px-5 py-3 flex items-center gap-2 flex-wrap">
+<button class="tab-btn active" id="tabDashboardContent" onclick="setTab('dashboard')"><i class="w-4 h-4" data-lucide="layout-dashboard"></i> Dashboard</button><button class="tab-btn" id="tabApprovalsContent" onclick="setTab('approvals')">
+<i class="w-4 h-4" data-lucide="check-circle"></i> Approvals
       </button>
-      <button class="tab-btn" id="tabMasterContent" onclick="setTab('master')">
-        <i data-lucide="database" class="w-4 h-4"></i> Master Data
+<button class="tab-btn" id="tabMasterContent" onclick="setTab('master')">
+<i class="w-4 h-4" data-lucide="database"></i> Master Data
       </button>
-      <button class="tab-btn" id="tabReportsContent" onclick="setTab('reports')">
-        <i data-lucide="bar-chart-2" class="w-4 h-4"></i> Reports
+<button class="tab-btn" id="tabReportsContent" onclick="setTab('reports')">
+<i class="w-4 h-4" data-lucide="bar-chart-2"></i> Reports
       </button>
-    </div>
-
-    <!-- ════════════════════════════════════════════
+</div>
+<!-- ════════════════════════════════════════════
          PANE: APPROVALS
     ═══════════════════════════════════════════════ -->
-    <div id="pane_approvals" class="space-y-6">
-
-      <!-- HOD Registration Approvals -->
-      <div class="section-card">
-        <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100">
-          <div class="flex items-center gap-3">
-            <div class="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center">
-              <i data-lucide="user-check" class="w-4 h-4 text-indigo-600"></i>
-            </div>
-            <div>
-              <h2 class="text-slate-800 font-700 text-sm">HOD Registration Approvals</h2>
-              <p class="text-slate-400 text-xs">Pending HOD account approvals</p>
-            </div>
-          </div>
-        </div>
-        <div class="p-6">
-          <div class="table-wrap">
-            <table class="data-table">
-              <thead>
-                <tr>
-                  <th>Email</th>
-                  <th>Department</th>
-                  <th>Applied</th>
-                  <th>Action</th>
-                </tr>
-              </thead>
-              <tbody id="hodRegRows">
-                <tr><td colspan="4" class="text-center py-6 text-slate-400 text-sm">
-                  <i data-lucide="loader-2" class="w-4 h-4 animate-spin inline mr-2"></i>Loading...
+<div class="space-y-6" id="pane_dashboard">
+<div class="section-card p-6" id="sectionHodRegs">
+<div class="flex items-start justify-between gap-4 flex-wrap">
+<div>
+<h2 class="text-slate-900 font-800 text-lg">Dashboard</h2>
+<p class="text-slate-500 text-sm mt-1">අද දිනයේ තත්ත්වය ඉක්මනින් බලන්න. කාඩ් එකක් ඔබලා අදාල ටැබ් එකට යන්න.</p>
+</div>
+<div class="flex items-center gap-2">
+<button class="btn btn-ghost btn-sm" onclick="refreshDashboardAll()">
+<i class="w-3.5 h-3.5" data-lucide="refresh-cw"></i> Refresh
+        </button>
+</div>
+</div>
+<div class="dash-grid mt-5">
+<button class="dash-card" data-go-tab="approvals" data-go-target="#sectionDailyLock" type="button">
+<div class="dash-ic"><i class="w-5 h-5" data-lucide="lock"></i></div>
+<div class="dash-meta">
+<div class="dash-label">Lock Status</div>
+<div class="dash-value" id="kpiLockStatus">—</div>
+<div class="dash-sub">Lock button + status</div>
+</div>
+</button>
+<button class="dash-card" data-go-tab="approvals" data-go-target="#sectionDailyLock" type="button">
+<div class="dash-ic"><i class="w-5 h-5" data-lucide="calendar"></i></div>
+<div class="dash-meta">
+<div class="dash-label">Day Information</div>
+<div class="dash-value" id="kpiDayInfo">—</div>
+<div class="dash-sub">Selected run date</div>
+</div>
+</button>
+<button class="dash-card" data-go-tab="approvals" data-go-target="#sectionDeptSummary" type="button">
+<div class="dash-ic"><i class="w-5 h-5" data-lucide="building-2"></i></div>
+<div class="dash-meta">
+<div class="dash-label">Total Departments</div>
+<div class="dash-value" id="kpiTotalDept">—</div>
+<div class="dash-sub">දෙපාර්තමේන්තු සාරාංශය</div>
+</div>
+</button>
+<button class="dash-card" data-go-tab="approvals" data-go-target="#sectionDeptSummary" type="button">
+<div class="dash-ic"><i class="w-5 h-5" data-lucide="check-circle"></i></div>
+<div class="dash-meta">
+<div class="dash-label">Submitted</div>
+<div class="dash-value" id="kpiSubmittedDept">—</div>
+<div class="dash-sub">Submitted departments</div>
+</div>
+</button>
+<button class="dash-card" data-go-tab="approvals" data-go-target="#sectionMissingDepartments" type="button">
+<div class="dash-ic"><i class="w-5 h-5" data-lucide="x-circle"></i></div>
+<div class="dash-meta">
+<div class="dash-label">Not Submitted</div>
+<div class="dash-value" id="kpiNotSubmittedDept">—</div>
+<div class="dash-sub">Missing departments</div>
+</div>
+</button>
+<button class="dash-card" data-go-tab="approvals" data-go-target="#sectionHodRegs" type="button">
+<div class="dash-ic"><i class="w-5 h-5" data-lucide="user-check"></i></div>
+<div class="dash-meta">
+<div class="dash-label">HOD Registration Approvals</div>
+<div class="dash-value" id="kpiPendingHodRegs">—</div>
+<div class="dash-sub">Pending HOD requests</div>
+</div>
+</button>
+<button class="dash-card" data-go-tab="approvals" data-go-target="#sectionTransportRequests" type="button">
+<div class="dash-ic"><i class="w-5 h-5" data-lucide="clipboard-list"></i></div>
+<div class="dash-meta">
+<div class="dash-label">Transport Requests</div>
+<div class="dash-value" id="kpiTotalRequests">—</div>
+<div class="dash-sub">Total requests for day</div>
+</div>
+</button>
+<button class="dash-card" data-go-tab="approvals" data-go-target="#sectionTransportRequests" type="button">
+<div class="dash-ic"><i class="w-5 h-5" data-lucide="hourglass"></i></div>
+<div class="dash-meta">
+<div class="dash-label">Pending Requests</div>
+<div class="dash-value" id="kpiPendingRequests">—</div>
+<div class="dash-sub">Need admin action</div>
+</div>
+</button>
+</div>
+</div>
+</div>
+<div class="hidden space-y-6" id="pane_approvals">
+<!-- HOD Registration Approvals -->
+<div class="section-card">
+<div class="flex items-center justify-between px-6 py-4 border-b border-slate-100">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center">
+<i class="w-4 h-4 text-indigo-600" data-lucide="user-check"></i>
+</div>
+<div>
+<h2 class="text-slate-800 font-700 text-sm">HOD Registration Approvals</h2>
+<p class="text-slate-400 text-xs">Pending HOD account approvals</p>
+</div>
+</div>
+</div>
+<div class="p-6">
+<div class="table-wrap">
+<table class="data-table">
+<thead>
+<tr>
+<th>Email</th>
+<th>Department</th>
+<th>Applied</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody id="hodRegRows">
+<tr><td class="text-center py-6 text-slate-400 text-sm" colspan="4">
+<i class="w-4 h-4 animate-spin inline mr-2" data-lucide="loader-2"></i>Loading...
                 </td></tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-
-      <!-- All Requests -->
-      <div class="section-card">
-        <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100">
-          <div class="flex items-center gap-3">
-            <div class="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center">
-              <i data-lucide="clipboard-list" class="w-4 h-4 text-blue-600"></i>
-            </div>
-            <div>
-              <h2 class="text-slate-800 font-700 text-sm">Transport Requests — All Departments</h2>
-              <p class="text-slate-400 text-xs">Review and approve submitted requests</p>
-            </div>
-          </div>
-          <button onclick="loadRequests()" class="btn btn-ghost btn-sm">
-            <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Refresh
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<!-- All Requests -->
+<div class="section-card" id="sectionTransportRequests">
+<div class="flex items-center justify-between px-6 py-4 border-b border-slate-100">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center">
+<i class="w-4 h-4 text-blue-600" data-lucide="clipboard-list"></i>
+</div>
+<div>
+<h2 class="text-slate-800 font-700 text-sm">Transport Requests — All Departments</h2>
+<p class="text-slate-400 text-xs">Review and approve submitted requests</p>
+</div>
+</div>
+<button class="btn btn-ghost btn-sm" onclick="loadRequests()">
+<i class="w-3.5 h-3.5" data-lucide="refresh-cw"></i> Refresh
           </button>
-        </div>
-
-        <!-- Filters -->
-        <div class="px-6 pt-5 pb-3 flex flex-wrap gap-4">
-          <div class="flex-1 min-w-40">
-            <label class="form-label">Filter by Status</label>
-            <select id="reqStatus" onchange="renderRequests()" class="form-input form-select">
-              <option value="">All Statuses</option>
-              <option value="SUBMITTED">SUBMITTED</option>
-              <option value="DRAFT">DRAFT</option>
-              <option value="ADMIN_APPROVED">ADMIN APPROVED</option>
-              <option value="TA_ASSIGNED">TA ASSIGNED</option>
-              <option value="HR_FINAL_APPROVED">HR FINAL APPROVED</option>
-              <option value="REJECTED">REJECTED</option>
-            </select>
-          </div>
-          <div class="flex-1 min-w-40">
-            <label class="form-label">Search</label>
-            <div class="relative">
-              <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none"></i>
-              <input id="reqSearch" placeholder="dept / date / id…" oninput="renderRequests()"
-                class="form-input pl-9" />
+</div>
+<!-- Filters -->
+<div class="px-6 pt-5 pb-3 flex flex-wrap gap-4">
+<div class="flex-1 min-w-40">
+<label class="form-label">Filter by Status</label>
+<select class="form-input form-select" id="reqStatus" onchange="renderRequests()">
+<option value="">All Statuses</option>
+<option value="SUBMITTED">SUBMITTED</option>
+<option value="DRAFT">DRAFT</option>
+<option value="ADMIN_APPROVED">ADMIN APPROVED</option>
+<option value="TA_ASSIGNED">TA ASSIGNED</option>
+<option value="HR_FINAL_APPROVED">HR FINAL APPROVED</option>
+<option value="REJECTED">REJECTED</option>
+</select>
+</div>
+<div class="flex-1 min-w-40">
+<label class="form-label">Search</label>
+<div class="relative">
+<i class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" data-lucide="search"></i>
+<input class="form-input pl-9" id="reqSearch" oninput="renderRequests()" placeholder="dept / date / id…"/>
+</div>
+</div>
+</div>
+<!-- Request List table — rendered by JS -->
+<div class="px-6 pb-6">
+<div class="table-wrap" id="reqList">
+<div class="text-center py-8 text-slate-400 text-sm">
+<i class="w-5 h-5 animate-spin inline mr-2" data-lucide="loader-2"></i>Loading requests…
             </div>
-          </div>
-        </div>
-
-        <!-- Request List table — rendered by JS -->
-        <div class="px-6 pb-6">
-          <div id="reqList" class="table-wrap">
-            <div class="text-center py-8 text-slate-400 text-sm">
-              <i data-lucide="loader-2" class="w-5 h-5 animate-spin inline mr-2"></i>Loading requests…
-            </div>
-          </div>
-        </div>
-
-        <!-- Request Detail Panel — toggled by JS -->
-        <div id="reqDetail" class="hidden px-6 pb-6">
-          <div class="border border-indigo-200 bg-indigo-50/50 rounded-xl p-5">
-            <div class="flex items-center justify-between mb-4">
-              <h3 class="text-slate-800 font-700 text-sm flex items-center gap-2">
-                <i data-lucide="file-text" class="w-4 h-4 text-indigo-600"></i>
-                Request Detail — <span id="dReqId" class="text-indigo-700 font-800"></span>
-              </h3>
-              <button onclick="closeDetail()" class="btn btn-ghost btn-sm">
-                <i data-lucide="x" class="w-3.5 h-3.5"></i> Close
+</div>
+</div>
+<!-- Request Detail Panel — toggled by JS -->
+<div class="hidden px-6 pb-6" id="reqDetail">
+<div class="border border-indigo-200 bg-indigo-50/50 rounded-xl p-5">
+<div class="flex items-center justify-between mb-4">
+<h3 class="text-slate-800 font-700 text-sm flex items-center gap-2">
+<i class="w-4 h-4 text-indigo-600" data-lucide="file-text"></i>
+                Request Detail — <span class="text-indigo-700 font-800" id="dReqId"></span>
+</h3>
+<button class="btn btn-ghost btn-sm" onclick="closeDetail()">
+<i class="w-3.5 h-3.5" data-lucide="x"></i> Close
               </button>
-            </div>
-            <div id="dMeta" class="text-sm text-slate-600 mb-4 space-y-1"></div>
-            <div id="dEmployees" class="table-wrap mb-4"></div>
-            <div class="flex gap-3">
-              <button id="btnApprove" class="btn btn-indigo" onclick="approveReq()">
-                <i data-lucide="check" class="w-4 h-4"></i> Approve (ADMIN)
+</div>
+<div class="text-sm text-slate-600 mb-4 space-y-1" id="dMeta"></div>
+<div class="table-wrap mb-4" id="dEmployees"></div>
+<div class="flex gap-3">
+<button class="btn btn-indigo" id="btnApprove" onclick="approveReq()">
+<i class="w-4 h-4" data-lucide="check"></i> Approve (ADMIN)
               </button>
-              <button onclick="closeDetail()" class="btn btn-ghost">
-                <i data-lucide="x" class="w-4 h-4"></i> Close
+<button class="btn btn-ghost" onclick="closeDetail()">
+<i class="w-4 h-4" data-lucide="x"></i> Close
               </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div><!-- /pane_approvals -->
-
-    <!-- ════════════════════════════════════════════
+</div>
+</div>
+</div>
+</div>
+</div><!-- /pane_approvals -->
+<!-- ════════════════════════════════════════════
          PANE: MASTER DATA
     ═══════════════════════════════════════════════ -->
-    <div id="pane_master" class="hidden space-y-6">
-
-      <!-- Departments -->
-      <div class="section-card">
-        <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100">
-          <div class="flex items-center gap-3">
-            <div class="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center">
-              <i data-lucide="building-2" class="w-4 h-4 text-amber-600"></i>
-            </div>
-            <h2 class="text-slate-800 font-700 text-sm">Departments</h2>
-          </div>
-          <div class="flex gap-2">
-            <button onclick="loadDepartments()" class="btn btn-ghost btn-sm">
-              <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Refresh
+<div class="hidden space-y-6" id="pane_master">
+<!-- Departments -->
+<div class="section-card">
+<div class="flex items-center justify-between px-6 py-4 border-b border-slate-100">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center">
+<i class="w-4 h-4 text-amber-600" data-lucide="building-2"></i>
+</div>
+<h2 class="text-slate-800 font-700 text-sm">Departments</h2>
+</div>
+<div class="flex gap-2">
+<button class="btn btn-ghost btn-sm" onclick="loadDepartments()">
+<i class="w-3.5 h-3.5" data-lucide="refresh-cw"></i> Refresh
             </button>
-            <button onclick="showAddDept()" class="btn btn-primary btn-sm">
-              <i data-lucide="plus" class="w-3.5 h-3.5"></i> Add Department
+<button class="btn btn-primary btn-sm" onclick="showAddDept()">
+<i class="w-3.5 h-3.5" data-lucide="plus"></i> Add Department
             </button>
-          </div>
-        </div>
-        <div class="p-6">
-          <div id="deptList" class="table-wrap">
-            <div class="text-center py-6 text-slate-400 text-sm">
-              <i data-lucide="loader-2" class="w-4 h-4 animate-spin inline mr-2"></i>Loading…
+</div>
+</div>
+<div class="p-6">
+<div class="table-wrap" id="deptList">
+<div class="text-center py-6 text-slate-400 text-sm">
+<i class="w-4 h-4 animate-spin inline mr-2" data-lucide="loader-2"></i>Loading…
             </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Routes -->
-      <div class="section-card">
-        <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100">
-          <div class="flex items-center gap-3">
-            <div class="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center">
-              <i data-lucide="route" class="w-4 h-4 text-blue-600"></i>
-            </div>
-            <h2 class="text-slate-800 font-700 text-sm">Routes (මාර්ග)</h2>
-          </div>
-          <div class="flex gap-2">
-            <button onclick="loadRoutes()" class="btn btn-ghost btn-sm">
-              <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Refresh
+</div>
+</div>
+</div>
+<!-- Routes -->
+<div class="section-card">
+<div class="flex items-center justify-between px-6 py-4 border-b border-slate-100">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center">
+<i class="w-4 h-4 text-blue-600" data-lucide="route"></i>
+</div>
+<h2 class="text-slate-800 font-700 text-sm">Routes (මාර්ග)</h2>
+</div>
+<div class="flex gap-2">
+<button class="btn btn-ghost btn-sm" onclick="loadRoutes()">
+<i class="w-3.5 h-3.5" data-lucide="refresh-cw"></i> Refresh
             </button>
-            <button onclick="showAddRoute()" class="btn btn-primary btn-sm">
-              <i data-lucide="plus" class="w-3.5 h-3.5"></i> Add Route
+<button class="btn btn-primary btn-sm" onclick="showAddRoute()">
+<i class="w-3.5 h-3.5" data-lucide="plus"></i> Add Route
             </button>
-          </div>
-        </div>
-        <div class="p-6">
-          <div id="routeList" class="table-wrap">
-            <div class="text-center py-6 text-slate-400 text-sm">
-              <i data-lucide="loader-2" class="w-4 h-4 animate-spin inline mr-2"></i>Loading…
+</div>
+</div>
+<div class="p-6">
+<div class="table-wrap" id="routeList">
+<div class="text-center py-6 text-slate-400 text-sm">
+<i class="w-4 h-4 animate-spin inline mr-2" data-lucide="loader-2"></i>Loading…
             </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Bulk Sub-routes Upload -->
-      <div class="section-card">
-        <div class="flex items-center gap-3 px-6 py-4 border-b border-slate-100">
-          <div class="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center">
-            <i data-lucide="map-pin" class="w-4 h-4 text-emerald-600"></i>
-          </div>
-          <div>
-            <h2 class="text-slate-800 font-700 text-sm">Bulk Sub-route Upload</h2>
-            <p class="text-slate-400 text-xs">
+</div>
+</div>
+</div>
+<!-- Bulk Sub-routes Upload -->
+<div class="section-card">
+<div class="flex items-center gap-3 px-6 py-4 border-b border-slate-100">
+<div class="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center">
+<i class="w-4 h-4 text-emerald-600" data-lucide="map-pin"></i>
+</div>
+<div>
+<h2 class="text-slate-800 font-700 text-sm">Bulk Sub-route Upload</h2>
+<p class="text-slate-400 text-xs">
               එක් මාර්ගයකට ග්‍රාම නාම එකවර ඇතුළත් කරන්න (line by line)
             </p>
-          </div>
-        </div>
-        <div class="p-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div>
-            <label class="form-label">Select Route</label>
-            <select id="selRoute" class="form-input form-select">
-              <option value="">-- Select Route --</option>
-            </select>
-          </div>
-          <div class="lg:col-span-2 lg:max-w-xl">
-            <label class="form-label">Village Names (one per line)</label>
-            <textarea id="bulkLines" rows="8"
-              placeholder="කොළඹ&#10;මොරටුව&#10;පානදුර&#10;..."
-              class="form-input font-mono text-sm"></textarea>
-          </div>
-          <div>
-            <button onclick="doBulkSubs()" class="btn btn-indigo">
-              <i data-lucide="upload" class="w-4 h-4"></i> Upload Sub-routes
+</div>
+</div>
+<div class="p-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
+<div>
+<label class="form-label">Select Route</label>
+<select class="form-input form-select" id="selRoute">
+<option value="">-- Select Route --</option>
+</select>
+</div>
+<div class="lg:col-span-2 lg:max-w-xl">
+<label class="form-label">Village Names (one per line)</label>
+<textarea class="form-input font-mono text-sm" id="bulkLines" placeholder="කොළඹ
+මොරටුව
+පානදුර
+..." rows="8"></textarea>
+</div>
+<div>
+<button class="btn btn-indigo" onclick="doBulkSubs()">
+<i class="w-4 h-4" data-lucide="upload"></i> Upload Sub-routes
             </button>
-          </div>
-        </div>
-      </div>
-    </div><!-- /pane_master -->
-
-    <!-- ════════════════════════════════════════════
+</div>
+</div>
+</div>
+</div><!-- /pane_master -->
+<!-- ════════════════════════════════════════════
          PANE: REPORTS
     ═══════════════════════════════════════════════ -->
-    <div id="pane_reports" class="hidden">
-      <div class="section-card">
-        <div class="flex items-center gap-3 px-6 py-4 border-b border-slate-100">
-          <div class="w-8 h-8 rounded-lg bg-violet-50 flex items-center justify-center">
-            <i data-lucide="file-bar-chart-2" class="w-4 h-4 text-violet-600"></i>
-          </div>
-          <div>
-            <h2 class="text-slate-800 font-700 text-sm">Reports</h2>
-            <p class="text-slate-400 text-xs">Generate and preview daily route-wise PDF reports</p>
-          </div>
-        </div>
-        <div class="p-6 space-y-5">
-          <div class="max-w-xs">
-            <label class="form-label">Report Date</label>
-            <input id="repDate" type="date" class="form-input" />
-          </div>
-          <div class="flex items-center gap-3">
-            <button onclick="downloadRouteReport()" class="btn btn-primary">
-              <i data-lucide="file-down" class="w-4 h-4"></i> Generate Route-wise PDF
+<div class="hidden" id="pane_reports">
+<div class="section-card">
+<div class="flex items-center gap-3 px-6 py-4 border-b border-slate-100">
+<div class="w-8 h-8 rounded-lg bg-violet-50 flex items-center justify-center">
+<i class="w-4 h-4 text-violet-600" data-lucide="file-bar-chart-2"></i>
+</div>
+<div>
+<h2 class="text-slate-800 font-700 text-sm">Reports</h2>
+<p class="text-slate-400 text-xs">Generate and preview daily route-wise PDF reports</p>
+</div>
+</div>
+<div class="p-6 space-y-5">
+<div class="max-w-xs">
+<label class="form-label">Report Date</label>
+<input class="form-input" id="repDate" type="date"/>
+</div>
+<div class="flex items-center gap-3">
+<button class="btn btn-primary" onclick="downloadRouteReport()">
+<i class="w-4 h-4" data-lucide="file-down"></i> Generate Route-wise PDF
             </button>
-          </div>
-          <p class="text-slate-400 text-xs flex items-center gap-1.5">
-            <i data-lucide="info" class="w-3.5 h-3.5"></i>
+</div>
+<p class="text-slate-400 text-xs flex items-center gap-1.5">
+<i class="w-3.5 h-3.5" data-lucide="info"></i>
             PDF will preview directly in this tab.
           </p>
-          <!-- PDF preview injected here by JS -->
-          <div id="reportPreview"></div>
-        </div>
-      </div>
-    </div><!-- /pane_reports -->
-
-  </main>
+<!-- PDF preview injected here by JS -->
+<div id="reportPreview"></div>
+</div>
+</div>
+</div><!-- /pane_reports -->
+</main>
 </div><!-- /main wrapper -->
-
-
 <!-- ══════════════════════════════════════════════════════════
      ALL ORIGINAL SCRIPTS — PRESERVED EXACTLY
 ═══════════════════════════════════════════════════════════ -->
@@ -783,11 +717,11 @@ updateClock();
 /* ── Tab system — ORIGINAL LOGIC PRESERVED ────── */
 function setTab(tab){
   // Sidebar nav-link active states
-  const sidebarBtnMap = { approvals:'tabApprovals', master:'tabMaster', reports:'tabReports' };
+  const sidebarBtnMap = { dashboard:'tabDashboard', approvals:'tabApprovals', master:'tabMaster', reports:'tabReports' };
   // Content area tab-btn active states
-  const contentBtnMap = { approvals:'tabApprovalsContent', master:'tabMasterContent', reports:'tabReportsContent' };
+  const contentBtnMap = { dashboard:'tabDashboardContent', approvals:'tabApprovalsContent', master:'tabMasterContent', reports:'tabReportsContent' };
 
-  const tabs = ["approvals","master","reports"];
+  const tabs = ["dashboard","approvals","master","reports"];
   for(const t of tabs){
     const pane = document.getElementById("pane_"+t);
     const sBtn = document.getElementById(sidebarBtnMap[t]);
@@ -802,7 +736,56 @@ function setTab(tab){
     try { loadDepartments(); } catch(e){}
     try { loadRoutes(); } catch(e){}
   }
+
+  if(tab === "dashboard"){
+    try { refreshDashboardAll(); } catch(e){}
+  }
+
 }
+
+
+// ── Dashboard helpers ─────────────────────────────────────────
+function setKPI(id, val){
+  const el = document.getElementById(id);
+  if(!el) return;
+  const v = (val===undefined || val===null || val==='') ? '—' : String(val);
+  el.textContent = v;
+}
+
+function goTo(tab, targetSelector){
+  if(tab) setTab(tab);
+  window.setTimeout(()=>{
+    if(targetSelector){
+      const target = document.querySelector(targetSelector);
+      if(target){
+        target.scrollIntoView({behavior:'smooth', block:'start'});
+      }
+    }
+  }, 80);
+}
+
+function wireDashboardCards(){
+  document.querySelectorAll('.dash-card').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const tab = btn.getAttribute('data-go-tab');
+      const tgt = btn.getAttribute('data-go-target');
+      goTo(tab, tgt);
+    });
+  });
+}
+
+function refreshDashboardAll(){
+  // refresh the same live data that powers the detailed tabs
+  try { loadRunSummary(); } catch(e){}
+  try { loadRequests(); } catch(e){}
+  try { renderHodRegs(); } catch(e){}
+  try { if(window.lucide) lucide.createIcons(); } catch(e){}
+}
+
+document.addEventListener('DOMContentLoaded', ()=>{
+  try { wireDashboardCards(); } catch(e){}
+});
+
 
 /* ── Guard / Auth — ORIGINAL ─────────────────── */
 async function guard(){
@@ -834,6 +817,24 @@ async function loadRequests(){
     const d = await api("/admin/requests");
     REQS = d.requests || [];
     renderRequests();
+
+    // Dashboard KPI (Pending + total requests for selected day)
+    const date = document.getElementById('runDate')?.value;
+    if(date){
+      const pending = REQS.filter(r=>{
+        const rd = String(r.request_date || r.date || '');
+        const st = String(r.status || '').toUpperCase();
+        return rd === date && ['SUBMITTED','PENDING','PENDING_ADMIN'].includes(st);
+      }).length;
+
+      const totalDay = REQS.filter(r=>String(r.request_date || r.date || '') === date).length;
+      setKPI('kpiPendingRequests', pending);
+
+      const tEl = document.getElementById('kpiTotalRequests');
+      if(tEl && (!tEl.textContent || tEl.textContent.trim() === '—')){
+        setKPI('kpiTotalRequests', totalDay);
+      }
+    }
   } catch(e) {
     document.getElementById("reqList").innerHTML =
       `<div class="alert alert-error">දෝෂයක්: ${e.message}</div>`;
@@ -946,6 +947,7 @@ async function renderHodRegs(){
   try{
     const deps = await api('/admin/departments');
     const d = await loadPendingHodRegs();
+    setKPI('kpiPendingHodRegs', (d||[]).length);
     const list = d.pending_hod || [];
     const depName = (id)=> (deps.departments||[]).find(x=>x.id===id)?.name || id || '';
     if(list.length===0){
@@ -1111,6 +1113,22 @@ async function loadRunSummary(){
       ? `<span class="badge badge-green px-3 py-1.5 text-sm">🔒 Locked — ${d.master_request.status}</span>`
       : `<span class="badge badge-amber px-3 py-1.5 text-sm">🔓 Not Locked</span>`;
 
+
+    // Dashboard KPIs (Departments + Requests)
+    const depts = (d.departments||[]);
+    const totalDept = depts.length;
+    const submittedDept = depts.filter(x=>!!x.submitted).length;
+    const notSubmittedDept = Math.max(0, totalDept - submittedDept);
+    const totalRequests = depts.reduce((s,x)=>s + (Number(x.requests_count)||0), 0);
+
+    setKPI('kpiLockStatus', locked ? 'Locked' : 'Not Locked');
+    setKPI('kpiDayInfo', date);
+    setKPI('kpiTotalDept', totalDept);
+    setKPI('kpiSubmittedDept', submittedDept);
+    setKPI('kpiNotSubmittedDept', notSubmittedDept);
+    setKPI('kpiTotalRequests', totalRequests);
+
+
     const deptRows = (d.departments||[]).map(dep=>`<tr>
       <td class="font-500">${dep.department_name}</td>
       <td>${dep.submitted ? '<span class="text-emerald-600 font-700">✓</span>' : '<span class="text-red-400">✗</span>'}</td>
@@ -1126,7 +1144,6 @@ async function loadRunSummary(){
       : `<div class="text-amber-700 text-sm font-500">${missing}</div>`;
     rm.className = missing === 'None' ? 'alert alert-ok' : 'alert alert-warn';
     lucide.createIcons();
-    try{ window.updateKpisFromRunSummary({locked: !!d.master_request, departments: d.departments||[]}); }catch(e){}
   } catch(e) {
     toast('❌ '+e.message);
   }
@@ -1209,75 +1226,6 @@ function downloadRouteReport(){
 
 /* ── Init — ORIGINAL ─────────────────────────── */
 (async()=>{
-
-  // ── KPI navigation (like "order history" tiles) ─────────────────────────
-  window.gotoKpi = function(key){
-    const map = {
-      lock:   { tab: 'approvals', el: 'topbar' },       // stay on page top
-      day:    { tab: 'approvals', el: 'runDate' },
-      deptTotal: { tab: 'approvals', el: 'runDeptRows' },
-      submitted: { tab: 'approvals', el: 'runDeptRows' },
-      notSubmitted: { tab: 'approvals', el: 'runMissing' },
-      hod:    { tab: 'approvals', el: 'hodRegRows' },
-      requests:{ tab: 'approvals', el: 'reqList' },
-      approvals:{ tab: 'approvals', el: 'pane_approvals' },
-      master: { tab: 'master', el: 'pane_master' },
-      reports:{ tab: 'reports', el: 'pane_reports' },
-    };
-
-    const t = map[key] || map.approvals;
-    setTab(t.tab);
-
-    // close sidebar on mobile if open
-    try { closeSidebar(); } catch(e){}
-
-    setTimeout(()=>{
-      const el = document.getElementById(t.el);
-      if(el){
-        el.scrollIntoView({behavior:'smooth', block:'start'});
-        if(t.el === 'runDate') el.focus();
-      }
-    }, 80);
-  }
-
-  function setKpi(id, value){
-    const el = document.getElementById(id);
-    if(el) el.textContent = value;
-  }
-
-  // Update KPI values from run summary data
-  window.updateKpisFromRunSummary = function(summary){
-    // day
-    const d = document.getElementById('runDate')?.value;
-    if(d) setKpi('kpiDay', d);
-
-    // lock status
-    const locked = !!summary?.locked;
-    setKpi('kpiLock', locked ? 'Locked' : 'Not Locked');
-    const sub = document.getElementById('kpiLockSub');
-    if(sub) sub.textContent = locked ? 'Submissions locked' : 'Submissions open';
-
-    // departments
-    const depts = Array.isArray(summary?.departments) ? summary.departments : [];
-    const total = depts.length;
-    const submitted = depts.filter(x=>!!x.submitted).length;
-    const notSubmitted = Math.max(0, total - submitted);
-
-    setKpi('kpiTotalDepts', total);
-    setKpi('kpiSubmitted', submitted);
-    setKpi('kpiNotSubmitted', notSubmitted);
-
-    // total requests (selected day) = sum of requests_count in summary rows
-    const totalReq = depts.reduce((acc,x)=>acc + (Number(x.requests_count)||0), 0);
-    setKpi('kpiReqTotal', totalReq);
-  }
-
-  window.updateKpisFromHodRegsCount = function(n){
-    setKpi('kpiHodPending', Number(n)||0);
-  }
-
-
-
   // Init icons
   lucide.createIcons();
 
@@ -1301,6 +1249,5 @@ function downloadRouteReport(){
   },500);
 })();
 </script>
-
 </body>
 </html>
