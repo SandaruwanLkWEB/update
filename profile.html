@@ -1,202 +1,121 @@
 <!doctype html>
 <html lang="si">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <meta name="theme-color" content="#4F46E5" />
-  <title>Profile & Security - Transport Management</title>
-  <link rel="stylesheet" href="assets/styles.css" />
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <meta name="theme-color" content="#E11D48"/>
+  <title>Profile - Transport Management</title>
+  <link rel="stylesheet" href="assets/styles.css"/>
   <script src="assets/config.js"></script>
   <script src="assets/app.js"></script>
 </head>
 <body>
 
-
-<header class="topbar">
-  <div class="topbar-inner">
-    <div class="brand">
-      <div class="brand-mark">DSI</div>
-      <div>
-        <div class="brand-title">Profile</div>
-        <div class="brand-sub">Transport Management</div>
-      </div>
-    </div>
-    <div class="topbar-actions">
-      <button class="icon-btn" onclick="toggleTheme()" title="Theme"><i data-lucide="moon"></i></button>
-      <a class="btn secondary small" href="profile.html"><i data-lucide="user"></i><span>Profile</span></a>
-      <a class="btn ghost small" href="index.html"><i data-lucide="home"></i><span>Home</span></a>
-      <button class="btn ghost small" onclick="logout()"><i data-lucide="log-out"></i><span>Logout</span></button>
-    </div>
+<header>
+  <h1>👤 Profile</h1>
+  <div style="display:flex; gap:8px; align-items:center;">
+    <button class="btn ghost small" onclick="history.back()">⬅️ Back</button>
+    <button class="btn secondary small" onclick="logout()">Logout</button>
   </div>
 </header>
 
-
 <main class="container">
-  <section class="card elevated" style="padding:16px; margin-bottom:14px;">
-    <div class="h2">🧾 ගිණුම් තොරතුරු</div>
-    <div id="me" class="p-muted" style="margin-top:10px;">Loading...</div>
-  </section>
+  <div class="card elevated" style="margin-bottom:14px;">
+    <h2 class="h2">මගේ ගිණුම</h2>
+    <hr/>
+    <div id="meBox" class="small">Loading...</div>
+  </div>
 
-  <section class="card soft" style="padding:16px;">
-    <div style="display:flex; justify-content:space-between; gap:10px; align-items:center; flex-wrap:wrap;">
-      <div>
-        <div class="h2">🔐 Two-Factor Authentication (Authenticator App)</div>
-        <div class="p-muted">Google/Microsoft/Authy/1Password/Bitwarden වගේ ඕනෑම authenticator app එකකින් භාවිතා කළ හැක.</div>
-      </div>
-      <span id="twofaStatus" class="badge">...</span>
+  <div class="card elevated">
+    <h2 class="h2">🔐 Two‑Factor Authentication (2FA)</h2>
+    <p class="mini">Authenticator app (TOTP) 2FA enable/disable. Backend support නැත්තම් “Not available” ලෙස පෙන්වයි.</p>
+    <hr/>
+    <div id="twofaStatus" class="alert info">Loading...</div>
+
+    <div class="btnrow" style="margin-top:12px;">
+      <button class="btn btn-primary" onclick="start2FA()">Enable / Setup</button>
+      <button class="btn secondary" onclick="disable2FA()">Disable</button>
+      <button class="btn ghost" onclick="refresh2FA()">Refresh</button>
     </div>
 
-    <div id="twofaActions" class="btnrow" style="margin-top:14px; gap:10px; flex-wrap:wrap;"></div>
-
-    <div id="setupBox" class="card" style="display:none; padding:14px; margin-top:14px;">
-      <div class="h2">1) App එකෙන් QR Scan කරන්න</div>
-      <div class="grid two" style="margin-top:10px; align-items:start;">
-        <div>
-          <img id="qrImg" alt="QR" style="max-width:220px; border-radius:16px; border:1px solid var(--border);" />
-          <div class="p-muted" style="margin-top:8px;">Manual key: <code id="manualKey"></code></div>
-        </div>
-        <div>
-          <label>2) App code එක ඇතුල් කරලා Enable කරන්න</label>
-          <input id="codeEnable" placeholder="6-digit code" />
-          <div class="btnrow" style="margin-top:10px;">
-            <button class="btn btn-primary" id="btnEnable">✅ Enable 2FA</button>
-            <button class="btn" id="btnCancel">✖ Cancel</button>
-          </div>
-          <div id="setupMsg" class="p-muted" style="margin-top:10px;"></div>
-        </div>
-      </div>
-    </div>
-
-    <div id="backupBox" class="card" style="display:none; padding:14px; margin-top:14px;">
-      <div class="h2">🗝️ Backup Codes</div>
-      <div class="p-muted">මෙවාව එක පාරක් පමණක් පෙන්වයි. හොඳින් සුරකින්න.</div>
-      <pre id="backupCodes" style="white-space:pre-wrap; margin-top:10px;"></pre>
-    </div>
-
-    <div id="disableBox" class="card" style="display:none; padding:14px; margin-top:14px;">
-      <div class="h2">2FA Disable</div>
-      <div class="grid two" style="margin-top:10px;">
-        <div>
-          <label>මුරපදය</label>
-          <input id="disablePass" type="password" placeholder="Password" />
-        </div>
-        <div>
-          <label>Authenticator code / Backup code</label>
-          <input id="disableCode" placeholder="Code" />
-        </div>
-      </div>
-      <div class="btnrow" style="margin-top:12px;">
-        <button class="btn btn-primary" id="btnDisable">🛑 Disable 2FA</button>
-      </div>
-      <div id="disableMsg" class="p-muted" style="margin-top:10px;"></div>
-    </div>
-  </section>
+    <div id="twofaBox" style="margin-top:12px;"></div>
+  </div>
 </main>
 
 <script>
-let ME = null;
+function esc(s){ return String(s??'').replace(/[&<>"']/g, (c)=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c])); }
 
-function setStatus(enabled){
-  const s = document.getElementById('twofaStatus');
-  s.className = 'badge ' + (enabled ? 'ok' : 'warn');
-  s.textContent = enabled ? 'Enabled' : 'Disabled';
+async function guardAny(){
+  const r = await loadMe();
+  if(!r || !r.me){ location.href="login.html"; return null; }
+  return r.me;
 }
 
-function renderActions(){
-  const box = document.getElementById('twofaActions');
-  box.innerHTML = '';
-  if(!ME) return;
-  if(ME.twofa_enabled){
-    box.innerHTML = `
-      <button class="btn" onclick="openDisable()">⚙️ Disable Options</button>
-    `;
-  }else{
-    box.innerHTML = `
-      <button class="btn btn-primary" onclick="startSetup()">➕ Enable 2FA</button>
-    `;
-  }
+async function init(){
+  const me = await guardAny();
+  if(!me) return;
+  document.getElementById("meBox").innerHTML =
+    `<div><strong>Email:</strong> ${esc(me.email||'')}</div>
+     <div><strong>Role:</strong> ${esc(me.role||'')}</div>`;
+  await refresh2FA();
 }
 
-async function load(){
-  const d = await loadMe();
-  ME = d.me;
-  if(!ME){ location.href='login.html'; return; }
-  document.getElementById('me').innerHTML = `
-    <div><b>Email:</b> ${ME.email||''}</div>
-    <div><b>Role:</b> ${ME.role||''}</div>
-  `;
-  setStatus(!!ME.twofa_enabled);
-  renderActions();
-}
-
-function closeAll(){
-  document.getElementById('setupBox').style.display='none';
-  document.getElementById('backupBox').style.display='none';
-  document.getElementById('disableBox').style.display='none';
-  document.getElementById('setupMsg').textContent='';
-  document.getElementById('disableMsg').textContent='';
-}
-
-async function startSetup(){
-  closeAll();
-  document.getElementById('setupBox').style.display='block';
-  document.getElementById('setupMsg').textContent='⏳ QR සකසමින්...';
+async function refresh2FA(){
+  const st = document.getElementById("twofaStatus");
+  const box = document.getElementById("twofaBox");
+  box.innerHTML = "";
   try{
-    const d = await api('/auth/2fa/setup', { method:'POST' });
-    document.getElementById('qrImg').src = d.qr;
-    document.getElementById('manualKey').textContent = d.manual_key;
-    document.getElementById('setupMsg').textContent='QR Scan කරලා code එක ඇතුල් කරන්න.';
+    const d = await api("/auth/2fa/status");
+    st.className = d.enabled ? "alert ok" : "alert warn";
+    st.textContent = d.enabled ? "✅ 2FA Enabled" : "⚠️ 2FA Disabled";
   }catch(e){
-    document.getElementById('setupMsg').textContent='❌ ' + e.message;
+    st.className = "alert info";
+    st.textContent = "ℹ️ 2FA Not available (backend endpoint missing)";
   }
 }
 
-function openDisable(){
-  closeAll();
-  document.getElementById('disableBox').style.display='block';
+async function start2FA(){
+  const box = document.getElementById("twofaBox");
+  box.innerHTML = "";
+  try{
+    const d = await api("/auth/2fa/setup", { method:"POST" });
+    box.innerHTML =
+      `<div class="card soft" style="margin-top:10px;">
+        <div class="small"><strong>Secret:</strong> <code>${esc(d.secret||'')}</code></div>
+        <div class="mini" style="margin-top:6px;">Authenticator app එකට add කරලා, verify code එක submit කරන්න.</div>
+        <div style="margin-top:10px;">
+          <label>Verify code</label>
+          <input id="vcode" placeholder="123456" inputmode="numeric"/>
+        </div>
+        <div class="btnrow" style="margin-top:10px;">
+          <button class="btn btn-primary" onclick="verify2FA()">Verify & Enable</button>
+        </div>
+      </div>`;
+  }catch(e){ toast("❌ "+e.message); }
 }
 
-document.getElementById('btnEnable').onclick = async ()=>{
-  const code = document.getElementById('codeEnable').value.trim();
-  document.getElementById('setupMsg').textContent='⏳ Enable කරමින්...';
+async function verify2FA(){
+  const code = document.getElementById("vcode")?.value?.trim();
+  if(!code){ toast("⚠️ Code එක දාන්න"); return; }
   try{
-    const d = await api('/auth/2fa/enable', { method:'POST', body: JSON.stringify({ code }) });
-    document.getElementById('backupBox').style.display='block';
-    document.getElementById('backupCodes').textContent = (d.backup_codes||[]).join('\n');
-    toast('✅ 2FA Enabled');
-    // refresh me
-    const me2 = await loadMe();
-    ME = me2.me;
-    setStatus(true);
-    renderActions();
-    document.getElementById('setupMsg').textContent='✅ 2FA Enabled.';
-  }catch(e){
-    document.getElementById('setupMsg').textContent='❌ ' + e.message;
-  }
-};
+    await api("/auth/2fa/verify", { method:"POST", body: JSON.stringify({ code }) });
+    toast("✅ 2FA Enabled");
+    document.getElementById("twofaBox").innerHTML = "";
+    await refresh2FA();
+  }catch(e){ toast("❌ "+e.message); }
+}
 
-document.getElementById('btnDisable').onclick = async ()=>{
-  const password = document.getElementById('disablePass').value;
-  const code = document.getElementById('disableCode').value.trim();
-  document.getElementById('disableMsg').textContent='⏳ Disable කරමින්...';
+async function disable2FA(){
+  if(!confirm("2FA Disable කරන්නද?")) return;
   try{
-    await api('/auth/2fa/disable', { method:'POST', body: JSON.stringify({ password, code }) });
-    toast('✅ 2FA Disabled');
-    const me2 = await loadMe();
-    ME = me2.me;
-    setStatus(false);
-    renderActions();
-    closeAll();
-  }catch(e){
-    document.getElementById('disableMsg').textContent='❌ ' + e.message;
-  }
-};
+    await api("/auth/2fa/disable", { method:"POST" });
+    toast("✅ Disabled");
+    await refresh2FA();
+  }catch(e){ toast("❌ "+e.message); }
+}
 
-document.getElementById('btnCancel').onclick = ()=> closeAll();
-
-window.addEventListener('DOMContentLoaded', load);
+init().catch(e=>{ console.error(e); location.href="login.html"; });
 </script>
 
-  <script src="https://unpkg.com/lucide@latest"></script>
 </body>
 </html>

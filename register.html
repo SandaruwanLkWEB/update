@@ -1,140 +1,22 @@
-<!doctype html>
-<html lang="si" class="h-full">
-<head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <meta name="theme-color" content="#0f172a"/>
-  <title>Register — DSI Transport</title>
-  <link rel="stylesheet" href="assets/styles.css" />
-
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
-  <link rel="preconnect" href="https://fonts.googleapis.com"/>
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
-
-  <script src="assets/config.js"></script>
-  <script src="assets/app.js"></script>
-
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: { sans: ['DM Sans', 'ui-sans-serif', 'system-ui'] },
-          animation: {
-            'fade-up':   'fadeUp 0.5s ease both',
-            'drift':     'drift 18s ease-in-out infinite',
-            'drift2':    'drift2 22s ease-in-out infinite',
-            'pulse-dot': 'pulseDot 2s infinite',
-          },
-          keyframes: {
-            fadeUp:    { from:{ opacity:'0', transform:'translateY(20px)' }, to:{ opacity:'1', transform:'translateY(0)' } },
-            drift:     { '0%,100%':{ transform:'translate(0,0) scale(1)' }, '33%':{ transform:'translate(30px,-20px) scale(1.05)' }, '66%':{ transform:'translate(-20px,30px) scale(0.97)' } },
-            drift2:    { '0%,100%':{ transform:'translate(0,0) scale(1.05)' }, '33%':{ transform:'translate(-25px,20px) scale(0.97)' }, '66%':{ transform:'translate(20px,-30px) scale(1.05)' } },
-            pulseDot:  { '0%,100%':{ opacity:'1' }, '50%':{ opacity:'.35' } },
-          }
-        }
-      }
-    }
-  </script>
-
-  </head>
-<body class="min-h-screen bg-slate-50 flex flex-col">
-
-  <!-- TOP NAVBAR -->
-  <header class="fixed top-0 left-0 right-0 z-20 bg-white/80 backdrop-blur-md border-b border-slate-200 px-6 py-3 flex items-center justify-between"
-          style="box-shadow:0 1px 0 #e2e8f0;">
-    <div class="flex items-center gap-3">
-      <div class="w-8 h-8 rounded-xl bg-slate-900 flex items-center justify-center">
-        <i data-lucide="bus" class="w-4 h-4 text-white"></i>
-      </div>
-      <span class="text-slate-800 font-700 text-sm">DSI Transport</span>
-    </div>
-    <a href="login.html"
-       class="flex items-center gap-2 px-4 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 transition text-slate-700 text-sm font-600">
-      <i data-lucide="log-in" class="w-4 h-4"></i> Sign In
-    </a>
-  </header>
-
-  <!-- BACKGROUND: gradient + orbs -->
-  <div class="fixed inset-0 -z-10 overflow-hidden">
-    <div class="absolute inset-0" style="background:linear-gradient(135deg,#f8fafc 0%,#f1f5f9 50%,#e2e8f0 100%);"></div>
-    <div class="absolute w-96 h-96 rounded-full opacity-20 animate-drift"
-         style="background:radial-gradient(circle,#8b5cf6,transparent); top:-8%; left:-5%;"></div>
-    <div class="absolute w-80 h-80 rounded-full opacity-15 animate-drift2"
-         style="background:radial-gradient(circle,#f59e0b,transparent); bottom:-5%; right:-5%;"></div>
-  </div>
-
-  <!-- MAIN CONTENT -->
-  <main class="flex-1 flex flex-col items-center justify-center px-5 pt-20 pb-12">
-
-    <!-- Header text -->
-    <div class="text-center mb-10 animate-fade-up">
-      <div class="inline-flex items-center gap-2 bg-white border border-slate-200 rounded-full px-4 py-2 mb-6 shadow-sm">
-        <div class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse-dot"></div>
-        <span class="text-slate-600 text-xs font-600">ප්‍රවාහන කළමනාකරණ පද්ධතිය</span>
-      </div>
-      <h1 class="text-slate-900 font-800 text-3xl sm:text-4xl mb-3">ලියාපදිංචි වීම</h1>
-      <p class="text-slate-500 text-sm max-w-sm mx-auto">
-        ඔබගේ භූමිකාව අනුව ලියාපදිංචි වීමේ ආකෘතිය තෝරන්න
-      </p>
-    </div>
-
-    <!-- Role cards grid -->
-    <div class="w-full max-w-xl grid grid-cols-1 sm:grid-cols-2 gap-5 animate-fade-up" style="animation-delay:0.12s;">
-
-      <!-- EMP registration link — ORIGINAL href preserved -->
-      <a href="register_emp.html" class="role-card emp">
-        <div class="role-icon emp">
-          <i data-lucide="user" class="w-6 h-6 text-violet-600"></i>
-        </div>
-        <div class="role-arrow">
-          <i data-lucide="arrow-right" class="w-4 h-4"></i>
-        </div>
-        <h2 class="text-slate-800 font-800 text-lg mb-2">සේවක (EMP)</h2>
-        <p class="text-slate-500 text-sm leading-relaxed">HOD අනුමැතිය අවශ්‍යයි. ඔබේ දෙපාර්තමේන්තු ප්‍රධානී අනුමත කළ පසු ඇතුල් විය හැකිය.</p>
-        <div class="mt-4 flex items-center gap-2">
-          <span class="inline-flex items-center gap-1.5 text-xs font-600 text-violet-600 bg-violet-50 border border-violet-100 rounded-full px-2.5 py-1">
-            <i data-lucide="shield" class="w-3 h-3"></i> HOD Approval
-          </span>
-        </div>
-      </a>
-
-      <!-- HOD registration link — ORIGINAL href preserved -->
-      <a href="register_hod.html" class="role-card hod">
-        <div class="role-icon hod">
-          <i data-lucide="building-2" class="w-6 h-6 text-amber-600"></i>
-        </div>
-        <div class="role-arrow">
-          <i data-lucide="arrow-right" class="w-4 h-4"></i>
-        </div>
-        <h2 class="text-slate-800 font-800 text-lg mb-2">දෙපාර්තමේන්තු ප්‍රධානී (HOD)</h2>
-        <p class="text-slate-500 text-sm leading-relaxed">පරිපාලක අනුමැතිය අවශ්‍යයි. Admin අනුමත කළ පසු HOD ලෙස ඇතුල් විය හැකිය.</p>
-        <div class="mt-4 flex items-center gap-2">
-          <span class="inline-flex items-center gap-1.5 text-xs font-600 text-amber-600 bg-amber-50 border border-amber-100 rounded-full px-2.5 py-1">
-            <i data-lucide="shield-check" class="w-3 h-3"></i> Admin Approval
-          </span>
-        </div>
-      </a>
-    </div>
-
-    <!-- Footer -->
-    <div class="mt-8 text-center animate-fade-up" style="animation-delay:0.22s;">
-      <p class="text-slate-500 text-sm">
-        දැනටමත් ගිණුමක් ඇත?
-        <a href="login.html" class="text-slate-800 font-700 hover:text-violet-600 transition ml-1">ඇතුල් වන්න →</a>
-      </p>
-    </div>
-
-  </main>
-
-  <!-- Footer strip -->
-  <footer class="text-center py-4 text-slate-400 text-xs border-t border-slate-200 bg-white/60">
-    © 2025 DSI Transport Management System · All rights reserved
-  </footer>
-
-  <script>
-    lucide.createIcons();
-  </script>
-</body>
-</html>
+<!doctype html><html><head>
+<meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>ලියාපදිංචි වීම</title>
+<link rel="stylesheet" href="assets/styles.css"/>
+<script src="assets/config.js"></script>
+<script src="assets/app.js"></script>
+</head><body>
+<div class="topbar"><div class="inner">
+<div class="brand"><span class="dot"></span> ප්‍රවාහන පද්ධතිය</div>
+<div class="nav"><a class="btn btn-ghost" href="login.html">ඇතුල්වීම</a></div>
+</div></div>
+<div class="container">
+<h1 class="h1">ලියාපදිංචි වීම</h1>
+<div class="card soft">
+<h2 class="h2">භූමිකාව තෝරන්න</h2>
+<p class="p-muted mini">ඔබගේ භූමිකාව අනුව ලියාපදිංචි වීමේ පත්‍රය තෝරන්න.</p>
+<div class="grid two section">
+  <a class="card" href="register_emp.html"><h2 class="h2">සේවක (EMP)</h2><p class="p-muted mini">HOD අනුමැතිය අවශ්‍යයි.</p></a>
+  <a class="card" href="register_hod.html"><h2 class="h2">දෙපාර්තමේන්තු ප්‍රධානී (HOD)</h2><p class="p-muted mini">පරිපාලක අනුමැතිය අවශ්‍යයි.</p></a>
+</div>
+</div>
+</div></body></html>

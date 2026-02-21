@@ -1,365 +1,351 @@
 <!doctype html>
-<html lang="si" class="h-full">
+<html lang="si">
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <meta name="theme-color" content="#0f172a"/>
-  <title>Sign In — DSI Transport Management</title>
-  <link rel="stylesheet" href="assets/styles.css" />
-
-  <!-- Tailwind CSS CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-
-  <!-- Lucide Icons -->
-  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
-
-  <!-- Google Fonts: DM Sans -->
-  <link rel="preconnect" href="https://fonts.googleapis.com"/>
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet"/>
-
-  <!-- Backend scripts (PRESERVED) -->
+  <meta name="theme-color" content="#E11D48"/>
+  <title>🔐 ඇතුල්වීම - Transport Management</title>
+  <link rel="stylesheet" href="assets/styles.css"/>
   <script src="assets/config.js"></script>
   <script src="assets/app.js"></script>
-
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: { sans: ['DM Sans','ui-sans-serif','system-ui'] },
-          animation: {
-            'fade-up': 'fadeUp 0.6s cubic-bezier(0.4,0,0.2,1) both',
-            'fade-up-2': 'fadeUp 0.6s 0.1s cubic-bezier(0.4,0,0.2,1) both',
-            'fade-up-3': 'fadeUp 0.6s 0.2s cubic-bezier(0.4,0,0.2,1) both',
-            'pulse-slow': 'pulse 4s cubic-bezier(0.4,0,0.6,1) infinite',
-            'drift': 'drift 18s ease-in-out infinite',
-            'drift2': 'drift2 22s ease-in-out infinite',
-          },
-          keyframes: {
-            fadeUp: { from:{ opacity:'0', transform:'translateY(20px)' }, to:{ opacity:'1', transform:'translateY(0)' } },
-            drift:  { '0%,100%':{ transform:'translate(0,0) rotate(0deg)' }, '33%':{ transform:'translate(30px,-20px) rotate(3deg)' }, '66%':{ transform:'translate(-20px,15px) rotate(-2deg)' } },
-            drift2: { '0%,100%':{ transform:'translate(0,0) rotate(0deg)' }, '33%':{ transform:'translate(-25px,20px) rotate(-3deg)' }, '66%':{ transform:'translate(20px,-15px) rotate(2deg)' } },
-          }
-        }
+  <style>
+    /* Enhanced login page styles */
+    .login-wrapper {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    
+    .login-card {
+      width: 100%;
+      max-width: 480px;
+      animation: fadeInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
       }
     }
-  </script>
+    
+    .logo-section {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+    
+    .logo-icon {
+      width: 80px;
+      height: 80px;
+      margin: 0 auto 16px;
+      background: linear-gradient(135deg, var(--brand), var(--brand-2));
+      border-radius: var(--r-lg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 40px;
+      box-shadow: var(--glow-brand), var(--shadow-lg);
+      animation: pulse-glow 3s ease-in-out infinite;
+    }
+    
+    .logo-title {
+      font-size: 28px;
+      font-weight: 900;
+      background: linear-gradient(135deg, var(--text), var(--muted));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin: 0;
+    }
+    
+    .logo-subtitle {
+      color: var(--muted);
+      margin-top: 8px;
+      font-size: 14px;
+    }
+    
+    .input-group {
+      margin-bottom: 18px;
+    }
+    
+    .input-with-icon {
+      position: relative;
+    }
+    
+    .input-icon {
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--muted-2);
+      font-size: 18px;
+      pointer-events: none;
+    }
+    
+    .input-with-icon input {
+      padding-left: 48px;
+    }
+    
+    .remember-forgot {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 16px 0;
+      font-size: 14px;
+    }
+    
+    .remember-me {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text-secondary);
+      cursor: pointer;
+    }
+    
+    .forgot-link {
+      color: var(--brand);
+      font-weight: 600;
+      transition: opacity 0.2s;
+    }
+    
+    .forgot-link:hover {
+      opacity: 0.8;
+    }
+    
+    .divider {
+      display: flex;
+      align-items: center;
+      text-align: center;
+      margin: 24px 0;
+      color: var(--muted-2);
+      font-size: 14px;
+    }
+    
+    .divider::before,
+    .divider::after {
+      content: '';
+      flex: 1;
+      border-bottom: 1px solid var(--border);
+    }
+    
+    .divider span {
+      padding: 0 16px;
+    }
+    
+    .register-prompt {
+      text-align: center;
+      margin-top: 24px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border);
+      color: var(--text-secondary);
+    }
+    
+    .register-link {
+      color: var(--brand);
+      font-weight: 700;
+      text-decoration: none;
+    }
+    
+    .register-link:hover {
+      text-decoration: underline;
+    }
+    
+    @media(max-width: 640px) {
+      .logo-icon {
+        width: 64px;
+        height: 64px;
+        font-size: 32px;
+      }
+      
+      .logo-title {
+        font-size: 24px;
+      }
+    }
+  /* Password reset modal */
+.reset-modal{ position:fixed; inset:0; z-index:9999; display:flex; align-items:center; justify-content:center; padding:16px; }
+.reset-backdrop{ position:absolute; inset:0; background:rgba(0,0,0,.45); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+.reset-dialog{ position:relative; width:100%; max-width:520px; padding:16px 18px; }
+.reset-head{ display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:10px; }
+.reset-head h3{ margin:0; font-size:18px; }
+.reset-grid{ display:grid; gap:12px; }
+.reset-actions{ display:flex; gap:10px; justify-content:flex-end; margin-top:10px; flex-wrap:wrap; }
+.hint{ color: var(--muted); font-size: 13px; }
+.orline{ display:flex; align-items:center; gap:10px; color:var(--muted-2); font-size:13px; }
+.orline::before, .orline::after{ content:""; height:1px; background:var(--border); flex:1; }
 
-  </head>
-<body class="h-full">
+</style>
+</head>
+<body>
 
-<div class="min-h-screen lg:grid lg:grid-cols-[1fr_520px] xl:grid-cols-[1fr_560px]">
-
-  <!-- ════════════════════════════════════════════════════
-       LEFT — BRAND PANEL
-  ═══════════════════════════════════════════════════════ -->
-  <div class="brand-panel flex flex-col justify-between p-10 xl:p-14 min-h-[280px] lg:min-h-screen relative">
-    <div class="grid-overlay"></div>
-    <div class="glow-orb-1"></div>
-    <div class="glow-orb-2"></div>
-
-    <!-- Top logo wordmark -->
-    <div class="relative z-10 animate-fade-up">
-      <div class="flex items-center gap-3 mb-2">
-        <div class="w-10 h-10 rounded-xl bg-indigo-500 flex items-center justify-center shadow-lg flex-shrink-0">
-          <i data-lucide="bus" class="w-5 h-5 text-white"></i>
-        </div>
-        <div>
-          <span class="text-white font-800 text-lg leading-none tracking-tight">DSI Transport</span>
-          <span class="block text-slate-400 text-xs mt-0.5 tracking-widest uppercase font-500">Management System</span>
-        </div>
-      </div>
-
-      <!-- Navigation links -->
-      <nav class="mt-6 flex gap-3 flex-wrap">
-        <a href="index.html" class="role-badge hover:bg-white/15 transition">
-          <i data-lucide="home" class="w-3 h-3"></i> Home
-        </a>
-        <a href="register.html" class="role-badge hover:bg-white/15 transition">
-          <i data-lucide="user-plus" class="w-3 h-3"></i> ලියාපදිංචි වන්න
-        </a>
-      </nav>
+<div class="topbar">
+  <div class="inner">
+    <div class="brand">
+      <span class="dot"></span> 
+      ප්‍රවාහන කළමණාකරණ පද්ධතිය
     </div>
-
-    <!-- Center hero content -->
-    <div class="relative z-10 animate-fade-up-2">
-      <!-- Large icon -->
-      <div class="mb-8">
-        <div class="w-20 h-20 rounded-3xl bg-indigo-500/20 border border-indigo-400/30 flex items-center justify-center mb-6 shadow-2xl">
-          <i data-lucide="bus-front" class="w-10 h-10 text-indigo-300"></i>
-        </div>
-        <h1 class="text-white font-800 text-4xl xl:text-5xl leading-tight tracking-tight">
-          ප්‍රවාහන<br/>
-          <span class="text-indigo-400">කළමනාකරණ</span><br/>
-          <span class="text-slate-300 font-400 text-3xl xl:text-4xl">පද්ධතිය</span>
-        </h1>
-        <p class="text-slate-400 text-sm mt-4 leading-relaxed max-w-sm">
-          A unified enterprise platform for managing employee transport across all departments — secure, real-time, and reliable.
-        </p>
-      </div>
-
-      <!-- Role tags -->
-      <div class="flex flex-wrap gap-2">
-        <span class="role-badge"><i data-lucide="shield" class="w-3 h-3 text-indigo-400"></i> Admin</span>
-        <span class="role-badge"><i data-lucide="users" class="w-3 h-3 text-emerald-400"></i> HOD</span>
-        <span class="role-badge"><i data-lucide="user" class="w-3 h-3 text-amber-400"></i> Employee</span>
-        <span class="role-badge"><i data-lucide="hard-hat" class="w-3 h-3 text-blue-400"></i> TA</span>
-        <span class="role-badge"><i data-lucide="briefcase" class="w-3 h-3 text-violet-400"></i> HR</span>
-        <span class="role-badge"><i data-lucide="map" class="w-3 h-3 text-rose-400"></i> Planning</span>
-      </div>
-    </div>
-
-    <!-- Stats row -->
-    <div class="relative z-10 animate-fade-up-3 grid grid-cols-3 gap-3 mt-8 lg:mt-0">
-      <div class="stat-pill">
-        <div class="text-white font-800 text-2xl">24/7</div>
-        <div class="text-slate-400 text-xs mt-1">Uptime</div>
-      </div>
-      <div class="stat-pill">
-        <div class="text-white font-800 text-2xl">6+</div>
-        <div class="text-slate-400 text-xs mt-1">User Roles</div>
-      </div>
-      <div class="stat-pill">
-        <div class="text-white font-800 text-2xl">∞</div>
-        <div class="text-slate-400 text-xs mt-1">Routes</div>
-      </div>
-    </div>
-
-    <!-- Footer legal -->
-    <div class="relative z-10 mt-8 lg:mt-6 flex flex-wrap gap-x-5 gap-y-1">
-      <a href="privacy.html" class="text-slate-500 text-xs hover:text-slate-300 transition">Privacy Policy</a>
-      <a href="data-protection.html" class="text-slate-500 text-xs hover:text-slate-300 transition">Data Protection</a>
-      <a href="about.html" class="text-slate-500 text-xs hover:text-slate-300 transition">About</a>
+    <div class="nav">
+      <a class="btn ghost" href="index.html">🏠 Home</a>
+      <a class="btn" href="register.html">ලියාපදිංචි වන්න</a>
     </div>
   </div>
+</div>
 
-  <!-- ════════════════════════════════════════════════════
-       RIGHT — LOGIN FORM
-  ═══════════════════════════════════════════════════════ -->
-  <div class="form-panel flex items-center justify-center px-8 py-12 xl:px-14">
-    <div class="w-full max-w-sm animate-fade-up">
-
-      <!-- Header -->
-      <div class="mb-8">
-        <div class="w-12 h-12 rounded-2xl bg-indigo-50 border border-indigo-100 flex items-center justify-center mb-5 shadow-sm">
-          <i data-lucide="log-in" class="w-6 h-6 text-indigo-600"></i>
-        </div>
-        <h2 class="text-slate-900 font-800 text-3xl tracking-tight leading-tight">Welcome back</h2>
-        <p class="text-slate-400 text-sm mt-1.5 font-400">ඔබගේ ගිණුමට ඇතුල් වන්න</p>
-      </div>
-
-      <!-- ── ERROR MESSAGE — id="msg" PRESERVED ── -->
-      <div id="msg" class="hidden"></div>
-
-      <!-- ── EMAIL — id="email" PRESERVED ── -->
-      <div class="mb-4">
-        <label class="block text-xs font-700 text-slate-500 uppercase tracking-widest mb-2">
-          Email Address
-        </label>
-        <div class="input-wrap">
-          <span class="input-icon">
-            <i data-lucide="mail" class="w-4 h-4"></i>
-          </span>
-          <input
-            id="email"
-            type="email"
+<div class="login-wrapper">
+  <div class="login-card">
+    
+    <!-- Logo Section -->
+    <div class="logo-section">
+      <div class="logo-icon">🚌</div>
+      <h1 class="logo-title">Welcome Back</h1>
+      <p class="logo-subtitle">ඔබගේ ගිණුමට ඇතුල් වන්න</p>
+    </div>
+    
+    <!-- Login Form Card -->
+    <div class="card elevated">
+      
+      <!-- Error Message -->
+      <div id="msg" class="alert error hidden"></div>
+      
+      <!-- Email Input -->
+      <div class="input-group">
+        <label>📧 විද්‍යුත් තැපෑල</label>
+        <div class="input-with-icon">
+          <span class="input-icon">✉️</span>
+          <input 
+            id="email" 
+            type="email" 
             placeholder="name@example.com"
             autocomplete="email"
             autofocus
-            class="form-input"
           />
         </div>
       </div>
-
-      <!-- ── PASSWORD — id="password" PRESERVED ── -->
-      <div class="mb-4">
-        <label class="block text-xs font-700 text-slate-500 uppercase tracking-widest mb-2">
-          Password
-        </label>
-        <div class="input-wrap">
-          <span class="input-icon">
-            <i data-lucide="lock-keyhole" class="w-4 h-4"></i>
-          </span>
-          <input
-            id="password"
-            type="password"
+      
+      <!-- Password Input -->
+      <div class="input-group">
+        <label>🔒 මුරපදය</label>
+        <div class="input-with-icon">
+          <span class="input-icon">🔑</span>
+          <input 
+            id="password" 
+            type="password" 
             placeholder="••••••••"
             autocomplete="current-password"
-            class="form-input"
           />
         </div>
       </div>
-
-      <!-- ── REMEMBER + FORGOT — id="remember", class="forgot-link" PRESERVED ── -->
-      <div class="flex items-center justify-between mb-6">
-        <label class="flex items-center gap-2 cursor-pointer select-none">
+      
+      <!-- Remember & Forgot -->
+      <div class="remember-forgot">
+        <label class="remember-me">
           <input type="checkbox" id="remember" />
-          <span class="text-sm text-slate-500 font-500">Remember me</span>
+          <span>මතක තබා ගන්න</span>
         </label>
-        <!-- class="forgot-link" is queried by JS — must stay -->
-        <a href="#" class="forgot-link">Forgot password?</a>
+        <a href="#" class="forgot-link">මුරපදය අමතකද?</a>
       </div>
-
-      <!-- ── LOGIN BUTTON — id="btnLogin" PRESERVED ── -->
-      <button id="btnLogin" class="btn-signin mb-5">
-        <i data-lucide="log-in" class="w-4 h-4"></i>
-        Sign In
+      
+      <!-- Login Button -->
+      <button class="btn btn-primary" id="btnLogin" style="width:100%; justify-content:center; margin-top:8px;">
+        🔓 ඇතුල් වන්න
       </button>
-
+      
       <!-- Divider -->
-      <div class="divider mb-5">
-        <div class="divider-line"></div>
-        <span class="text-slate-400 text-xs font-600">හෝ</span>
-        <div class="divider-line"></div>
+      <div class="divider">
+        <span>හෝ</span>
+      </div>
+      
+      <!-- Register Prompt -->
+      <div class="register-prompt">
+        ගිණුමක් නැද්ද? 
+        <a href="register.html" class="register-link">දැන් ලියාපදිංචි වන්න →</a>
+      </div>
+      
+    </div>
+    
+    <!-- Footer Links -->
+    <div style="text-align:center; margin-top:24px; color:var(--muted-2); font-size:13px;">
+      <a href="privacy.html" style="color:inherit; margin:0 12px;">Privacy Policy</a>
+      <a href="data-protection.html" style="color:inherit; margin:0 12px;">Data Protection</a>
+      <a href="about.html" style="color:inherit; margin:0 12px;">About</a>
+    </div>
+    
+  </div>
+</div>
+
+<!-- Password reset modal -->
+<div id="resetModal" class="reset-modal hidden" aria-hidden="true">
+  <div class="reset-backdrop" id="resetBackdrop"></div>
+  <div class="card elevated reset-dialog">
+    <div class="reset-head">
+      <h3>🔁 මුරපදය නැවත සකසන්න</h3>
+      <button class="btn ghost small" id="resetClose">✖</button>
+    </div>
+
+    <div id="resetMsg" class="alert error hidden" style="margin-bottom:10px;"></div>
+
+    <div id="resetStep1" class="reset-grid">
+      <div class="hint">Email එක මතක නම් Email දාන්න. Email අමතක නම් Emp No දාන්න (ඔබගේ account එකට අදාල email එකට OTP යවයි).</div>
+
+      <div class="input-group" style="margin:0;">
+        <label>📧 Email</label>
+        <input id="resetEmail" type="email" placeholder="name@example.com" autocomplete="email"/>
       </div>
 
-      <!-- Register prompt -->
-      <p class="text-center text-sm text-slate-500 font-400">
-        ගිණුමක් නැද්ද?&nbsp;
-        <a href="register.html" class="text-indigo-600 font-700 hover:text-indigo-800 transition">
-          දැන් ලියාපදිංචි වන්න →
-        </a>
-      </p>
+      <div class="orline"><span>හෝ</span></div>
 
-      <!-- Trust indicators -->
-      <div class="mt-8 pt-6 border-t border-slate-200 flex items-center justify-center gap-5">
-        <div class="flex items-center gap-1.5 text-slate-400 text-xs">
-          <i data-lucide="shield-check" class="w-3.5 h-3.5 text-emerald-500"></i>
-          <span>Secure Login</span>
-        </div>
-        <div class="flex items-center gap-1.5 text-slate-400 text-xs">
-          <i data-lucide="lock" class="w-3.5 h-3.5 text-indigo-400"></i>
-          <span>Encrypted</span>
-        </div>
-        <div class="flex items-center gap-1.5 text-slate-400 text-xs">
-          <i data-lucide="eye-off" class="w-3.5 h-3.5 text-slate-400"></i>
-          <span>Private</span>
-        </div>
+      <div class="input-group" style="margin:0;">
+        <label>🆔 Emp No</label>
+        <input id="resetEmpNo" type="text" placeholder="EMP001" autocomplete="off"/>
+      </div>
+
+      <div class="reset-actions">
+        <button class="btn secondary" id="btnSendOtp">📨 OTP යවන්න</button>
+      </div>
+    </div>
+
+    <div id="resetStep2" class="reset-grid hidden">
+      <div class="hint">OTP එක මිනිත්තු 5ක් වලංගුයි. දවසට ඉල්ලිය හැක්කේ වාර 3ක් පමණි.</div>
+
+      <div class="input-group" style="margin:0;">
+        <label>🔢 OTP (6 අංක)</label>
+        <input id="resetOtp" type="text" inputmode="numeric" maxlength="6" placeholder="123456" autocomplete="one-time-code"/>
+      </div>
+
+      <div class="input-group" style="margin:0;">
+        <label>🔒 නව මුරපදය</label>
+        <input id="resetNewPass" type="password" placeholder="අවමයෙන් අකුරු 6ක්" autocomplete="new-password"/>
+      </div>
+
+      <div class="input-group" style="margin:0;">
+        <label>🔒 නව මුරපදය (තහවුරු කරන්න)</label>
+        <input id="resetNewPass2" type="password" placeholder="නැවත ටයිප් කරන්න" autocomplete="new-password"/>
+      </div>
+
+      <div class="reset-actions">
+        <button class="btn ghost" id="btnResendOtp">↻ OTP නැවත</button>
+        <button class="btn secondary" id="btnDoReset">✅ Reset</button>
       </div>
     </div>
   </div>
 </div>
 
-
-<!-- ════════════════════════════════════════════════════════
-     PASSWORD RESET MODAL
-     ALL IDs PRESERVED: resetModal, resetBackdrop, resetMsg,
-     resetStep1, resetStep2, resetEmail, resetEmpNo,
-     resetOtp, resetNewPass, resetNewPass2, resetClose,
-     btnSendOtp, btnResendOtp, btnDoReset
-═══════════════════════════════════════════════════════════ -->
-<div id="resetModal" class="hidden" aria-hidden="true">
-  <div id="resetBackdrop"></div>
-  <div class="reset-dialog">
-
-    <!-- Modal header -->
-    <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100">
-      <div class="flex items-center gap-3">
-        <div class="w-9 h-9 rounded-xl bg-indigo-50 flex items-center justify-center">
-          <i data-lucide="key-round" class="w-4 h-4 text-indigo-600"></i>
-        </div>
-        <div>
-          <h3 class="text-slate-800 font-700 text-base">Reset Password</h3>
-          <p class="text-slate-400 text-xs">මුරපදය නැවත සකසන්න</p>
-        </div>
-      </div>
-      <button id="resetClose" class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-500 transition">
-        <i data-lucide="x" class="w-4 h-4"></i>
-      </button>
-    </div>
-
-    <div class="px-6 py-5">
-      <!-- Error message — id="resetMsg" PRESERVED -->
-      <div id="resetMsg" class="hidden"></div>
-
-      <!-- STEP 1 — id="resetStep1" PRESERVED -->
-      <div id="resetStep1">
-        <div class="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 mb-4">
-          <p class="text-amber-700 text-xs leading-relaxed">
-            Email එක මතක නම් Email දාන්න. Email අමතක නම් Emp No දාන්න. (OTP ඔබගේ account email වෙත යවනු ලැබේ)
-          </p>
-        </div>
-
-        <div class="mb-4">
-          <label class="reset-label">📧 Email Address</label>
-          <input id="resetEmail" type="email" placeholder="name@example.com"
-            autocomplete="email" class="reset-input"/>
-        </div>
-
-        <div class="flex items-center gap-3 mb-4">
-          <div class="flex-1 h-px bg-slate-200"></div>
-          <span class="text-slate-400 text-xs font-600">හෝ</span>
-          <div class="flex-1 h-px bg-slate-200"></div>
-        </div>
-
-        <div class="mb-5">
-          <label class="reset-label">🆔 Employee Number</label>
-          <input id="resetEmpNo" type="text" placeholder="EMP001"
-            autocomplete="off" class="reset-input"/>
-        </div>
-
-        <div class="flex justify-end">
-          <button id="btnSendOtp" class="reset-btn reset-btn-primary">
-            <i data-lucide="send" class="w-4 h-4"></i> Send OTP
-          </button>
-        </div>
-      </div>
-
-      <!-- STEP 2 — id="resetStep2" PRESERVED -->
-      <div id="resetStep2" class="hidden">
-        <div class="bg-blue-50 border border-blue-200 rounded-xl px-4 py-3 mb-4">
-          <p class="text-blue-700 text-xs leading-relaxed">
-            ⏱️ OTP is valid for <strong>5 minutes</strong>. Max <strong>3 requests</strong> per day.
-          </p>
-        </div>
-
-        <div class="mb-4">
-          <label class="reset-label">🔢 OTP Code (6 digits)</label>
-          <input id="resetOtp" type="text" inputmode="numeric" maxlength="6"
-            placeholder="123456" autocomplete="one-time-code"
-            class="reset-input text-center text-2xl tracking-widest font-700"/>
-        </div>
-
-        <div class="mb-4">
-          <label class="reset-label">🔒 New Password</label>
-          <input id="resetNewPass" type="password" placeholder="Minimum 6 characters"
-            autocomplete="new-password" class="reset-input"/>
-        </div>
-
-        <div class="mb-5">
-          <label class="reset-label">🔒 Confirm New Password</label>
-          <input id="resetNewPass2" type="password" placeholder="Re-type new password"
-            autocomplete="new-password" class="reset-input"/>
-        </div>
-
-        <div class="flex gap-3 justify-end">
-          <button id="btnResendOtp" class="reset-btn reset-btn-ghost">
-            <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Resend OTP
-          </button>
-          <button id="btnDoReset" class="reset-btn reset-btn-primary">
-            <i data-lucide="check" class="w-4 h-4"></i> Reset Password
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-
-<!-- ════════════════════════════════════════════════════════
-     ALL ORIGINAL SCRIPTS — PRESERVED EXACTLY
-═══════════════════════════════════════════════════════════ -->
 <script>
 // Forgot password modal
-const resetModal   = document.getElementById("resetModal");
-const resetMsg     = document.getElementById("resetMsg");
-const resetStep1   = document.getElementById("resetStep1");
-const resetStep2   = document.getElementById("resetStep2");
-const resetEmail   = document.getElementById("resetEmail");
-const resetEmpNo   = document.getElementById("resetEmpNo");
-const resetOtp     = document.getElementById("resetOtp");
+const resetModal = document.getElementById("resetModal");
+const resetMsg = document.getElementById("resetMsg");
+const resetStep1 = document.getElementById("resetStep1");
+const resetStep2 = document.getElementById("resetStep2");
+const resetEmail = document.getElementById("resetEmail");
+const resetEmpNo = document.getElementById("resetEmpNo");
+const resetOtp = document.getElementById("resetOtp");
 const resetNewPass = document.getElementById("resetNewPass");
-const resetNewPass2= document.getElementById("resetNewPass2");
+const resetNewPass2 = document.getElementById("resetNewPass2");
 
 // Store only the identifier that the user used (email OR emp_no)
 let resetIdentifier = {};
@@ -389,7 +375,6 @@ function showResetError(message){
   resetMsg.classList.remove("hidden");
 }
 
-// class="forgot-link" — queried by JS below; must not change
 document.querySelector(".forgot-link").addEventListener("click", (e) => {
   e.preventDefault();
   openResetModal();
@@ -404,7 +389,7 @@ document.getElementById("resetBackdrop").addEventListener("click", closeResetMod
 
 async function requestOtp(){
   resetMsg.classList.add("hidden");
-  const email  = resetEmail.value.trim();
+  const email = resetEmail.value.trim();
   const emp_no = resetEmpNo.value.trim();
   if(!email && !emp_no) return showResetError("Email හෝ Emp No එකක් ඇතුල් කරන්න.");
 
@@ -416,10 +401,10 @@ async function requestOtp(){
   const btn = document.getElementById("btnSendOtp");
   btn.disabled = true;
   const old = btn.textContent;
-  btn.textContent = "⏳ Sending…";
+  btn.textContent = "⏳ යවමින්...";
   try{
     await api("/auth/password-reset/request", { method:"POST", body: JSON.stringify(payload) });
-    toast("📨 OTP sent to your email");
+    toast("📨 OTP යවලා තියෙනවා");
     resetStep1.classList.add("hidden");
     resetStep2.classList.remove("hidden");
     resetOtp.focus();
@@ -434,8 +419,8 @@ async function requestOtp(){
 async function doReset(){
   resetMsg.classList.add("hidden");
   const otp = resetOtp.value.trim();
-  const p1  = resetNewPass.value;
-  const p2  = resetNewPass2.value;
+  const p1 = resetNewPass.value;
+  const p2 = resetNewPass2.value;
 
   if(!otp || !/^\d{6}$/.test(otp)) return showResetError("OTP එක 6 අංකයක් විය යුතුයි.");
   if(!p1 || p1.length < 6) return showResetError("නව මුරපදය අවමයෙන් අකුරු 6ක් විය යුතුයි.");
@@ -446,10 +431,10 @@ async function doReset(){
   const btn = document.getElementById("btnDoReset");
   btn.disabled = true;
   const old = btn.textContent;
-  btn.textContent = "⏳ Resetting…";
+  btn.textContent = "⏳ සකසමින්...";
   try{
     await api("/auth/password-reset/confirm", { method:"POST", body: JSON.stringify(payload) });
-    toast("✅ Password reset successfully");
+    toast("✅ මුරපදය සාර්ථකව වෙනස් වුණා");
     closeResetModal();
     // Focus password field for login
     document.getElementById("password").focus();
@@ -461,78 +446,76 @@ async function doReset(){
   }
 }
 
-document.getElementById("btnSendOtp").addEventListener("click",  (e) => { e.preventDefault(); requestOtp(); });
+document.getElementById("btnSendOtp").addEventListener("click", (e) => { e.preventDefault(); requestOtp(); });
 document.getElementById("btnResendOtp").addEventListener("click", (e) => { e.preventDefault(); requestOtp(); });
-document.getElementById("btnDoReset").addEventListener("click",   (e) => { e.preventDefault(); doReset(); });
+document.getElementById("btnDoReset").addEventListener("click", (e) => { e.preventDefault(); doReset(); });
 
 // Enter key support
 document.getElementById("email").addEventListener('keypress', (e) => {
   if(e.key === 'Enter') document.getElementById("password").focus();
 });
+
 document.getElementById("password").addEventListener('keypress', (e) => {
   if(e.key === 'Enter') document.getElementById("btnLogin").click();
 });
 
-// ── LOGIN HANDLER — ORIGINAL PRESERVED ──────────────────
+// Login handler
 document.getElementById("btnLogin").onclick = async ()=>{
-  const email    = document.getElementById("email").value.trim();
+  const email = document.getElementById("email").value.trim();
   const password = document.getElementById("password").value;
-  const msg      = document.getElementById("msg");
-  const btn      = document.getElementById("btnLogin");
-
+  const msg = document.getElementById("msg");
+  const btn = document.getElementById("btnLogin");
+  
   // Validation
   if(!email || !password) {
     msg.textContent = "⚠️ කරුණාකර සියලු තොරතුරු පුරවන්න";
-    msg.className = "error";
     msg.classList.remove("hidden");
     return;
   }
-
+  
   msg.classList.add("hidden");
   btn.disabled = true;
-  btn.innerHTML = `<svg class="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 11-6.219-8.56"/></svg> Signing in…`;
-
+  btn.textContent = "⏳ පිවිසෙමින්...";
+  
   try{
-    const d = await api("/auth/login", {
-      method:"POST",
-      body: JSON.stringify({ email, password })
+    const d = await api("/auth/login", { 
+      method:"POST", 
+      body: JSON.stringify({ email, password }) 
     });
-
+    
     setToken(d.token);
-
+    
     // Save remember me preference
     if(document.getElementById("remember").checked) {
       localStorage.setItem("rememberedEmail", email);
     }
-
-    const me   = await loadMe();
+    
+    const me = await loadMe();
     const role = me.me && me.me.role;
-
+    
     // Show success
     toast("✅ සාදරයෙන් පිළිගනිමු!");
-
+    
     // Redirect based on role
     setTimeout(() => {
-      if(role==="ADMIN")     location.href="admin.html";
-      else if(role==="HOD")  location.href="hod.html";
-      else if(role==="TA")   location.href="ta.html";
-      else if(role==="HR")   location.href="hr.html";
-      else if(role==="EMP")  location.href="emp.html";
+      if(role==="ADMIN") location.href="admin.html";
+      else if(role==="HOD") location.href="hod.html";
+      else if(role==="TA") location.href="ta.html";
+      else if(role==="HR") location.href="hr.html";
+      else if(role==="EMP") location.href="emp.html";
       else if(role==="PLANNING") location.href="planning.html";
       else location.href="index.html";
     }, 500);
-
+    
   }catch(e){
     msg.textContent = "❌ " + (e.message || "ඇතුල් වීම අසාර්ථකයි. කරුණාකර නැවත උත්සාහ කරන්න.");
-    msg.className = "error";
     msg.classList.remove("hidden");
     btn.disabled = false;
-    btn.innerHTML = `<i data-lucide="log-in" class="w-4 h-4"></i> Sign In`;
-    lucide.createIcons();
+    btn.textContent = "🔓 ඇතුල් වන්න";
   }
 };
 
-// ── LOAD REMEMBERED EMAIL — ORIGINAL PRESERVED ──────────
+// Load remembered email
 window.addEventListener('DOMContentLoaded', () => {
   const remembered = localStorage.getItem("rememberedEmail");
   if(remembered) {
@@ -540,9 +523,6 @@ window.addEventListener('DOMContentLoaded', () => {
     document.getElementById("remember").checked = true;
     document.getElementById("password").focus();
   }
-
-  // Init icons after DOM ready
-  lucide.createIcons();
 });
 </script>
 

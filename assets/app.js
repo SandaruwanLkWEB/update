@@ -1,63 +1,70 @@
+/* ============================================================
+   Theme toggle (Light/Dark) - persists in localStorage
+   ============================================================ */
+(function(){
+  const KEY = "theme_mode"; // 'light' | 'dark' | 'system'
+  const root = document.documentElement;
+
+  function systemTheme(){
+    return window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+  }
+
+  function apply(mode){
+    const resolved = (mode === "system" || !mode) ? systemTheme() : mode;
+    root.dataset.theme = resolved;
+    // keep meta theme-color aligned (optional)
+    const meta = document.querySelector('meta[name="theme-color"]');
+    if(meta){
+      meta.setAttribute("content", resolved === "dark" ? "#0B1020" : "#E11D48");
+    }
+  }
+
+  window.getThemeMode = function(){
+    return localStorage.getItem(KEY) || "system";
+  };
+
+  window.setThemeMode = function(mode){
+    localStorage.setItem(KEY, mode);
+    apply(mode);
+    window.updateThemeToggle && window.updateThemeToggle();
+  };
+
+  window.toggleTheme = function(){
+    const cur = window.getThemeMode();
+    // toggle between dark and light (system -> dark -> light -> dark ...)
+    const next = (cur === "dark") ? "light" : "dark";
+    window.setThemeMode(next);
+  };
+
+  // Apply as early as possible (before paint)
+  apply(window.getThemeMode());
+
+  // React to system changes if in system mode
+  try{
+    const mq = window.matchMedia("(prefers-color-scheme: dark)");
+    mq.addEventListener("change", ()=>{ if(window.getThemeMode()==="system") apply("system"); });
+  }catch(e){}
+})();
+
 function getToken() { return localStorage.getItem("token"); }
 function setToken(t) { localStorage.setItem("token", t); }
 function clearToken() { localStorage.removeItem("token"); }
 
-// --- Theme (Light default + optional Dark) ---
-function applyThemeFromStorage(){
-  const saved = localStorage.getItem("theme") || "light";
-  document.documentElement.dataset.theme = (saved === "dark") ? "dark" : "";
-}
-
-function toggleTheme(){
-  const isDark = (document.documentElement.dataset.theme === "dark");
-  document.documentElement.dataset.theme = isDark ? "" : "dark";
-  localStorage.setItem("theme", isDark ? "light" : "dark");
-}
-
-document.addEventListener("DOMContentLoaded", applyThemeFromStorage);
-
-// --- Lucide Icons ---
-function initLucide(){
-  try{
-    if (window.lucide && typeof window.lucide.createIcons === "function"){
-      window.lucide.createIcons();
-    }
-  }catch(e){}
-}
-
-// --- Welcome Overlay (shown once after login) ---
-function maybeShowWelcome(){
-  try{
-    const flag = localStorage.getItem("justLoggedIn");
-    if(!flag) return;
-    localStorage.removeItem("justLoggedIn");
-    const role = localStorage.getItem("justLoggedInRole") || "";
-    const email = localStorage.getItem("rememberedEmail") || "";
-    const div = document.createElement("div");
-    div.className = "welcome";
-    div.innerHTML = `
-      <div class="welcome-card">
-        <div class="welcome-top">
-          <div class="welcome-mark"><i data-lucide="bus-front"></i></div>
-          <div>
-            <div class="welcome-title">Welcome • DSI Transport System</div>
-            <div class="welcome-sub">${role ? role.toUpperCase() : "USER"} ${email ? "• " + email : ""}</div>
-          </div>
-        </div>
-        <div class="welcome-bar"><div></div></div>
-      </div>`;
-    document.body.appendChild(div);
-    initLucide();
-    setTimeout(()=>{ div.style.opacity="0"; div.style.transition="opacity .22s ease"; }, 1150);
-    setTimeout(()=>{ div.remove(); }, 1450);
-  }catch(e){}
-}
-
-document.addEventListener("DOMContentLoaded", () => { initLucide(); maybeShowWelcome(); });
-
-
 function qs(id){ return document.getElementById(id); }
 function qsa(sel){ return Array.from(document.querySelectorAll(sel)); }
+
+// HTML escape helper (avoid XSS in template strings)
+function esc(v){
+  const s = String(v ?? "");
+  return s
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+// expose globally for inline page scripts
+window.esc = window.esc || esc;
 
 function ensureToast(){
   if (document.getElementById("toast")) return;
@@ -314,4 +321,97 @@ async function downloadPdfWithAuth(url, filename) {
     console.error('PDF download error:', error);
     toast("❌ " + error.message);
   }
+}
+
+
+function ensureThemeToggle(){
+  // Prevent duplicates
+  if (document.getElementById("themeToggleBtn")) return;
+
+  const header = document.querySelector("header");
+  if(!header) return;
+
+  // Try to find an actions container in header (a div that contains Home/Logout buttons)
+  let actions = null;
+  const divs = Array.from(header.querySelectorAll("div"));
+  for(const d of divs){
+    const hasBtn = d.querySelector("button") || d.querySelector("a.btn");
+    if(hasBtn) { actions = d; break; }
+  }
+  if(!actions) actions = header;
+
+  const btn = document.createElement("button");
+  btn.id = "themeToggleBtn";
+  btn.type = "button";
+  btn.className = "btn ghost small theme-toggle";
+  btn.addEventListener("click", ()=> toggleTheme());
+
+  window.updateThemeToggle = function(){
+    const mode = (window.getThemeMode && window.getThemeMode()) || "system";
+    const isDark = (document.documentElement.dataset.theme === "dark");
+    btn.textContent = isDark ? "☀️ Light" : "🌙 Dark";
+    btn.title = isDark ? "Light mode" : "Dark mode";
+  };
+
+  actions.insertBefore(btn, actions.firstChild);
+  window.updateThemeToggle();
+}
+
+document.addEventListener("DOMContentLoaded", ()=>{
+  try{ ensureThemeToggle();
+  try{ ensureProfileButton(); }catch(e){} }catch(e){}
+});
+
+
+function ensureProfileButton(){
+  if (document.getElementById("profileBtn")) return;
+
+  // only when logged-in token exists
+  const t = localStorage.getItem("token");
+  if(!t) return;
+
+  const header = document.querySelector("header");
+  if(!header) return;
+
+  // If already exists in markup, do nothing
+  if(header.querySelector('a[href="profile.html"]')) return;
+
+  // Find an actions container (same heuristic as theme toggle)
+  let actions = null;
+  const divs = Array.from(header.querySelectorAll("div"));
+  for(const d of divs){
+    const hasControls = d.querySelector("button") || d.querySelector("a.btn");
+    if(hasControls){ actions = d; break; }
+  }
+  if(!actions) actions = header;
+
+  const a = document.createElement("a");
+  a.id = "profileBtn";
+  a.href = "profile.html";
+  a.className = "btn ghost small";
+  a.textContent = "👤 Profile";
+
+  // Insert near Home button if possible, else at start
+  const home = actions.querySelector('a[href="index.html"], a[href="admin.html"], a[href="hod.html"], a[href="ta.html"], a[href="hr.html"], a[href="employee.html"]');
+  if(home && home.nextSibling){
+    actions.insertBefore(a, home.nextSibling);
+  }else{
+    actions.insertBefore(a, actions.firstChild);
+  }
+}
+
+
+function goHome(){
+  // Navigate to correct dashboard by role
+  loadMe().then((d)=>{
+    const me = d && d.me;
+    if(!me || !me.role){ location.href = "login.html"; return; }
+    const r = String(me.role).toUpperCase();
+    if(r === "ADMIN") location.href = "admin.html";
+    else if(r === "HR") location.href = "hr.html";
+    else if(r === "TA" || r === "TRANSPORT_AUTHORITY") location.href = "ta.html";
+    else if(r === "HOD") location.href = "hod.html";
+    else if(r === "EMP" || r === "EMPLOYEE") location.href = "employee.html";
+    else location.href = "index.html";
+  }).catch(()=> location.href="login.html");
 }

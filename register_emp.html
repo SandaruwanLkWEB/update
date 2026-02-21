@@ -1,406 +1,277 @@
 <!doctype html>
-<html lang="si" class="h-full">
+<html lang="si">
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <meta name="theme-color" content="#0f172a"/>
-  <title>සේවක ලියාපදිංචි වීම — DSI Transport</title>
-  <link rel="stylesheet" href="assets/styles.css" />
-
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
-  <link rel="preconnect" href="https://fonts.googleapis.com"/>
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
-
+  <meta name="theme-color" content="#E11D48"/>
+  <title>👤 සේවක ලියාපදිංචි වීම</title>
+  <link rel="stylesheet" href="assets/styles.css"/>
   <script src="assets/config.js"></script>
   <script src="assets/app.js"></script>
-
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: { sans: ['DM Sans', 'ui-sans-serif', 'system-ui'] },
-          animation: {
-            'fade-in':   'fadeIn 0.45s ease',
-            'fade-up':   'fadeUp 0.45s ease both',
-            'drift':     'drift 20s ease-in-out infinite',
-            'drift2':    'drift2 25s ease-in-out infinite',
-            'pulse-dot': 'pulseDot 2s infinite',
-          },
-          keyframes: {
-            fadeIn:    { from:{ opacity:'0' }, to:{ opacity:'1' } },
-            fadeUp:    { from:{ opacity:'0', transform:'translateY(14px)' }, to:{ opacity:'1', transform:'translateY(0)' } },
-            drift:     { '0%,100%':{ transform:'translate(0,0) scale(1)' }, '50%':{ transform:'translate(24px,-18px) scale(1.05)' } },
-            drift2:    { '0%,100%':{ transform:'translate(0,0) scale(1.04)' }, '50%':{ transform:'translate(-18px,22px) scale(0.97)' } },
-            pulseDot:  { '0%,100%':{ opacity:'1' }, '50%':{ opacity:'.35' } },
-          }
-        }
-      }
+  <style>
+    .form-section {
+      animation: fadeIn 0.4s ease;
     }
-  </script>
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
 
-  </head>
-<body class="min-h-screen flex">
-
-<!-- ═══ LEFT BRAND PANEL ═══ -->
-<div class="hidden lg:flex w-2/5 xl:w-[42%] flex-col relative overflow-hidden"
-     style="background:linear-gradient(145deg,#0a0f1e 0%,#1e1b4b 50%,#312e81 100%); min-height:100vh;">
-
-  <!-- Glow orbs -->
-  <div class="absolute inset-0 overflow-hidden pointer-events-none">
-    <div class="absolute w-72 h-72 rounded-full animate-drift opacity-20"
-         style="background:radial-gradient(circle,#7c3aed,transparent); top:-10%; left:-10%;"></div>
-    <div class="absolute w-64 h-64 rounded-full animate-drift2 opacity-15"
-         style="background:radial-gradient(circle,#a78bfa,transparent); bottom:5%; right:-5%;"></div>
-    <div class="absolute w-48 h-48 rounded-full animate-drift opacity-10"
-         style="background:radial-gradient(circle,#c4b5fd,transparent); top:40%; right:10%; animation-delay:-8s;"></div>
-    <!-- Grid -->
-    <div class="absolute inset-0 opacity-5"
-         style="background-image:linear-gradient(rgba(255,255,255,.3) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.3) 1px,transparent 1px);background-size:48px 48px;"></div>
-  </div>
-
-  <!-- Top nav -->
-  <div class="relative z-10 px-8 pt-7 flex items-center gap-3">
-    <div class="w-9 h-9 rounded-xl bg-white/15 flex items-center justify-center backdrop-blur">
-      <i data-lucide="bus" class="w-5 h-5 text-white"></i>
+<div class="topbar">
+  <div class="inner">
+    <div class="brand">
+      <span class="dot"></span> 
+      ප්‍රවාහන කළමණාකරණ පද්ධතිය
     </div>
-    <div>
-      <div class="text-white font-700 text-sm leading-none">DSI Transport</div>
-      <div class="text-white/50 text-xs mt-0.5">Management System</div>
+    <div class="nav">
+      <a class="btn ghost" href="login.html">🔓 ඇතුල්වීම</a>
+      <a class="btn" href="register.html">⬅️ ආපසු</a>
     </div>
-  </div>
-
-  <!-- Content -->
-  <div class="relative z-10 flex-1 flex flex-col justify-center px-10 py-12">
-    <!-- Role badge -->
-    <div class="inline-flex items-center gap-2 bg-violet-500/20 border border-violet-400/30 rounded-full px-4 py-2 mb-7 w-fit">
-      <i data-lucide="user-plus" class="w-4 h-4 text-violet-300"></i>
-      <span class="text-violet-200 text-xs font-600 uppercase tracking-wider">Employee Registration</span>
-    </div>
-    <h1 class="text-white font-800 text-4xl leading-tight mb-4">
-      සේවක<br/>
-      <span class="text-violet-300">ලියාපදිංචි</span><br/>
-      වීම
-    </h1>
-    <p class="text-white/60 text-sm leading-relaxed mb-8 max-w-xs">
-      ඔබගේ තොරතුරු ඇතුළත් කර ලියාපදිංචි වන්න. HOD අනුමැතිය ලැබූ පසු පද්ධතිය භාවිතා කළ හැකිය.
-    </p>
-
-    <!-- Steps -->
-    <div class="space-y-4">
-      <div class="flex items-center gap-3">
-        <div class="w-7 h-7 rounded-full bg-violet-500/30 border border-violet-400/40 flex items-center justify-center flex-shrink-0">
-          <span class="text-violet-200 text-xs font-700">1</span>
-        </div>
-        <span class="text-white/70 text-sm">ලියාපදිංචි ආකෘතිය පුරවන්න</span>
-      </div>
-      <div class="flex items-center gap-3">
-        <div class="w-7 h-7 rounded-full bg-violet-500/30 border border-violet-400/40 flex items-center justify-center flex-shrink-0">
-          <span class="text-violet-200 text-xs font-700">2</span>
-        </div>
-        <span class="text-white/70 text-sm">HOD අනුමැතිය ලැබේ</span>
-      </div>
-      <div class="flex items-center gap-3">
-        <div class="w-7 h-7 rounded-full bg-violet-500/30 border border-violet-400/40 flex items-center justify-center flex-shrink-0">
-          <span class="text-violet-200 text-xs font-700">3</span>
-        </div>
-        <span class="text-white/70 text-sm">ඔබේ ගිණුමෙන් ඇතුල් වන්න</span>
-      </div>
-    </div>
-  </div>
-
-  <!-- Trust badges -->
-  <div class="relative z-10 px-10 pb-8 flex gap-5 flex-wrap">
-    <div class="trust-badge"><i data-lucide="shield" class="w-3.5 h-3.5"></i> Secure</div>
-    <div class="trust-badge"><i data-lucide="lock" class="w-3.5 h-3.5"></i> Encrypted</div>
-    <div class="trust-badge"><i data-lucide="eye-off" class="w-3.5 h-3.5"></i> Private</div>
   </div>
 </div>
 
-<!-- ═══ RIGHT FORM PANEL ═══ -->
-<div class="flex-1 flex flex-col min-h-screen bg-slate-50">
-
-  <!-- Mobile top bar -->
-  <div class="lg:hidden flex items-center justify-between px-5 py-4 bg-white border-b border-slate-200">
-    <div class="flex items-center gap-2">
-      <div class="w-7 h-7 rounded-lg bg-slate-900 flex items-center justify-center">
-        <i data-lucide="bus" class="w-4 h-4 text-white"></i>
-      </div>
-      <span class="text-slate-800 font-700 text-sm">DSI Transport</span>
+<div class="container">
+  <h1 class="h1">👤 සේවක ලියාපදිංචි වීම</h1>
+  <p class="p-muted">ඔබගේ තොරතුරු පුරවා ලියාපදිංචි වන්න. HOD අනුමැතියෙන් පසු ඔබට පද්ධතිය භාවිතා කළ හැකිය.</p>
+  
+  <div class="card elevated form-section">
+    
+    <!-- Loading Indicator -->
+    <div id="loadingDepts" class="alert" style="display:none;">
+      ⏳ දෙපාර්තමේන්තු පූරණය වෙමින්...
     </div>
-    <div class="flex gap-2">
-      <a href="register.html" class="text-sm text-slate-500 font-600 hover:text-slate-800 transition flex items-center gap-1">
-        <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i> Back
-      </a>
-      <a href="login.html" class="text-sm text-violet-600 font-700 hover:text-violet-800 transition">Sign In</a>
-    </div>
-  </div>
-
-  <!-- Form area -->
-  <div class="flex-1 flex flex-col justify-center px-6 py-10 lg:px-14 xl:px-20 max-w-2xl w-full mx-auto">
-
-    <!-- Header -->
-    <div class="mb-8 animate-fade-up">
-      <div class="flex items-center gap-3 mb-4">
-        <div class="w-10 h-10 rounded-xl bg-violet-100 flex items-center justify-center">
-          <i data-lucide="user-plus" class="w-5 h-5 text-violet-600"></i>
-        </div>
-        <div>
-          <h2 class="text-slate-900 font-800 text-2xl leading-none">සේවක ලියාපදිංචිය</h2>
-          <p class="text-slate-400 text-sm mt-1">Employee Registration</p>
-        </div>
-      </div>
-      <p class="text-slate-500 text-sm leading-relaxed">
-        HOD අනුමැතිය ලැබූ පසු ඔබට පද්ධතිය භාවිතා කළ හැකිය.
-      </p>
-    </div>
-
-    <!-- Alerts — ids PRESERVED -->
-    <!-- id="loadingDepts" PRESERVED -->
-    <div id="loadingDepts" class="alert" style="display:none; background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe;">
-      <div class="flex items-center gap-2 text-sm">
-        <i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i>
-        දෙපාර්තමේන්තු පූරණය වෙමින්…
-      </div>
-    </div>
-    <!-- id="deptError" PRESERVED -->
+    
+    <!-- Error Alert -->
     <div id="deptError" class="alert error hidden"></div>
-    <!-- id="msg" PRESERVED -->
+    
+    <!-- Success/Error Message -->
     <div id="msg" class="alert hidden"></div>
-
-    <!-- Form -->
-    <div class="space-y-0 animate-fade-up" style="animation-delay:0.08s;">
-
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-5">
-        <!-- Full name -->
-        <div class="form-group">
-          <label class="form-label">සම්පූර්ණ නම</label>
-          <div class="form-input-wrap">
-            <i data-lucide="user" class="icon"></i>
-            <!-- id="emp_name" PRESERVED -->
-            <input id="emp_name" class="form-input" placeholder="සමග ප්‍රනාන්දු"
-                   autocomplete="name" required/>
-          </div>
-        </div>
-
-        <!-- Emp no -->
-        <div class="form-group">
-          <label class="form-label">සේවක අංකය (Emp No)</label>
-          <div class="form-input-wrap">
-            <i data-lucide="hash" class="icon"></i>
-            <!-- id="emp_no" PRESERVED -->
-            <input id="emp_no" class="form-input" placeholder="20482"
-                   autocomplete="off" required/>
-          </div>
-        </div>
-
-        <!-- Email -->
-        <div class="form-group sm:col-span-2">
-          <label class="form-label">විද්‍යුත් තැපෑල</label>
-          <div class="form-input-wrap">
-            <i data-lucide="mail" class="icon"></i>
-            <!-- id="email" PRESERVED -->
-            <input id="email" type="email" class="form-input" placeholder="name@example.com"
-                   autocomplete="email" required/>
-          </div>
-        </div>
-
-        <!-- Department -->
-        <div class="form-group sm:col-span-2">
-          <label class="form-label">දෙපාර්තමේන්තුව</label>
-          <div class="form-input-wrap">
-            <i data-lucide="building-2" class="icon"></i>
-            <!-- id="department_id" PRESERVED -->
-            <select id="department_id" class="form-input" required>
-              <option value="">⏳ පූරණය වෙමින්...</option>
-            </select>
-          </div>
-        </div>
-
-        <!-- Password -->
-        <div class="form-group">
-          <label class="form-label">මුරපදය</label>
-          <div class="form-input-wrap">
-            <i data-lucide="lock" class="icon"></i>
-            <!-- id="password" PRESERVED -->
-            <input id="password" type="password" class="form-input" placeholder="අවම අකුරු 6"
-                   autocomplete="new-password" minlength="6" required/>
-          </div>
-        </div>
-
-        <!-- Confirm password -->
-        <div class="form-group">
-          <label class="form-label">මුරපදය නැවත</label>
-          <div class="form-input-wrap">
-            <i data-lucide="lock-keyhole" class="icon"></i>
-            <!-- id="password_confirm" PRESERVED -->
-            <input id="password_confirm" type="password" class="form-input" placeholder="නැවත ටයිප් කරන්න"
-                   autocomplete="new-password" minlength="6" required/>
-          </div>
-        </div>
+    
+    <div class="grid two">
+      <div>
+        <label>👤 සම්පූර්ණ නම</label>
+        <input 
+          id="emp_name" 
+          placeholder="සමග ප්‍රනාන්දු"
+          autocomplete="name"
+          required
+        />
+        
+        <label>🆔 සේවක අංකය (Emp No)</label>
+        <input 
+          id="emp_no" 
+          placeholder="උදා: 20482"
+          autocomplete="off"
+          required
+        />
+        
+        <label>📧 විද්‍යුත් තැපෑල</label>
+        <input 
+          id="email" 
+          type="email" 
+          placeholder="name@example.com"
+          autocomplete="email"
+          required
+        />
       </div>
-
-      <!-- Submit button -->
-      <!-- id="btnReg" PRESERVED -->
-      <button id="btnReg"
-        class="w-full flex items-center justify-center gap-2 py-3.5 px-6 rounded-xl font-700 text-white text-base
-               bg-gradient-to-r from-violet-700 to-violet-600 hover:from-violet-800 hover:to-violet-700
-               transition-all shadow-lg shadow-violet-200 hover:shadow-violet-300 hover:shadow-xl
-               focus:outline-none focus:ring-4 focus:ring-violet-200 mt-2">
-        <i data-lucide="check-circle" class="w-5 h-5"></i>
-        ලියාපදිංචි වන්න
-      </button>
-
-      <!-- Login link -->
-      <p class="text-center text-slate-500 text-sm mt-5">
-        දැනටමත් ගිණුමක් ඇත?
-        <a href="login.html" class="text-violet-600 font-700 hover:text-violet-800 transition ml-1">ඇතුල් වන්න →</a>
-      </p>
-
-      <!-- Back link (desktop) -->
-      <p class="text-center text-slate-400 text-sm mt-2 hidden lg:block">
-        <a href="register.html" class="hover:text-slate-600 transition flex items-center justify-center gap-1.5">
-          <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i> Back to role selection
-        </a>
-      </p>
+      
+      <div>
+        <label>🏢 දෙපාර්තමේන්තුව</label>
+        <select id="department_id" required>
+          <option value="">⏳ පූරණය වෙමින්...</option>
+        </select>
+        
+        <label>🔒 මුරපදය</label>
+        <input 
+          id="password" 
+          type="password" 
+          placeholder="අවම අකුරු 6"
+          autocomplete="new-password"
+          minlength="6"
+          required
+        />
+        
+        <label>🔒 මුරපදය නැවත ඇතුළත් කරන්න</label>
+        <input 
+          id="password_confirm" 
+          type="password" 
+          placeholder="මුරපදය නැවත ටයිප් කරන්න"
+          autocomplete="new-password"
+          minlength="6"
+          required
+        />
+      </div>
     </div>
+    
+    <div class="toolbar" style="margin-top:18px;">
+      <div class="btnrow" style="width:100%;">
+        <button class="btn btn-primary" id="btnReg" style="width:100%; justify-content:center;">
+          ✅ ලියාපදිංචි වන්න
+        </button>
+      </div>
+    </div>
+    
+    <p class="p-muted" style="margin-top:18px; text-align:center; font-size:13px;">
+      දැනටමත් ගිණුමක් තිබේද? 
+      <a href="login.html" style="color:var(--brand); font-weight:700;">ඇතුල් වන්න →</a>
+    </p>
   </div>
 </div>
 
-<!-- ═══ ALL ORIGINAL SCRIPTS — PRESERVED EXACTLY ═══ -->
 <script>
-lucide.createIcons();
-
-/* ── Load departments with error handling — ORIGINAL ── */
+// Load departments with error handling
 (async ()=>{
-  const sel        = document.getElementById("department_id");
+  const sel = document.getElementById("department_id");
   const loadingDiv = document.getElementById("loadingDepts");
-  const errorDiv   = document.getElementById("deptError");
-
-  try{
+  const errorDiv = document.getElementById("deptError");
+  
+  try {
+    // Show loading
     loadingDiv.style.display = 'block';
     sel.disabled = true;
-    lucide.createIcons();
-
+    
     const d = await api("/public/departments");
     const departments = d.departments || [];
-
-    if(departments.length === 0) throw new Error("දෙපාර්තමේන්තු හමු නොවීය");
-
-    sel.innerHTML = '<option value="">-- තෝරන්න --</option>' +
+    
+    if(departments.length === 0) {
+      throw new Error("දෙපාර්තමේන්තු හමු නොවීය");
+    }
+    
+    // Populate dropdown
+    sel.innerHTML = '<option value="">-- තෝරන්න --</option>' + 
       departments.map(x => `<option value="${x.id}">${x.name}</option>`).join("");
-
+    
+    // Hide loading
     loadingDiv.style.display = 'none';
     sel.disabled = false;
-
-  }catch(e){
+    
+  } catch(e) {
     console.error('Department load error:', e);
+    
+    // Show error
     loadingDiv.style.display = 'none';
     errorDiv.textContent = "⚠️ දෙපාර්තමේන්තු පූරණය කිරීමට නොහැකි විය: " + e.message;
     errorDiv.classList.remove("hidden");
+    
+    // Fallback dropdown
     sel.innerHTML = '<option value="">දෙපාර්තමේන්තු පූරණය අසාර්ථකයි</option>';
     sel.disabled = true;
   }
 })();
 
-/* ── validateForm — ORIGINAL ─────────────── */
-function validateForm(){
-  const emp_name        = document.getElementById("emp_name").value.trim();
-  const emp_no          = document.getElementById("emp_no").value.trim();
-  const email           = document.getElementById("email").value.trim();
-  const department_id   = document.getElementById("department_id").value;
-  const password        = document.getElementById("password").value;
+// Form validation helper
+function validateForm() {
+  const emp_name = document.getElementById("emp_name").value.trim();
+  const emp_no = document.getElementById("emp_no").value.trim();
+  const email = document.getElementById("email").value.trim();
+  const department_id = document.getElementById("department_id").value;
+  const password = document.getElementById("password").value;
   const password_confirm = document.getElementById("password_confirm").value;
-
-  if(!emp_name)                           return "⚠️ කරුණාකර ඔබගේ නම ඇතුළත් කරන්න";
-  if(!emp_no)                             return "⚠️ කරුණාකර සේවක අංකය ඇතුළත් කරන්න";
-  if(!email)                              return "⚠️ කරුණාකර විද්‍යුත් තැපෑල ඇතුළත් කරන්න";
-  if(!email.includes('@'))                return "⚠️ වලංගු විද්‍යුත් තැපැල් ලිපිනයක් ඇතුළත් කරන්න";
-  if(!department_id)                      return "⚠️ කරුණාකර දෙපාර්තමේන්තුව තෝරන්න";
-  if(!password)                           return "⚠️ කරුණාකර මුරපදයක් ඇතුළත් කරන්න";
-  if(password.length < 6)                 return "⚠️ මුරපදය අවම අකුරු 6ක් විය යුතුය";
-  if(password !== password_confirm)       return "⚠️ මුරපද ගැලපෙන්නේ නැත. නැවත පරීක්ෂා කරන්න";
+  
+  if(!emp_name) return "⚠️ කරුණාකර ඔබගේ නම ඇතුළත් කරන්න";
+  if(!emp_no) return "⚠️ කරුණාකර සේවක අංකය ඇතුළත් කරන්න";
+  if(!email) return "⚠️ කරුණාකර විද්‍යුත් තැපෑල ඇතුළත් කරන්න";
+  if(!email.includes('@')) return "⚠️ වලංගු විද්‍යුත් තැපැල් ලිපිනයක් ඇතුළත් කරන්න";
+  if(!department_id) return "⚠️ කරුණාකර දෙපාර්තමේන්තුව තෝරන්න";
+  if(!password) return "⚠️ කරුණාකර මුරපදයක් ඇතුළත් කරන්න";
+  if(password.length < 6) return "⚠️ මුරපදය අවම අකුරු 6ක් විය යුතුය";
+  if(password !== password_confirm) return "⚠️ මුරපද ගැලපෙන්නේ නැත. නැවත පරීක්ෂා කරන්න";
+  
   return null;
 }
 
-/* ── Registration handler — ORIGINAL ──────── */
+// Registration handler
 document.getElementById("btnReg").onclick = async ()=>{
   const msg = document.getElementById("msg");
   const btn = document.getElementById("btnReg");
-
+  
+  // Validate
   const validationError = validateForm();
-  if(validationError){
+  if(validationError) {
     msg.textContent = validationError;
     msg.className = "alert error";
     return;
   }
-
+  
   const payload = {
-    emp_name:      document.getElementById("emp_name").value.trim(),
-    emp_no:        document.getElementById("emp_no").value.trim(),
-    email:         document.getElementById("email").value.trim(),
+    emp_name: document.getElementById("emp_name").value.trim(),
+    emp_no: document.getElementById("emp_no").value.trim(),
+    email: document.getElementById("email").value.trim(),
     department_id: document.getElementById("department_id").value,
-    password:      document.getElementById("password").value
+    password: document.getElementById("password").value
   };
-
+  
   msg.className = "alert hidden";
   btn.disabled = true;
-  btn.innerHTML = `<svg class="animate-spin w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 11-6.219-8.56"/></svg> යොමු කරමින්…`;
-
-  try{
-    const response = await api("/auth/register", { method:"POST", body: JSON.stringify(payload) });
-
+  btn.textContent = "⏳ යොමු කරමින්...";
+  
+  try {
+    const response = await api("/auth/register", { 
+      method: "POST", 
+      body: JSON.stringify(payload) 
+    });
+    
+    // Success
     msg.textContent = "✅ සාර්ථකයි! ඔබගේ ගිණුම HOD අනුමැතිය සඳහා යොමු කර ඇත. ඔබට විද්‍යුත් තැපෑලෙන් දැනුම්දීමක් ලැබෙනු ඇත.";
     msg.className = "alert ok";
-
-    // Clear form — ORIGINAL
+    
+    // Clear form
     document.getElementById("emp_name").value = "";
     document.getElementById("emp_no").value = "";
     document.getElementById("email").value = "";
     document.getElementById("department_id").value = "";
     document.getElementById("password").value = "";
     document.getElementById("password_confirm").value = "";
-
-    btn.innerHTML = `<i data-lucide="check-circle" class="w-5 h-5"></i> ලියාපදිංචි වන්න`;
+    
+    btn.textContent = "✅ ලියාපදිංචි වන්න";
     btn.disabled = false;
-    lucide.createIcons();
-
-    // Redirect after 3 seconds — ORIGINAL
-    setTimeout(()=>{ location.href = "login.html"; }, 3000);
-
-  }catch(e){
+    
+    // Redirect after 3 seconds
+    setTimeout(() => {
+      location.href = "login.html";
+    }, 3000);
+    
+  } catch(e) {
     console.error('Registration error:', e);
-
-    // Enhanced error messages — ORIGINAL
+    
+    // Enhanced error messages
     let errorMsg = e.message || "ලියාපදිංචිය අසාර්ථකයි";
-    if(errorMsg.includes("duplicate") || errorMsg.includes("exists"))
+    
+    // Make errors more user-friendly
+    if(errorMsg.includes("duplicate") || errorMsg.includes("exists")) {
       errorMsg = "⚠️ මෙම විද්‍යුත් තැපෑල හෝ සේවක අංකය දැනටමත් භාවිතා වේ";
-    else if(errorMsg.includes("invalid") || errorMsg.includes("validation"))
+    } else if(errorMsg.includes("invalid") || errorMsg.includes("validation")) {
       errorMsg = "⚠️ කරුණාකර සියලු තොරතුරු නිවැරදිව පුරවා ඇති දැයි සලකා බලන්න";
-    else if(errorMsg.includes("network") || errorMsg.includes("fetch"))
+    } else if(errorMsg.includes("network") || errorMsg.includes("fetch")) {
       errorMsg = "⚠️ සර්වර් සම්බන්ධතා ගැටලුවක්. කරුණාකර නැවත උත්සාහ කරන්න";
-    else if(errorMsg.includes("500") || errorMsg.includes("Server error"))
+    } else if(errorMsg.includes("500") || errorMsg.includes("Server error")) {
       errorMsg = "⚠️ සර්වර් දෝෂයක්. කරුණාකර පසුව නැවත උත්සාහ කරන්න";
-
+    }
+    
     msg.textContent = "❌ " + errorMsg;
     msg.className = "alert error";
-    btn.innerHTML = `<i data-lucide="check-circle" class="w-5 h-5"></i> ලියාපදිංචි වන්න`;
+    btn.textContent = "✅ ලියාපදිංචි වන්න";
     btn.disabled = false;
-    lucide.createIcons();
   }
 };
 
-/* ── Enter key tab support — ORIGINAL ──────── */
-document.querySelectorAll('input').forEach((input, index, inputs)=>{
-  input.addEventListener('keypress', (e)=>{
-    if(e.key === 'Enter'){
+// Enter key support
+document.querySelectorAll('input').forEach((input, index, inputs) => {
+  input.addEventListener('keypress', (e) => {
+    if(e.key === 'Enter') {
       e.preventDefault();
-      if(index < inputs.length - 1) inputs[index + 1].focus();
-      else document.getElementById("btnReg").click();
+      if(index < inputs.length - 1) {
+        inputs[index + 1].focus();
+      } else {
+        document.getElementById("btnReg").click();
+      }
     }
   });
 });
 </script>
+
 </body>
 </html>

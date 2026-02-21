@@ -1,443 +1,185 @@
 <!doctype html>
-<html lang="si" class="h-full">
+<html>
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <meta name="theme-color" content="#0f172a"/>
-  <title>HOD Dashboard — DSI Transport</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>HOD Dashboard</title>
   <link rel="stylesheet" href="assets/styles.css" />
-
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
-  <link rel="preconnect" href="https://fonts.googleapis.com"/>
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
-
   <script src="assets/config.js"></script>
   <script src="assets/app.js"></script>
+</head>
+<body>
+<header>
+  <h1>HOD Dashboard</h1>
+  <div style="display:flex; gap:8px; align-items:center;">
+    <a href="index.html">Home</a>
+    <button class="btn secondary small" onclick="logout()">Logout</button>
+  </div>
+</header>
 
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: { sans: ['DM Sans', 'ui-sans-serif', 'system-ui'] },
-          animation: {
-            'fade-in': 'fadeIn 0.4s ease',
-            'pulse-dot': 'pulseDot 2s infinite',
-          },
-          keyframes: {
-            fadeIn:   { from:{ opacity:'0', transform:'translateY(6px)' }, to:{ opacity:'1', transform:'translateY(0)' } },
-            pulseDot: { '0%,100%':{ opacity:'1' }, '50%':{ opacity:'.4' } },
-          }
-        }
-      }
-    }
-  </script>
+<div class="container">
+  <div class="card" id="meBox"></div>
 
-  </head>
-<body class="h-full bg-slate-50">
-
-<div id="sidebarOverlay" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 lg:hidden" onclick="closeSidebar()"></div>
-
-<!-- ═══ SIDEBAR ═══ -->
-<aside id="sidebar" class="fixed top-0 left-0 w-64 h-full bg-slate-900 flex flex-col z-50" style="box-shadow:4px 0 24px rgba(0,0,0,0.15);">
-
-  <div class="px-5 py-5 border-b border-white/8 flex items-center gap-3 flex-shrink-0">
-    <div class="w-9 h-9 rounded-xl bg-amber-500 flex items-center justify-center flex-shrink-0 shadow-lg">
-      <i data-lucide="building-2" class="w-5 h-5 text-white"></i>
-    </div>
-    <div>
-      <div class="text-white font-bold text-sm leading-none">DSI Transport</div>
-      <div class="text-slate-400 text-xs mt-0.5 font-medium">Head of Department</div>
+  <div class="card">
+    <div class="tabs">
+      <button class="btn active" id="tabApprovals" onclick="showTab('approvals')">Approvals</button>
+      <button class="btn" id="tabEmployees" onclick="showTab('employees')">Employees</button>
+      <button class="btn" id="tabRequests" onclick="showTab('requests')">Requests</button>
     </div>
   </div>
 
-  <!-- id="meBox" PRESERVED — filled by guard() -->
-  <div class="px-4 py-3 border-b border-white/8 flex-shrink-0">
-    <div id="meBox" class="flex items-center gap-3">
-      <div class="w-8 h-8 rounded-full bg-amber-500/30 flex items-center justify-center">
-        <i data-lucide="user" class="w-4 h-4 text-amber-300"></i>
+  <!-- Approvals -->
+  <div class="card" id="pane_approvals">
+    <h2 style="margin:0 0 10px;">Pending Registrations</h2>
+    <div id="pendingBox" class="small">Loading...</div>
+  </div>
+
+  <!-- Employees -->
+  <div class="card" id="pane_employees" style="display:none;">
+    <h2 style="margin:0 0 10px;">Employee Management</h2>
+
+    <div class="row">
+      <div>
+        <label>Full Name</label>
+        <input id="eName" placeholder="Saman Perera" />
       </div>
       <div>
-        <div class="text-slate-300 text-xs font-medium">Loading...</div>
-        <div class="text-slate-500 text-xs">HOD</div>
+        <label>Emp No</label>
+        <input id="eNo" placeholder="EMP001" />
       </div>
     </div>
-  </div>
 
-  <nav class="flex-1 overflow-y-auto px-3 py-4 space-y-1">
-    <div class="text-slate-500 text-xs font-700 uppercase tracking-widest px-3 mb-3">Manage</div>
-
-    <!-- id="tabApprovals" PRESERVED -->
-    <button class="nav-link active" id="tabApprovals" onclick="showTab('approvals')">
-      <i data-lucide="user-check" class="w-4 h-4"></i> Approvals
-    </button>
-    <!-- id="tabEmployees" PRESERVED -->
-    <button class="nav-link" id="tabEmployees" onclick="showTab('employees')">
-      <i data-lucide="users" class="w-4 h-4"></i> Employees
-    </button>
-    <!-- id="tabRequests" PRESERVED -->
-    <button class="nav-link" id="tabRequests" onclick="showTab('requests')">
-      <i data-lucide="clipboard-list" class="w-4 h-4"></i> Daily Requests
-    </button>
-
-    <div class="border-t border-white/8 my-3"></div>
-    <a href="index.html" class="nav-link"><i data-lucide="home" class="w-4 h-4"></i> Home</a>
-    <button class="nav-link text-red-400 hover:text-red-300 hover:bg-red-500/10" onclick="logout()">
-      <i data-lucide="log-out" class="w-4 h-4"></i> Sign Out
-    </button>
-  </nav>
-
-  <div class="px-4 py-3 border-t border-white/8 flex-shrink-0 flex items-center gap-2">
-    <div class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse-dot"></div>
-    <span class="text-slate-400 text-xs">System Online</span>
-  </div>
-</aside>
-
-<!-- ═══ MAIN WRAPPER ═══ -->
-<div class="lg:ml-64 min-h-screen flex flex-col">
-
-  <!-- TOP NAVBAR -->
-  <header class="sticky top-0 z-30 bg-white border-b border-slate-200 px-5 py-3 flex items-center gap-4 flex-shrink-0"
-          style="box-shadow:0 1px 0 #e2e8f0,0 2px 12px rgba(0,0,0,0.04);">
-    <button onclick="openSidebar()" class="lg:hidden p-2 rounded-lg text-slate-500 hover:bg-slate-100">
-      <i data-lucide="menu" class="w-5 h-5"></i>
-    </button>
-    <div class="hidden sm:flex items-center gap-2">
-      <div class="w-7 h-7 rounded-lg bg-amber-50 flex items-center justify-center">
-        <i data-lucide="building-2" class="w-4 h-4 text-amber-600"></i>
+    <div class="row">
+      <div>
+        <label>පෙරනිමි රූට්</label>
+        <select id="eRoute"></select>
       </div>
       <div>
-        <h1 class="text-slate-900 font-700 text-sm leading-none">HOD Dashboard</h1>
-        <p class="text-slate-400 text-xs mt-0.5">Manage your department employees and transport requests</p>
-      </div>
-    </div>
-    <div class="flex items-center gap-3 ml-auto">
-      <div class="hidden md:flex items-center gap-2 px-3 py-1.5 bg-emerald-50 border border-emerald-200 rounded-full">
-        <div class="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse-dot"></div>
-        <span class="text-emerald-700 text-xs font-600" id="liveClock">Live</span>
-      </div>
-      <button onclick="logout()"
-        class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-slate-500 hover:bg-slate-100 transition text-sm font-500 border border-slate-200">
-        <i data-lucide="log-out" class="w-4 h-4"></i>
-        <span class="hidden sm:inline">Logout</span>
-      </button>
-    </div>
-  </header>
-
-  <!-- MAIN CONTENT -->
-  <main class="flex-1 p-5 lg:p-7 space-y-5 animate-fade-in">
-
-    <!-- Tab Bar -->
-    <div class="section-card px-5 py-3 flex items-center gap-2 flex-wrap">
-      <button class="tab-btn active" id="tabApprovalsContent" onclick="showTab('approvals')">
-        <i data-lucide="user-check" class="w-4 h-4"></i> Approvals
-      </button>
-      <button class="tab-btn" id="tabEmployeesContent" onclick="showTab('employees')">
-        <i data-lucide="users" class="w-4 h-4"></i> Employees
-      </button>
-      <button class="tab-btn" id="tabRequestsContent" onclick="showTab('requests')">
-        <i data-lucide="clipboard-list" class="w-4 h-4"></i> Daily Requests
-      </button>
-    </div>
-
-    <!-- ═══ PANE: APPROVALS ═══ -->
-    <!-- id="pane_approvals" PRESERVED -->
-    <div id="pane_approvals">
-      <div class="section-card">
-        <div class="flex items-center gap-3 px-6 py-4 border-b border-slate-100">
-          <div class="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center">
-            <i data-lucide="user-plus" class="w-4 h-4 text-amber-600"></i>
-          </div>
-          <div>
-            <h2 class="text-slate-800 font-700 text-sm">Pending Employee Registrations</h2>
-            <p class="text-slate-400 text-xs">New employees awaiting HOD approval</p>
-          </div>
-        </div>
-        <div class="p-6">
-          <!-- id="pendingBox" PRESERVED -->
-          <div id="pendingBox" class="text-center py-8 text-slate-400 text-sm">
-            <i data-lucide="loader-2" class="w-5 h-5 animate-spin inline mr-2"></i>Loading…
-          </div>
-        </div>
+        <label>Default ග්‍රාම</label>
+        <select id="eSub"></select>
       </div>
     </div>
 
-    <!-- ═══ PANE: EMPLOYEES ═══ -->
-    <!-- id="pane_employees" PRESERVED -->
-    <div id="pane_employees" class="hidden space-y-5">
-
-      <!-- Add Employee Form -->
-      <div class="section-card">
-        <div class="flex items-center gap-3 px-6 py-4 border-b border-slate-100">
-          <div class="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center">
-            <i data-lucide="user-plus" class="w-4 h-4 text-blue-600"></i>
-          </div>
-          <h2 class="text-slate-800 font-700 text-sm">Add Employee</h2>
-        </div>
-        <div class="p-6">
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            <div>
-              <label class="form-label">Full Name</label>
-              <!-- id="eName" PRESERVED -->
-              <input id="eName" placeholder="Saman Perera" class="form-input"/>
-            </div>
-            <div>
-              <label class="form-label">Employee No</label>
-              <!-- id="eNo" PRESERVED -->
-              <input id="eNo" placeholder="EMP001" class="form-input"/>
-            </div>
-            <div>
-              <label class="form-label">Default Route (පෙරනිමි රූට්)</label>
-              <!-- id="eRoute" PRESERVED -->
-              <select id="eRoute" class="form-input form-select"></select>
-            </div>
-            <div>
-              <label class="form-label">Default Village (ග්‍රාම)</label>
-              <!-- id="eSub" PRESERVED -->
-              <select id="eSub" class="form-input form-select"></select>
-            </div>
-            <div>
-              <label class="form-label">Email <span class="text-slate-400 font-400">(Optional)</span></label>
-              <!-- id="eEmail" PRESERVED -->
-              <input id="eEmail" type="email" placeholder="emp@company.lk" class="form-input"/>
-              <p class="text-slate-400 text-xs mt-1.5">Email + Password = instant active account (EMP role)</p>
-            </div>
-            <div>
-              <label class="form-label">Password <span class="text-slate-400 font-400">(Optional)</span></label>
-              <!-- id="ePass" PRESERVED -->
-              <input id="ePass" type="password" placeholder="min 6 chars" class="form-input"/>
-            </div>
-          </div>
-          <div class="flex gap-3 mt-5">
-            <button class="btn btn-amber" onclick="addEmployee()">
-              <i data-lucide="user-plus" class="w-4 h-4"></i> Add Employee
-            </button>
-            <button class="btn btn-ghost" onclick="loadEmployees()">
-              <i data-lucide="refresh-cw" class="w-4 h-4"></i> Refresh List
-            </button>
-          </div>
-        </div>
+    <div class="row">
+      <div>
+        <label>Email (Optional)</label>
+        <input id="eEmail" type="email" placeholder="emp@company.lk" />
+        <div class="small">Email + Password දුන්නොත් account එක එවෙලේම ACTIVE (EMP role) වේ.</div>
       </div>
-
-      <!-- Employee List -->
-      <div class="section-card">
-        <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100">
-          <div class="flex items-center gap-3">
-            <div class="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center">
-              <i data-lucide="users" class="w-4 h-4 text-slate-600"></i>
-            </div>
-            <h2 class="text-slate-800 font-700 text-sm">Employee Management</h2>
-          </div>
-          <div class="w-48">
-            <div class="relative">
-              <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 pointer-events-none"></i>
-              <!-- id="empSearch" PRESERVED -->
-              <input id="empSearch" placeholder="name or emp no…" oninput="renderEmployees()"
-                class="form-input pl-9 py-2 text-xs"/>
-            </div>
-          </div>
-        </div>
-        <div class="p-6">
-          <div class="table-wrap">
-            <!-- id="empList" PRESERVED — filled by JS -->
-            <div id="empList" class="text-center py-6 text-slate-400 text-sm">
-              <i data-lucide="loader-2" class="w-4 h-4 animate-spin inline mr-2"></i>Loading…
-            </div>
-          </div>
-        </div>
+      <div>
+        <label>Password (Optional)</label>
+        <input id="ePass" type="password" placeholder="min 6 chars" />
       </div>
     </div>
 
-    <!-- ═══ PANE: REQUESTS ═══ -->
-    <!-- id="pane_requests" PRESERVED -->
-    <div id="pane_requests" class="hidden space-y-5">
+    <div style="display:flex; gap:8px; flex-wrap:wrap;">
+      <button class="btn" onclick="addEmployee()">Add Employee</button>
+      <button class="btn ghost" onclick="loadEmployees()">Refresh</button>
+    </div>
 
-      <!-- Create Draft -->
-      <div class="section-card">
-        <div class="flex items-center gap-3 px-6 py-4 border-b border-slate-100">
-          <div class="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center">
-            <i data-lucide="plus-circle" class="w-4 h-4 text-amber-600"></i>
-          </div>
-          <h2 class="text-slate-800 font-700 text-sm">Create Daily Transport Request</h2>
-        </div>
-        <div class="p-6 space-y-4">
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div>
-              <label class="form-label">Date</label>
-              <!-- id="rDate" PRESERVED -->
-              <input id="rDate" placeholder="YYYY-MM-DD" class="form-input"/>
-            </div>
-            <div>
-              <label class="form-label">Time</label>
-              <!-- id="rTime" PRESERVED -->
-              <input id="rTime" placeholder="HH:MM" class="form-input"/>
-            </div>
-            <div class="sm:col-span-2">
-              <label class="form-label">Notes <span class="text-slate-400 font-400">(Optional)</span></label>
-              <!-- id="rNotes" PRESERVED -->
-              <textarea id="rNotes" rows="2" placeholder="Special OT / notes…" class="form-input"></textarea>
-            </div>
-          </div>
+    <div class="hr"></div>
 
-          <!-- Employee selector -->
-          <div class="border border-slate-200 rounded-xl overflow-hidden">
-            <div class="flex items-center justify-between px-4 py-3 bg-slate-50 border-b border-slate-200">
-              <div class="flex items-center gap-2">
-                <i data-lucide="users" class="w-4 h-4 text-slate-500"></i>
-                <span class="text-slate-700 font-600 text-sm">Select Employees &amp; Routes</span>
-              </div>
-              <div class="flex items-center gap-3">
-                <div class="relative">
-                  <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 pointer-events-none"></i>
-                  <!-- id="selSearch" PRESERVED -->
-                  <input id="selSearch" placeholder="filter employees…" oninput="renderSelectEmployees()"
-                    class="form-input pl-9 py-2 text-xs w-44"/>
-                </div>
-                <div>
-                  <label class="form-label text-slate-500 mb-0">Persist route changes</label>
-                  <!-- id="persistMode" PRESERVED -->
-                  <select id="persistMode" class="form-input form-select py-1.5 text-xs">
-                    <option value="NO">No (this request only)</option>
-                    <option value="YES">Yes (update employee defaults)</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-            <div class="overflow-x-auto p-2">
-              <!-- id="selectEmployeesBox" PRESERVED — filled by JS -->
-              <div id="selectEmployeesBox" class="text-center py-4 text-slate-400 text-sm">
-                <i data-lucide="loader-2" class="w-4 h-4 animate-spin inline mr-2"></i>Loading employees…
-              </div>
-            </div>
-          </div>
-
-          <div class="flex gap-3">
-            <button class="btn btn-amber" onclick="createDraft()">
-              <i data-lucide="file-plus" class="w-4 h-4"></i> Create Draft
-            </button>
-            <button class="btn btn-ghost" onclick="loadRequests()">
-              <i data-lucide="refresh-cw" class="w-4 h-4"></i> Refresh Requests
-            </button>
-          </div>
-        </div>
+    <div class="row">
+      <div>
+        <label>Search</label>
+        <input id="empSearch" placeholder="type name or emp no..." oninput="renderEmployees()" />
       </div>
+      <div></div>
+    </div>
 
-      <!-- Request List -->
-      <div class="section-card">
-        <div class="flex items-center gap-3 px-6 py-4 border-b border-slate-100">
-          <div class="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center">
-            <i data-lucide="list" class="w-4 h-4 text-slate-600"></i>
-          </div>
-          <h2 class="text-slate-800 font-700 text-sm">My Requests (latest 50)</h2>
-        </div>
-        <div class="p-6">
-          <div class="table-wrap">
-            <!-- id="reqList" PRESERVED -->
-            <div id="reqList" class="text-center py-6 text-slate-400 text-sm">
-              <i data-lucide="loader-2" class="w-4 h-4 animate-spin inline mr-2"></i>Loading…
-            </div>
-          </div>
-        </div>
+    <div id="empList"></div>
+  </div>
+
+  <!-- Requests -->
+  <div class="card" id="pane_requests" style="display:none;">
+    <h2 style="margin:0 0 10px;">Daily Requests</h2>
+
+    <div class="row">
+      <div>
+        <label>Date</label>
+        <input id="rDate" placeholder="YYYY-MM-DD" />
       </div>
-
-      <!-- id="reqEditor" PRESERVED — toggled by JS -->
-      <div id="reqEditor" class="hidden">
-        <div class="section-card border-2 border-amber-200">
-          <div class="flex items-center justify-between px-6 py-4 border-b border-amber-100 bg-amber-50">
-            <div class="flex items-center gap-3">
-              <div class="w-8 h-8 rounded-lg bg-amber-100 flex items-center justify-center">
-                <i data-lucide="file-edit" class="w-4 h-4 text-amber-700"></i>
-              </div>
-              <h3 class="text-slate-800 font-700 text-sm">
-                Request Editor —
-                <!-- id="editReqId" PRESERVED -->
-                <span id="editReqId" class="text-amber-700 font-800"></span>
-              </h3>
-            </div>
-            <button onclick="closeEditor()" class="btn btn-ghost btn-sm">
-              <i data-lucide="x" class="w-3.5 h-3.5"></i> Close
-            </button>
-          </div>
-          <div class="p-6 space-y-4">
-            <!-- id="reqMeta" PRESERVED -->
-            <div id="reqMeta" class="text-sm text-slate-600 bg-slate-50 rounded-xl px-4 py-3 border border-slate-200"></div>
-            <div class="table-wrap">
-              <!-- id="reqEmployeesBox" PRESERVED -->
-              <div id="reqEmployeesBox"></div>
-            </div>
-            <div class="flex gap-3 flex-wrap pt-2">
-              <button class="btn btn-amber" onclick="saveReqChanges()">
-                <i data-lucide="save" class="w-4 h-4"></i> Save Changes
-              </button>
-              <button class="btn btn-success" onclick="submitRequest()">
-                <i data-lucide="send" class="w-4 h-4"></i> Submit to Admin
-              </button>
-              <button class="btn btn-ghost" onclick="closeEditor()">
-                <i data-lucide="x" class="w-4 h-4"></i> Close
-              </button>
-            </div>
-            <p class="text-amber-600 text-xs flex items-center gap-1.5 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
-              <i data-lucide="alert-triangle" class="w-3.5 h-3.5 flex-shrink-0"></i>
-              Admin approve වුන පස්සේ request එක lock වෙනවා.
-            </p>
-          </div>
-        </div>
+      <div>
+        <label>Time</label>
+        <input id="rTime" placeholder="HH:MM" />
       </div>
+    </div>
+    <label>Notes (Optional)</label>
+    <textarea id="rNotes" rows="2" placeholder="Special OT / notes..."></textarea>
 
-    </div><!-- /pane_requests -->
+    <div class="row">
+      <div>
+        <label>Employee Search</label>
+        <input id="selSearch" placeholder="filter employees..." oninput="renderSelectEmployees()" />
+        <div class="small">Tick කරලා select කරලා route/sub route override කරන්න පුළුවන්.</div>
+      </div>
+      <div>
+        <label>Persist changes to Employee defaults?</label>
+        <select id="persistMode">
+          <option value="NO">No (only for this request)</option>
+          <option value="YES">Yes (update employee default route/sub too)</option>
+        </select>
+      </div>
+    </div>
 
-  </main>
+    <div id="selectEmployeesBox"></div>
+
+    <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:10px;">
+      <button class="btn" onclick="createDraft()">Create Draft</button>
+      <button class="btn ghost" onclick="loadRequests()">Refresh Requests</button>
+    </div>
+
+    <div class="hr"></div>
+
+    <h3 style="margin:0 0 10px;">My Requests (latest 50)</h3>
+    <div id="reqList" class="small">Loading...</div>
+
+    <div class="hr"></div>
+
+    <div id="reqEditor" style="display:none;">
+      <h3 style="margin:0 0 10px;">Request Editor: <span id="editReqId"></span></h3>
+      <div id="reqMeta" class="small"></div>
+      <div class="hr"></div>
+      <div id="reqEmployeesBox"></div>
+
+      <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:10px;">
+        <button class="btn" onclick="saveReqChanges()">Save Changes</button>
+        <button class="btn secondary" onclick="submitRequest()">Submit to Admin</button>
+        <button class="btn ghost" onclick="closeEditor()">Close</button>
+      </div>
+      <p class="small">⚠ Admin approve වුන පස්සේ request එක lock වෙනවා.</p>
+    </div>
+
+  </div>
 </div>
 
-<!-- ═══ ALL ORIGINAL SCRIPTS — PRESERVED EXACTLY ═══ -->
 <script>
 let ME = null;
 let EMP = [];
 let REQS = [];
 let CURRENT_REQ_ID = null;
-let PENDING_CHANGES = new Map();
+let PENDING_CHANGES = new Map(); // key employee_id -> {effective_route_id, effective_sub_route_id, remove, persist_to_employee}
 
-/* ── Sidebar ─────────────────────────────── */
-function openSidebar(){
-  document.getElementById('sidebar').classList.add('open');
-  document.getElementById('sidebarOverlay').classList.add('active');
-}
-function closeSidebar(){
-  document.getElementById('sidebar').classList.remove('open');
-  document.getElementById('sidebarOverlay').classList.remove('active');
-}
-function updateClock(){
-  const el = document.getElementById('liveClock');
-  if(el) el.textContent = new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
-}
-setInterval(updateClock, 1000); updateClock();
-
-/* ── Tab — ORIGINAL (showTab + setTab alias) ─ */
 function setTab(active){
   const tabs = ["approvals","employees","requests"];
   for(const t of tabs){
-    const pane = document.getElementById("pane_"+t);
-    if(pane) pane.classList.toggle("hidden", t !== active);
-    const sBtn = document.getElementById("tab"+t.charAt(0).toUpperCase()+t.slice(1));
-    if(sBtn) sBtn.classList.toggle("active", t === active);
-    const cBtn = document.getElementById("tab"+t.charAt(0).toUpperCase()+t.slice(1)+"Content");
-    if(cBtn) cBtn.classList.toggle("active", t === active);
+    qs("pane_"+t).style.display = (t===active) ? "" : "none";
+    qs("tab"+t.charAt(0).toUpperCase()+t.slice(1)).classList.toggle("active", t===active);
   }
 }
+
 function showTab(t){ setTab(t); }
 
-/* ── initLookups — ORIGINAL ──────────────── */
 async function initLookups(){
   const tree = await loadRouteTree(true);
-  // Employee add route selects — ids eRoute, eSub PRESERVED
-  document.getElementById("eRoute").innerHTML = optionHTML(tree.routes.map(r=>({id:r.id, label:`${r.route_no} - ${r.route_name}`})),"id","label","",true,"-- Select Route --");
-  document.getElementById("eRoute").addEventListener("change", ()=>{
-    const rid = document.getElementById("eRoute").value;
+  // Employee add route selects
+  qs("eRoute").innerHTML = optionHTML(tree.routes.map(r=>({id:r.id, label:`${r.route_no} - ${r.route_name}`})),"id","label","",true,"-- Select Route --");
+  qs("eRoute").addEventListener("change", ()=>{
+    const rid = qs("eRoute").value;
     const subs = subRoutesFor(rid).map(s=>({id:s.id, label:s.sub_name}));
-    document.getElementById("eSub").innerHTML = optionHTML(subs,"id","label","",true,"-- Select ග්‍රාම --");
+    qs("eSub").innerHTML = optionHTML(subs,"id","label","",true,"-- Select ග්‍රාම --");
   });
-  document.getElementById("eSub").innerHTML = optionHTML([],"id","label","",true,"-- Select ග්‍රාම --");
+  qs("eSub").innerHTML = optionHTML([],"id","label","",true,"-- Select ග්‍රාම --");
 }
 
 function routeLabel(route_id){
@@ -451,57 +193,32 @@ function subLabel(sub_id){
   return s ? s.sub_name : "";
 }
 
-/* ── guard — ORIGINAL ────────────────────── */
 async function guard(){
   ME = await guardRole("HOD");
   if(!ME) return;
-  const meBox = document.getElementById("meBox");
-  if(meBox){
-    meBox.innerHTML = `
-      <div class="w-8 h-8 rounded-full bg-amber-500/30 flex items-center justify-center flex-shrink-0">
-        <i data-lucide="user" class="w-4 h-4 text-amber-300"></i>
-      </div>
-      <div>
-        <div class="text-slate-200 text-xs font-600">${ME.email||'HOD'}</div>
-        <div class="text-slate-400 text-xs">Dept: ${ME.department_id||'—'}</div>
-      </div>`;
-    lucide.createIcons();
-  }
-  // Default date — ORIGINAL
+  qs("meBox").innerHTML = `<b>${ME.role}</b> | ${ME.email} | Dept ID: ${ME.department_id}`;
+  // defaults
   const today = new Date();
   const yyyy = today.getFullYear();
   const mm = String(today.getMonth()+1).padStart(2,"0");
   const dd = String(today.getDate()).padStart(2,"0");
-  document.getElementById("rDate").value = `${yyyy}-${mm}-${dd}`;
+  qs("rDate").value = `${yyyy}-${mm}-${dd}`;
 }
 
-/* ── loadPending — ORIGINAL ──────────────── */
 async function loadPending(){
   const d = await api("/hod/registrations/pending");
-  if(d.pending.length===0){
-    document.getElementById("pendingBox").innerHTML = `
-      <div class="flex flex-col items-center py-10 text-slate-400">
-        <i data-lucide="check-circle" class="w-8 h-8 mb-2 text-emerald-400"></i>
-        <span class="text-sm font-500">No pending registrations</span>
-      </div>`;
-    lucide.createIcons();
-    return;
-  }
-  let html = `<div class="table-wrap"><table class="data-table">
-    <thead><tr><th>ID</th><th>Email</th><th>Applied</th><th>Action</th></tr></thead><tbody>`;
+  if(d.pending.length===0){ qs("pendingBox").innerHTML = "<span class='badge good'>No pending</span>"; return; }
+  let html = "<table><tr><th>ID</th><th>Email</th><th>Created</th><th>Action</th></tr>";
   for(const p of d.pending){
     html += `<tr>
-      <td><strong>#${p.id}</strong></td>
+      <td>${p.id}</td>
       <td>${p.email}</td>
       <td>${(p.created_at||"").toString().slice(0,19).replace("T"," ")}</td>
-      <td><button class='btn btn-success btn-sm' onclick='approveReg(${p.id})'>
-        <i data-lucide="check" class="w-3 h-3"></i> Approve
-      </button></td>
+      <td><button class='btn small' onclick='approveReg(${p.id})'>Approve</button></td>
     </tr>`;
   }
-  html += "</tbody></table></div>";
-  document.getElementById("pendingBox").innerHTML = html;
-  lucide.createIcons();
+  html += "</table>";
+  qs("pendingBox").innerHTML = html;
 }
 
 async function approveReg(id){
@@ -512,7 +229,6 @@ async function approveReg(id){
   }catch(e){ toast(e.message); }
 }
 
-/* ── loadEmployees — ORIGINAL ────────────── */
 async function loadEmployees(){
   const d = await api("/hod/employees");
   EMP = d.employees || [];
@@ -520,13 +236,10 @@ async function loadEmployees(){
   renderSelectEmployees();
 }
 
-/* ── renderEmployees — ORIGINAL ──────────── */
 function renderEmployees(){
-  const q = (document.getElementById("empSearch").value||"").toLowerCase();
+  const q = (qs("empSearch").value||"").toLowerCase();
   const list = EMP.filter(e => (e.full_name||"").toLowerCase().includes(q) || (e.emp_no||"").toLowerCase().includes(q));
-  let html = `<table>
-    <thead><tr><th>Name</th><th>Emp No</th><th>Default Route</th><th>Default Village</th><th>Active</th><th>Action</th></tr></thead>
-    <tbody>`;
+  let html = "<table><tr><th>Name</th><th>Emp No</th><th>පෙරනිමි රූට්</th><th>පෙරනිමි ග්‍රාම</th><th>Active</th><th>Action</th></tr>";
   for(const e of list){
     const routeOptions = optionHTML(
       ROUTE_TREE.routes.map(r=>({id:r.id, label:`${r.route_no} - ${r.route_name}`})),
@@ -534,41 +247,45 @@ function renderEmployees(){
     );
     const subs = subRoutesFor(e.default_route_id || "").map(s=>({id:s.id, label:s.sub_name}));
     const subOptions = optionHTML(subs, "id","label", e.default_sub_route_id || "", true, "--");
-    // dynamic IDs er_, es_, ea_ PRESERVED
     html += `<tr>
-      <td class="font-500">${e.full_name}</td>
+      <td>${e.full_name}</td>
       <td>${e.emp_no}</td>
-      <td><select id="er_${e.id}" onchange="onEmpRouteChange(${e.id})">${routeOptions}</select></td>
-      <td><select id="es_${e.id}">${subOptions}</select></td>
-      <td><select id="ea_${e.id}">
-        <option value="true" ${e.is_active ? "selected":""}>Active</option>
-        <option value="false" ${!e.is_active ? "selected":""}>Inactive</option>
-      </select></td>
-      <td><button class="btn btn-ghost btn-sm" onclick="saveEmployee(${e.id})">
-        <i data-lucide="save" class="w-3 h-3"></i> Save
-      </button></td>
+      <td>
+        <select id="er_${e.id}" onchange="onEmpRouteChange(${e.id})">${routeOptions}</select>
+      </td>
+      <td>
+        <select id="es_${e.id}">${subOptions}</select>
+      </td>
+      <td>
+        <select id="ea_${e.id}">
+          <option value="true" ${e.is_active ? "selected":""}>Yes</option>
+          <option value="false" ${!e.is_active ? "selected":""}>No</option>
+        </select>
+      </td>
+      <td>
+        <button class="btn small" onclick="saveEmployee(${e.id})">Save</button>
+      </td>
     </tr>`;
   }
-  html += "</tbody></table>";
-  document.getElementById("empList").innerHTML = html;
-  lucide.createIcons();
+  html += "</table>";
+  qs("empList").innerHTML = html;
 }
 
 function onEmpRouteChange(empId){
-  const rid = document.getElementById("er_"+empId).value;
+  const rid = qs("er_"+empId).value;
   const subs = subRoutesFor(rid).map(s=>({id:s.id, label:s.sub_name}));
-  document.getElementById("es_"+empId).innerHTML = optionHTML(subs, "id","label","", true, "--");
+  qs("es_"+empId).innerHTML = optionHTML(subs, "id","label","", true, "--");
 }
 
 async function saveEmployee(empId){
   try{
     const body = {
-      default_route_id: document.getElementById("er_"+empId).value ? parseInt(document.getElementById("er_"+empId).value,10) : null,
-      default_sub_route_id: document.getElementById("es_"+empId).value ? parseInt(document.getElementById("es_"+empId).value,10) : null,
-      is_active: document.getElementById("ea_"+empId).value === "true"
+      default_route_id: qs("er_"+empId).value ? parseInt(qs("er_"+empId).value,10) : null,
+      default_sub_route_id: qs("es_"+empId).value ? parseInt(qs("es_"+empId).value,10) : null,
+      is_active: qs("ea_"+empId).value === "true"
     };
     await api(`/hod/employees/${empId}`, {method:"PATCH", body: JSON.stringify(body)});
-    toast("✅ Saved");
+    toast("Saved");
     await loadEmployees();
   }catch(e){ toast(e.message); }
 }
@@ -576,34 +293,27 @@ async function saveEmployee(empId){
 async function addEmployee(){
   try{
     const body = {
-      full_name: document.getElementById("eName").value.trim(),
-      emp_no: document.getElementById("eNo").value.trim(),
-      default_route_id: document.getElementById("eRoute").value ? parseInt(document.getElementById("eRoute").value,10) : null,
-      default_sub_route_id: document.getElementById("eSub").value ? parseInt(document.getElementById("eSub").value,10) : null
+      full_name: qs("eName").value.trim(),
+      emp_no: qs("eNo").value.trim(),
+      default_route_id: qs("eRoute").value ? parseInt(qs("eRoute").value,10) : null,
+      default_sub_route_id: qs("eSub").value ? parseInt(qs("eSub").value,10) : null
     };
-    const email = document.getElementById("eEmail").value.trim();
-    const pass  = document.getElementById("ePass").value;
+    const email = qs("eEmail").value.trim();
+    const pass = qs("ePass").value;
     if(email && pass){ body.email=email; body.password=pass; }
+
     await api("/hod/employees", {method:"POST", body: JSON.stringify(body)});
-    document.getElementById("eName").value="";
-    document.getElementById("eNo").value="";
-    document.getElementById("eEmail").value="";
-    document.getElementById("ePass").value="";
-    document.getElementById("eRoute").value="";
-    document.getElementById("eSub").innerHTML = optionHTML([], "id","label","", true, "-- Select ග්‍රාම --");
-    toast("✅ Employee added");
+    qs("eName").value=""; qs("eNo").value=""; qs("eEmail").value=""; qs("ePass").value="";
+    qs("eRoute").value=""; qs("eSub").innerHTML = optionHTML([], "id","label","", true, "-- Select ග්‍රාම --");
+    toast("Employee added");
     await loadEmployees();
   }catch(e){ toast(e.message); }
 }
 
-/* ── renderSelectEmployees — ORIGINAL ───────
-   Dynamic IDs: chk_, sr_, ss_ PRESERVED */
 function renderSelectEmployees(){
-  const q = (document.getElementById("selSearch").value||"").toLowerCase();
+  const q = (qs("selSearch").value||"").toLowerCase();
   const list = EMP.filter(e => e.is_active).filter(e => (e.full_name||"").toLowerCase().includes(q) || (e.emp_no||"").toLowerCase().includes(q));
-  let html = `<table>
-    <thead><tr><th style="width:36px;"></th><th>Name</th><th>Emp No</th><th>Route</th><th>Village</th></tr></thead>
-    <tbody>`;
+  let html = "<table><tr><th></th><th>Name</th><th>Emp No</th><th>රූට්</th><th>ග්‍රාම</th></tr>";
   for(const e of list){
     const routeOptions = optionHTML(
       ROUTE_TREE.routes.map(r=>({id:r.id, label:`${r.route_no} - ${r.route_name}`})),
@@ -611,24 +321,22 @@ function renderSelectEmployees(){
     );
     const subs = subRoutesFor(e.default_route_id || "").map(s=>({id:s.id, label:s.sub_name}));
     const subOptions = optionHTML(subs, "id","label", e.default_sub_route_id || "", true, "--");
-    // dynamic IDs chk_, sr_, ss_ PRESERVED
     html += `<tr>
-      <td><input type="checkbox" id="chk_${e.id}" style="accent-color:#f59e0b; width:15px; height:15px;"></td>
-      <td class="font-500">${e.full_name}</td>
+      <td><input type="checkbox" id="chk_${e.id}"></td>
+      <td>${e.full_name}</td>
       <td>${e.emp_no}</td>
       <td><select id="sr_${e.id}" onchange="onSelRouteChange(${e.id})">${routeOptions}</select></td>
       <td><select id="ss_${e.id}">${subOptions}</select></td>
     </tr>`;
   }
-  html += "</tbody></table>";
-  document.getElementById("selectEmployeesBox").innerHTML = html;
-  lucide.createIcons();
+  html += "</table>";
+  qs("selectEmployeesBox").innerHTML = html;
 }
 
 function onSelRouteChange(empId){
-  const rid = document.getElementById("sr_"+empId).value;
+  const rid = qs("sr_"+empId).value;
   const subs = subRoutesFor(rid).map(s=>({id:s.id, label:s.sub_name}));
-  document.getElementById("ss_"+empId).innerHTML = optionHTML(subs, "id","label","", true, "--");
+  qs("ss_"+empId).innerHTML = optionHTML(subs, "id","label","", true, "--");
 }
 
 function selectedEmployeesWithOverrides(){
@@ -636,28 +344,29 @@ function selectedEmployeesWithOverrides(){
   for(const e of EMP){
     const chk = document.getElementById("chk_"+e.id);
     if(chk && chk.checked){
-      const route_id = document.getElementById("sr_"+e.id).value ? parseInt(document.getElementById("sr_"+e.id).value,10) : null;
-      const sub_id   = document.getElementById("ss_"+e.id).value ? parseInt(document.getElementById("ss_"+e.id).value,10) : null;
+      const route_id = qs("sr_"+e.id).value ? parseInt(qs("sr_"+e.id).value,10) : null;
+      const sub_id = qs("ss_"+e.id).value ? parseInt(qs("ss_"+e.id).value,10) : null;
       picked.push({ employee_id: e.id, route_id, sub_id });
     }
   }
   return picked;
 }
 
-/* ── createDraft — ORIGINAL ──────────────── */
 async function createDraft(){
   try{
     const picked = selectedEmployeesWithOverrides();
     if(picked.length===0) throw new Error("Select employees first");
     const body = {
-      request_date: document.getElementById("rDate").value.trim(),
-      request_time: document.getElementById("rTime").value.trim(),
-      notes: document.getElementById("rNotes").value.trim(),
+      request_date: qs("rDate").value.trim(),
+      request_time: qs("rTime").value.trim(),
+      notes: qs("rNotes").value.trim(),
       employee_ids: picked.map(x=>x.employee_id)
     };
     const r = await api("/hod/requests", {method:"POST", body: JSON.stringify(body)});
     const reqId = r.request.id;
-    const persist = document.getElementById("persistMode").value === "YES";
+
+    // Apply overrides (if any different) + optional persist
+    const persist = qs("persistMode").value === "YES";
     const changes = [];
     for(const p of picked){
       changes.push({
@@ -668,14 +377,14 @@ async function createDraft(){
       });
     }
     await api(`/hod/requests/${reqId}/employees`, {method:"PATCH", body: JSON.stringify({changes})});
-    toast("✅ Draft created: " + reqId);
+
+    toast("Draft created: " + reqId);
     await loadRequests();
     await openEditor(reqId);
     setTab("requests");
   }catch(e){ toast(e.message); }
 }
 
-/* ── loadRequests — ORIGINAL ─────────────── */
 async function loadRequests(){
   const d = await api("/hod/requests");
   REQS = d.requests || [];
@@ -683,78 +392,52 @@ async function loadRequests(){
 }
 
 function renderRequests(){
-  if(REQS.length===0){
-    document.getElementById("reqList").innerHTML = `
-      <div class="flex items-center justify-center py-8 gap-2 text-slate-400 text-sm">
-        <i data-lucide="inbox" class="w-5 h-5"></i> No requests yet
-      </div>`;
-    lucide.createIcons();
-    return;
-  }
-  let html = `<table class="data-table">
-    <thead><tr><th>ID</th><th>Date</th><th>Time</th><th>Status</th><th>Action</th></tr></thead>
-    <tbody>`;
+  if(REQS.length===0){ qs("reqList").innerHTML = "<span class='badge warn'>No requests</span>"; return; }
+  let html = "<table><tr><th>ID</th><th>Date</th><th>Time</th><th>Status</th><th>Action</th></tr>";
   for(const r of REQS){
     html += `<tr>
-      <td><strong>#${r.id}</strong></td>
+      <td>${r.id}</td>
       <td>${fmtDate(r.request_date)}</td>
       <td>${fmtTime(r.request_time)}</td>
       <td>${statusBadge(r.status)}</td>
-      <td><button class="btn btn-ghost btn-sm" onclick="openEditor(${r.id})">
-        <i data-lucide="pencil" class="w-3 h-3"></i> View / Edit
-      </button></td>
+      <td>
+        <button class="btn small" onclick="openEditor(${r.id})">View / Edit</button>
+      </td>
     </tr>`;
   }
-  html += "</tbody></table>";
-  document.getElementById("reqList").innerHTML = html;
-  lucide.createIcons();
+  html += "</table>";
+  qs("reqList").innerHTML = html;
 }
 
-/* ── openEditor — ORIGINAL ───────────────── */
 async function openEditor(id){
   try{
     CURRENT_REQ_ID = id;
     PENDING_CHANGES = new Map();
-    document.getElementById("reqEditor").classList.remove("hidden");
-    document.getElementById("editReqId").textContent = id;
-    document.getElementById("reqMeta").innerHTML = `<span class="text-slate-400 text-sm">Loading request details…</span>`;
-    document.getElementById("reqEmployeesBox").innerHTML = `<div class="text-center py-4 text-slate-400 text-sm"><i data-lucide="loader-2" class="w-4 h-4 animate-spin inline"></i></div>`;
-    lucide.createIcons();
-    try{ document.getElementById("reqEditor").scrollIntoView({behavior:"smooth", block:"start"}); }catch(_e){}
+    // Show editor immediately to avoid mobile UI feeling "stuck"
+    qs("reqEditor").style.display = "";
+    qs("editReqId").textContent = id;
+    qs("reqMeta").innerHTML = `<span class="small">Loading request details...</span>`;
+    qs("reqEmployeesBox").innerHTML = `<div class="small">Loading...</div>`;
+    try{ qs("reqEditor").scrollIntoView({behavior:"smooth", block:"start"}); }catch(_e){}
 
     const d = await api(`/hod/requests/${id}`);
-    document.getElementById("reqMeta").innerHTML =
-      `<div class="flex flex-wrap gap-4 text-sm">
-        <span><strong class="text-slate-700">Date:</strong> ${fmtDate(d.request.request_date)}</span>
-        <span><strong class="text-slate-700">Time:</strong> ${fmtTime(d.request.request_time)}</span>
-        <span><strong class="text-slate-700">Status:</strong> ${statusBadge(d.request.status)}</span>
-      </div>`;
+    qs("reqMeta").innerHTML = `Date: <b>${fmtDate(d.request.request_date)}</b> | Time: <b>${fmtTime(d.request.request_time)}</b> | Status: ${statusBadge(d.request.status)}`;
 
     if(!["DRAFT","SUBMITTED"].includes(d.request.status)){
-      document.getElementById("reqEmployeesBox").innerHTML =
-        `<div class="text-amber-600 text-sm mb-3 px-3 py-2 bg-amber-50 border border-amber-200 rounded-lg">
-          <i data-lucide="lock" class="w-3.5 h-3.5 inline mr-1"></i>
-          Request is locked (Admin approved or later). View only.
-        </div>` + renderReqEmployeesTable(d.employees, true);
-      lucide.createIcons();
+      qs("reqEmployeesBox").innerHTML = "<div class='small'>Request is locked (Admin approved or later). View only.</div>" + renderReqEmployeesTable(d.employees, true);
       return;
     }
-    document.getElementById("reqEmployeesBox").innerHTML = renderReqEmployeesTable(d.employees, false);
-    lucide.createIcons();
+
+    qs("reqEmployeesBox").innerHTML = renderReqEmployeesTable(d.employees, false);
   }catch(e){
     toast(e.message);
-    document.getElementById("reqMeta").innerHTML = `<span class="text-slate-400 text-sm">Failed to load request.</span>`;
-    document.getElementById("reqEmployeesBox").innerHTML = "";
+    qs("reqMeta").innerHTML = `<span class="small">Failed to load request.</span>`;
+    qs("reqEmployeesBox").innerHTML = "";
   }
 }
 
-/* ── renderReqEmployeesTable — ORIGINAL ─────
-   Dynamic IDs: rr_, rs_, rm_, rp_ PRESERVED */
 function renderReqEmployeesTable(items, readonly){
-  let html = `<table>
-    <thead><tr>
-      <th>Name</th><th>Emp No</th><th>Route</th><th>Village</th><th>Remove</th><th>Persist</th>
-    </tr></thead><tbody>`;
+  let html = "<table><tr><th>Name</th><th>Emp No</th><th>තෝරාගත් රූට්</th><th>තෝරාගත් ග්‍රාම</th><th>Remove</th><th>Persist</th></tr>";
   for(const it of items){
     const routeOptions = optionHTML(
       ROUTE_TREE.routes.map(r=>({id:r.id, label:`${r.route_no} - ${r.route_name}`})),
@@ -763,27 +446,28 @@ function renderReqEmployeesTable(items, readonly){
     const subs = subRoutesFor(it.effective_route_id || "").map(s=>({id:s.id, label:s.sub_name}));
     const subOptions = optionHTML(subs, "id","label", it.effective_sub_route_id || "", true, "--");
     html += `<tr>
-      <td class="font-500">${it.full_name}</td>
+      <td>${it.full_name}</td>
       <td>${it.emp_no}</td>
-      <td>${readonly ? (routeLabel(it.effective_route_id)||"—") : `<select id="rr_${it.employee_id}" onchange="onReqRouteChange(${it.employee_id})">${routeOptions}</select>`}</td>
-      <td>${readonly ? (subLabel(it.effective_sub_route_id)||"—") : `<select id="rs_${it.employee_id}">${subOptions}</select>`}</td>
-      <td>${readonly ? "" : `<input type="checkbox" id="rm_${it.employee_id}" onchange="markRemove(${it.employee_id})" style="accent-color:#dc2626;">`}</td>
-      <td>${readonly ? "" : `<input type="checkbox" id="rp_${it.employee_id}" style="accent-color:#f59e0b;">`}</td>
+      <td>${readonly ? (routeLabel(it.effective_route_id)||"") : `<select id="rr_${it.employee_id}" onchange="onReqRouteChange(${it.employee_id})">${routeOptions}</select>`}</td>
+      <td>${readonly ? (subLabel(it.effective_sub_route_id)||"") : `<select id="rs_${it.employee_id}">${subOptions}</select>`}</td>
+      <td>${readonly ? "" : `<input type="checkbox" id="rm_${it.employee_id}" onchange="markRemove(${it.employee_id})">`}</td>
+      <td>${readonly ? "" : `<input type="checkbox" id="rp_${it.employee_id}">`}</td>
     </tr>`;
   }
-  html += "</tbody></table>";
+  html += "</table>";
   return html;
 }
 
 function onReqRouteChange(empId){
-  const rid = document.getElementById("rr_"+empId).value;
+  const rid = qs("rr_"+empId).value;
   const subs = subRoutesFor(rid).map(s=>({id:s.id, label:s.sub_name}));
-  document.getElementById("rs_"+empId).innerHTML = optionHTML(subs, "id","label","", true, "--");
+  qs("rs_"+empId).innerHTML = optionHTML(subs, "id","label","", true, "--");
 }
 
-function markRemove(empId){}  // ORIGINAL — just visual; saved in saveReqChanges()
+function markRemove(empId){
+  // just visual; saved in saveReqChanges()
+}
 
-/* ── saveReqChanges — ORIGINAL ───────────── */
 async function saveReqChanges(){
   try{
     if(!CURRENT_REQ_ID) return;
@@ -791,39 +475,44 @@ async function saveReqChanges(){
     if(!["DRAFT","SUBMITTED"].includes(d.request.status)) throw new Error("Request locked");
     const changes = [];
     for(const it of d.employees){
-      const remove = document.getElementById("rm_"+it.employee_id)?.checked || false;
-      if(remove){ changes.push({ employee_id: it.employee_id, remove: true }); continue; }
-      const route_id = document.getElementById("rr_"+it.employee_id).value ? parseInt(document.getElementById("rr_"+it.employee_id).value,10) : null;
-      const sub_id   = document.getElementById("rs_"+it.employee_id).value ? parseInt(document.getElementById("rs_"+it.employee_id).value,10) : null;
-      const persist  = document.getElementById("rp_"+it.employee_id).checked || false;
-      changes.push({ employee_id: it.employee_id, effective_route_id: route_id, effective_sub_route_id: sub_id, persist_to_employee: persist });
+      const remove = qs("rm_"+it.employee_id)?.checked || false;
+      if(remove){
+        changes.push({ employee_id: it.employee_id, remove: true });
+        continue;
+      }
+      const route_id = qs("rr_"+it.employee_id).value ? parseInt(qs("rr_"+it.employee_id).value,10) : null;
+      const sub_id = qs("rs_"+it.employee_id).value ? parseInt(qs("rs_"+it.employee_id).value,10) : null;
+      const persist = qs("rp_"+it.employee_id).checked || false;
+      changes.push({
+        employee_id: it.employee_id,
+        effective_route_id: route_id,
+        effective_sub_route_id: sub_id,
+        persist_to_employee: persist
+      });
     }
     await api(`/hod/requests/${CURRENT_REQ_ID}/employees`, {method:"PATCH", body: JSON.stringify({changes})});
-    toast("✅ Saved");
+    toast("Saved");
     await openEditor(CURRENT_REQ_ID);
-    await loadEmployees();
+    await loadEmployees(); // if persisted
   }catch(e){ toast(e.message); }
 }
 
-/* ── submitRequest — ORIGINAL ────────────── */
 async function submitRequest(){
   try{
     if(!CURRENT_REQ_ID) return;
     await api(`/hod/requests/${CURRENT_REQ_ID}/submit`, {method:"POST"});
-    toast("✅ Submitted to Admin");
+    toast("Submitted to Admin");
     await loadRequests();
     await openEditor(CURRENT_REQ_ID);
   }catch(e){ toast(e.message); }
 }
 
 function closeEditor(){
-  document.getElementById("reqEditor").classList.add("hidden");
+  qs("reqEditor").style.display = "none";
   CURRENT_REQ_ID = null;
 }
 
-/* ── Init — ORIGINAL ─────────────────────── */
 (async function init(){
-  lucide.createIcons();
   try{
     await guard();
     await initLookups();
